@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:nkrs_app/constrants/colors.dart';
 
 class FrontPage extends StatelessWidget {
   const FrontPage({super.key});
@@ -6,17 +7,18 @@ class FrontPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Image.asset("..\\..\\Assets\\0d17532a-6d28-47fc-ace8-1e878859b3fb.png",
-        width: 100,
-        fit: BoxFit.cover,
-        
+        Image.asset(
+          "Assets/logo.png",
+          width: 250,
+          fit:BoxFit.fill,
         ),
         SizedBox(height: 20,),
-        Center(
-          child: Text("N.K.R.S.Lanka Capital",
+         Text("N.K.R.S\nLanka Capital",textAlign: TextAlign.center,style: TextStyle(fontSize: 35,color: kMainColor,decoration:TextDecoration.none,
+              fontWeight: FontWeight.bold,fontFamily: 'MyCustomFont'),
          ),
-        )
+
       ],
     );
   }

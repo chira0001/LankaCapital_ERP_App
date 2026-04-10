@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:nkrs_app/Screens/OnBording/front_page.dart';
+
+
+import 'Screens/onbordingScreen.dart';
 
 
 void main() {
@@ -16,7 +18,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         fontFamily: "Inter",
       ),
-      home:FrontPage(),
+      home: Onbordingscreen(),
     );
   }
 }
