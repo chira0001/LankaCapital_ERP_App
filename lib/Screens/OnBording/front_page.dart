@@ -9,16 +9,19 @@ class FrontPage extends StatelessWidget {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Image.asset(
-          "Assets/logo.png",
-          width: 250,
-          fit:BoxFit.fill,
+        Image.asset("Assets/logo.png", width: 250, fit: BoxFit.fill),
+        SizedBox(height: 20),
+        Text(
+          "N.K.R.S\nLANKA CAPITAL",
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontSize: 35,
+            color: kMainColor,
+            decoration: TextDecoration.none,
+            fontWeight: FontWeight.w800,
+            fontFamily: 'MyCustomFont',
+          ),
         ),
-        SizedBox(height: 20,),
-         Text("N.K.R.S\nLanka Capital",textAlign: TextAlign.center,style: TextStyle(fontSize: 35,color: kMainColor,decoration:TextDecoration.none,
-              fontWeight: FontWeight.bold,fontFamily: 'MyCustomFont'),
-         ),
-
       ],
     );
   }
