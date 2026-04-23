@@ -15,8 +15,8 @@ class MyApp extends StatelessWidget {
       title: "NKRS App",
       debugShowCheckedModeBanner: false,
       theme: ThemeData(fontFamily: "Inter"),
-      // home:  Onbordingscreen(),
-        home:  LoanRequestSection(),
+      home: Onbordingscreen(),
+      // home:  LoanRequestSection(),
       // HomePage()
     );
   }
