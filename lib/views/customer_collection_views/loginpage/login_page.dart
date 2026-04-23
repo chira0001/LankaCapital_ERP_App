@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:nkrs_app/views/customer_collection_views/customerCollectionpage/customer_collection_home.dart';
 import 'package:nkrs_app/views/customer_collection_views/loginpage/register_page.dart';
 
 class LoginPage extends StatefulWidget {
@@ -154,7 +155,14 @@ class _LoginPageState extends State<LoginPage> {
                   width: double.infinity,
                   height: 50,
                   child: ElevatedButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const CustomerCollectionHome(),
+                        ),
+                      );
+                    },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color.fromARGB(255, 0, 140, 255),
                       shape: RoundedRectangleBorder(

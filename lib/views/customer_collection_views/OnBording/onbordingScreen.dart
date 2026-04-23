@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:nkrs_app/utility/colors.dart';
-import 'package:nkrs_app/utility/cusomButton.dart';
+import 'package:nkrs_app/views/customer_collection_views/utility/cusomButton.dart';
 import 'package:nkrs_app/views/customer_collection_views/OnBording/front_page.dart';
 import 'package:nkrs_app/views/customer_collection_views/OnBording/onbording_data.dart';
 import 'package:nkrs_app/views/customer_collection_views/OnBording/shered_onbording.dart';
@@ -37,27 +37,27 @@ class _OnbordingscreenState extends State<Onbordingscreen> {
                   children: [
                     FrontPage(),
                     SheredOnbording(
-                      title: OnbordingData.onbording_data_list[0].title,
+                      title: OnboardingData.onboarding_data_list[0].title,
                       imageParth:
-                          OnbordingData.onbording_data_list[0].imageParth,
+                          OnboardingData.onboarding_data_list[0].imagePath,
                       description:
-                          OnbordingData.onbording_data_list[0].description,
+                          OnboardingData.onboarding_data_list[0].description,
                     ),
 
                     SheredOnbording(
-                      title: OnbordingData.onbording_data_list[1].title,
+                      title: OnboardingData.onboarding_data_list[1].title,
                       imageParth:
-                          OnbordingData.onbording_data_list[1].imageParth,
+                          OnboardingData.onboarding_data_list[1].imagePath,
                       description:
-                          OnbordingData.onbording_data_list[1].description,
+                          OnboardingData.onboarding_data_list[1].description,
                     ),
 
                     SheredOnbording(
-                      title: OnbordingData.onbording_data_list[2].title,
+                      title: OnboardingData.onboarding_data_list[2].title,
                       imageParth:
-                          OnbordingData.onbording_data_list[2].imageParth,
+                          OnboardingData.onboarding_data_list[2].imagePath,
                       description:
-                          OnbordingData.onbording_data_list[2].description,
+                          OnboardingData.onboarding_data_list[2].description,
                     ),
                   ],
                 ),
