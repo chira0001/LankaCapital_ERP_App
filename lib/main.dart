@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-
-
-import 'Screens/onbordingScreen.dart';
+import 'package:nkrs_app/views/customer_collection_views/OnBording/onbordingScreen.dart';
 
 
 void main() {

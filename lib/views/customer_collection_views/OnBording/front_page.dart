@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:nkrs_app/constrants/colors.dart';
+import 'package:nkrs_app/utility/colors.dart';
 
 class FrontPage extends StatelessWidget {
   const FrontPage({super.key});

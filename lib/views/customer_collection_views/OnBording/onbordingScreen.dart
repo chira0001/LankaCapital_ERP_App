@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:nkrs_app/Data/onbording_data.dart';
-import 'package:nkrs_app/Screens/OnBording/front_page.dart';
-import 'package:nkrs_app/Screens/OnBording/shered_onbording.dart';
-import 'package:nkrs_app/Screens/loginpage/login_page.dart';
-import 'package:nkrs_app/constrants/colors.dart';
-import 'package:nkrs_app/widgets/CusomButton.dart';
+import 'package:nkrs_app/utility/colors.dart';
+import 'package:nkrs_app/utility/cusomButton.dart';
+import 'package:nkrs_app/views/customer_collection_views/OnBording/front_page.dart';
+import 'package:nkrs_app/views/customer_collection_views/OnBording/onbording_data.dart';
+import 'package:nkrs_app/views/customer_collection_views/OnBording/shered_onbording.dart';
+import 'package:nkrs_app/views/customer_collection_views/loginpage/login_page.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 class Onbordingscreen extends StatefulWidget {

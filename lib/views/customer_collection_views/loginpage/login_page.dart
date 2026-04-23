@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:nkrs_app/Screens/loginpage/register_page.dart';
-import 'package:nkrs_app/constrants/colors.dart';
+import 'package:nkrs_app/views/customer_collection_views/loginpage/register_page.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
