@@ -1,10 +1,11 @@
-class OnbordingModel {
+class OnboardingModel {
   final String title;
-  final String imageParth;
+  final String imagePath;
   final String description;
 
-  OnbordingModel({
+  OnboardingModel({
     required this.title,
-    required this.imageParth,
-    required this.description});
+    required this.imagePath,
+    required this.description,
+  });
 }
