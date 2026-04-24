@@ -102,7 +102,6 @@ class _NewClientLoanRequestState extends State<NewClientLoanRequest> {
       title: Text(""),
       content: Column(
         children: [
-          /// Step Indicator
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -113,10 +112,9 @@ class _NewClientLoanRequestState extends State<NewClientLoanRequest> {
               // circleStep("3", false),
             ],
           ),
-
           const SizedBox(height: 20),
-
           Container(
+            width: double.infinity,
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(15),
