@@ -100,67 +100,41 @@ class _NewClientLoanRequestState extends State<NewClientLoanRequest> {
       state: _currentStep > 1 ? StepState.complete : StepState.indexed,
       isActive: _currentStep >= 1,
       title: Text(""),
-      content: Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              // circleStep("1", false),
-              // line(),
-              // circleStep("2", true),
-              // line(),
-              // circleStep("3", false),
-            ],
-          ),
-          const SizedBox(height: 20),
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(15),
-              color: Colors.white,
-              boxShadow: [BoxShadow(blurRadius: 8, color: Colors.black12)],
-            ),
-            child: Column(
-              children: [
-                Row(
-                  children: const [
-                    Icon(Icons.credit_card, color: Colors.blue),
-                    SizedBox(width: 8),
-                    Text(
-                      "NIC Details",
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 15),
-                buildUploadBox("NIC Front Side", nicFront, true),
-                const SizedBox(height: 15),
-                buildUploadBox("NIC Back Side", nicBack, false),
-              ],
-            ),
-          ),
-          const Spacer(),
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton(
-              onPressed: () {
-                // validation here
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blue,
-                padding: const EdgeInsets.symmetric(vertical: 14),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
+      content: SingleChildScrollView(
+        child: Column(
+          children: [
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(15),
+                color: Colors.white,
+                boxShadow: [BoxShadow(blurRadius: 8, color: Colors.black12)],
               ),
-              child: const Text("Next", style: TextStyle(fontSize: 16)),
+              child: Column(
+                children: [
+                  Row(
+                    children: const [
+                      Icon(Icons.credit_card, color: Colors.blue),
+                      SizedBox(width: 8),
+                      Text(
+                        "NIC Details",
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 15),
+                  buildUploadBox("NIC Front Side", nicFront, true),
+                  const SizedBox(height: 15),
+                  buildUploadBox("NIC Back Side", nicBack, false),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     ),
 
@@ -168,7 +142,8 @@ class _NewClientLoanRequestState extends State<NewClientLoanRequest> {
       state: _currentStep > 2 ? StepState.complete : StepState.indexed,
       isActive: _currentStep >= 2,
       title: Text(""),
-      content: Column(),
+      content: Column(
+      ),
     ),
   ];
 
@@ -176,8 +151,6 @@ class _NewClientLoanRequestState extends State<NewClientLoanRequest> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        // elevation: 2.0,
-        // shadowColor: appBarShadow,
         backgroundColor: appBarC,
         leading: IconButton(
           onPressed: () {
@@ -586,5 +559,17 @@ class _NewClientLoanRequestState extends State<NewClientLoanRequest> {
         ),
       ],
     );
+  }
+
+  Widget circleStep(String text, bool active) {
+    return CircleAvatar(
+      radius: 14,
+      backgroundColor: active ? Colors.blue : Colors.grey.shade400,
+      child: Text(text, style: const TextStyle(color: Colors.white)),
+    );
+  }
+
+  Widget line() {
+    return Container(width: 50, height: 2, color: Colors.grey);
   }
 }
