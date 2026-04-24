@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:nkrs_app/utility/constanst.dart';
 import 'package:nkrs_app/views/customer_collection_views/customerCollectionpage/collection_entry.dart';
 import 'package:nkrs_app/views/customer_collection_views/utility/main_card.dart';
+import 'package:nkrs_app/views/new_loan_request_view/loan_request_section_view.dart';
 
 class CustomerCollectionHome extends StatefulWidget {
   const CustomerCollectionHome({super.key});
@@ -11,9 +13,64 @@ class CustomerCollectionHome extends StatefulWidget {
 }
 
 class _CustomerCollectionHomeState extends State<CustomerCollectionHome> {
+  int _selectedIndex = 0;
+  double logoSize = 32;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Container(
+              padding: EdgeInsets.all(kContainerPadding),
+              decoration: BoxDecoration(
+                color: Colors.blue.shade900,
+                borderRadius: BorderRadius.circular(kBorderRadiusSmall),
+              ),
+              child: const Icon(Icons.account_balance, color: Colors.white),
+            ),
+
+            SizedBox(width: 10),
+            Text("Lanka Capital"),
+          ],
+        ),
+        centerTitle: true,
+        backgroundColor: appBarC,
+        elevation: 2.0,
+        shadowColor: appBarShadow,
+        leading: GestureDetector(
+          onTap: () {
+            // Navigator.pop(context);
+          },
+          // child: IconButton(
+          //   onPressed: () {},
+          //   icon: Icon(
+          //     Icons.arrow_back_ios,
+          //     color: const Color.fromARGB(255, 0, 0, 0),
+          //     size: 10,
+          //     fontWeight: FontWeight.w600,
+          //   ),
+          // ),
+        ),
+        titleTextStyle: TextStyle(
+          color: btnC,
+          fontSize: appBarFontS,
+          fontWeight: FontWeight.bold,
+          letterSpacing: 1.3,
+        ),
+        actions: [
+          IconButton(
+            onPressed: () {},
+            icon: Icon(
+              Iconsax.user_edit_copy,
+              color: const Color.fromARGB(255, 0, 0, 0),
+              size: appBarIconS,
+            ),
+          ),
+          const SizedBox(width: 12),
+        ],
+      ),
       backgroundColor: const Color(0xFFF5F7FB),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -25,46 +82,6 @@ class _CustomerCollectionHomeState extends State<CustomerCollectionHome> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                SizedBox(height: kSmallSpacing),
-
-                // Top Bar
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
-                      children: [
-                        Container(
-                          padding: EdgeInsets.all(kContainerPadding),
-                          decoration: BoxDecoration(
-                            color: Colors.blue.shade900,
-                            borderRadius: BorderRadius.circular(
-                              kBorderRadiusSmall,
-                            ),
-                          ),
-                          child: const Icon(
-                            Icons.account_balance,
-                            color: Colors.white,
-                          ),
-                        ),
-                        SizedBox(width: kSmallSpacing),
-                        const Text(
-                          "Lanka Capital",
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const CircleAvatar(
-                      radius: 23,
-                      backgroundImage: AssetImage("assets/avatar.png"),
-                    ),
-                  ],
-                ),
-
-                SizedBox(height: kMediumSpacing),
-
                 // Greeting
                 const Text(
                   "Hello, Alex",
@@ -100,15 +117,25 @@ class _CustomerCollectionHomeState extends State<CustomerCollectionHome> {
                   ),
                 ),
                 SizedBox(height: kMediumSpacing),
-
-                MainCard(
-                  header: "New Loan Request",
-                  description:
-                      "Submit a fresh loan application for a new or existing customer.",
-                  cusIconRight: Icons.post_add,
-                  iconColor: Colors.orange,
-                  // ignore: deprecated_member_use
-                  iconBackgrouundColor: Colors.orange.withOpacity(0.1),
+                InkWell(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => LoanRequestSection(),
+                      ),
+                    );
+                  },
+                  borderRadius: BorderRadius.circular(cardBorderRadius),
+                  child: MainCard(
+                    header: "New Loan Request",
+                    description:
+                        "Submit a fresh loan application for a new or existing customer.",
+                    cusIconRight: Icons.post_add,
+                    iconColor: Colors.orange,
+                    // ignore: deprecated_member_use
+                    iconBackgrouundColor: Colors.orange.withOpacity(0.1),
+                  ),
                 ),
 
                 SizedBox(height: kMediumSpacing),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:nkrs_app/views/customer_collection_views/customerCollectionpage/PaymentCompleteScreen.dart';
 
 class ReceiptPreviewPage extends StatelessWidget {
   const ReceiptPreviewPage({super.key});
@@ -10,7 +11,14 @@ class ReceiptPreviewPage extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        leading: const Icon(Icons.arrow_back, color: Colors.black),
+
+        leading: IconButton(
+          onPressed: () {
+            Navigator.pop(context);
+            Icons.arrow_back_ios;
+          },
+          icon: Icon(Icons.arrow_back_ios, color: Colors.black),
+        ),
         centerTitle: true,
         title: const Text(
           "Receipt Preview",
@@ -105,9 +113,19 @@ class ReceiptPreviewPage extends StatelessWidget {
 
                 Expanded(
                   child: ElevatedButton.icon(
-                    onPressed: () {},
-                    icon: const Icon(Icons.print),
-                    label: const Text("Print Receipt"),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => PaymentCompleteScreen(),
+                        ),
+                      );
+                    },
+                    icon: const Icon(Icons.print, color: Colors.white),
+                    label: const Text(
+                      "Print Receipt",
+                      style: TextStyle(color: Colors.white),
+                    ),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.blue.shade700,
                       padding: const EdgeInsets.symmetric(vertical: 14),
@@ -147,10 +165,7 @@ class ReceiptPreviewPage extends StatelessWidget {
           Text(title, style: const TextStyle(color: Colors.grey)),
           Text(
             value,
-            style: const TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 16,
-            ),
+            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
           ),
         ],
       ),

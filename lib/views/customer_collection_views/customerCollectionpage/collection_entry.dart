@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:nkrs_app/utility/constanst.dart';
 import 'package:nkrs_app/views/customer_collection_views/customerCollectionpage/ReceiptPreviewPage.dart';
 
@@ -8,6 +9,56 @@ class CollectionEntryPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Container(
+              padding: EdgeInsets.all(kContainerPadding),
+              decoration: BoxDecoration(
+                color: Colors.blue.shade900,
+                borderRadius: BorderRadius.circular(kBorderRadiusSmall),
+              ),
+              child: const Icon(Icons.account_balance, color: Colors.white),
+            ),
+
+            SizedBox(width: 10),
+            Text("Lanka Capital"),
+          ],
+        ),
+        centerTitle: true,
+        backgroundColor: appBarC,
+        elevation: 2.0,
+        shadowColor: appBarShadow,
+        leading: IconButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          icon: Icon(
+            Icons.arrow_back_ios,
+            color: const Color.fromARGB(255, 0, 0, 0),
+            size: 20,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        titleTextStyle: TextStyle(
+          color: btnC,
+          fontSize: appBarFontS,
+          fontWeight: FontWeight.bold,
+          letterSpacing: 1.3,
+        ),
+        actions: [
+          IconButton(
+            onPressed: () {},
+            icon: Icon(
+              Iconsax.user_edit_copy,
+              color: const Color.fromARGB(255, 0, 0, 0),
+              size: appBarIconS,
+            ),
+          ),
+          const SizedBox(width: 12),
+        ],
+      ),
       backgroundColor: safeAreaC,
       body: SafeArea(
         child: SingleChildScrollView(
@@ -15,43 +66,6 @@ class CollectionEntryPage extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(kIconPadding),
-                        decoration: BoxDecoration(
-                          color: Colors.blue.shade900,
-                          borderRadius: BorderRadius.circular(
-                            kBorderRadiusMedium,
-                          ),
-                        ),
-                        child: const Icon(
-                          Icons.account_balance,
-                          color: Colors.white,
-                        ),
-                      ),
-                      const SizedBox(width: kSmallSpacing),
-                      const Text(
-                        "Lanka Capital",
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const CircleAvatar(
-                    radius: 23,
-                    backgroundImage: AssetImage("assets/avatar.png"),
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: kMediumSpacing),
-
               const Text(
                 "DAILY COLLECTION ENTRY",
                 style: TextStyle(
