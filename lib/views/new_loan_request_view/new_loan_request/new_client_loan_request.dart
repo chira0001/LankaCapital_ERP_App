@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:nkrs_app/main.dart';
@@ -12,6 +14,9 @@ class NewClientLoanRequest extends StatefulWidget {
 }
 
 class _NewClientLoanRequestState extends State<NewClientLoanRequest> {
+  File? nicFront;
+  File? nicBack;
+
   final _formKey = GlobalKey<FormState>();
   // for step
   final TextEditingController name = TextEditingController();
@@ -56,7 +61,7 @@ class _NewClientLoanRequestState extends State<NewClientLoanRequest> {
                   Text(
                     "Personal Details",
                     style: TextStyle(
-                      fontSize: cardHeaderFS - 2,
+                      fontSize: cardHeaderFS,
                       color: cardHeaderFC,
                       fontWeight: FontWeight(700),
                     ),
@@ -95,8 +100,72 @@ class _NewClientLoanRequestState extends State<NewClientLoanRequest> {
       state: _currentStep > 1 ? StepState.complete : StepState.indexed,
       isActive: _currentStep >= 1,
       title: Text(""),
-      content: Column(),
+      content: Column(
+        children: [
+          /// Step Indicator
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              // circleStep("1", false),
+              // line(),
+              // circleStep("2", true),
+              // line(),
+              // circleStep("3", false),
+            ],
+          ),
+
+          const SizedBox(height: 20),
+
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(15),
+              color: Colors.white,
+              boxShadow: [BoxShadow(blurRadius: 8, color: Colors.black12)],
+            ),
+            child: Column(
+              children: [
+                Row(
+                  children: const [
+                    Icon(Icons.credit_card, color: Colors.blue),
+                    SizedBox(width: 8),
+                    Text(
+                      "NIC Details",
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 15),
+                buildUploadBox("NIC Front Side", nicFront, true),
+                const SizedBox(height: 15),
+                buildUploadBox("NIC Back Side", nicBack, false),
+              ],
+            ),
+          ),
+          const Spacer(),
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: () {
+                // validation here
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.blue,
+                padding: const EdgeInsets.symmetric(vertical: 14),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+              child: const Text("Next", style: TextStyle(fontSize: 16)),
+            ),
+          ),
+        ],
+      ),
     ),
+
     Step(
       state: _currentStep > 2 ? StepState.complete : StepState.indexed,
       isActive: _currentStep >= 2,
@@ -197,7 +266,7 @@ class _NewClientLoanRequestState extends State<NewClientLoanRequest> {
                 children: [
                   SizedBox(
                     width: MediaQuery.of(context).size.width * 0.43,
-                    height: 50,
+                    height: 45,
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         backgroundColor: btnC,
@@ -221,7 +290,7 @@ class _NewClientLoanRequestState extends State<NewClientLoanRequest> {
                   if (_currentStep > 0)
                     SizedBox(
                       width: MediaQuery.of(context).size.width * 0.43,
-                      height: 50,
+                      height: 45,
                       child: ElevatedButton(
                         onPressed: details.onStepCancel,
                         style: ElevatedButton.styleFrom(
@@ -265,9 +334,9 @@ class _NewClientLoanRequestState extends State<NewClientLoanRequest> {
       controller: controllerNames,
       keyboardType: TextInputType.number,
       autocorrect: false,
-      // maxLength: 10,
       cursorColor: const Color.fromARGB(255, 0, 55, 255),
       decoration: InputDecoration(
+        contentPadding: const EdgeInsets.symmetric(vertical: 0, horizontal: 12),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.all(Radius.circular(btnBorderRadius)),
         ),
@@ -286,7 +355,7 @@ class _NewClientLoanRequestState extends State<NewClientLoanRequest> {
           ),
         ),
         errorStyle: TextStyle(
-          color: const Color.fromARGB(255, 233, 1, 1),
+          color: Color.fromARGB(255, 233, 1, 1),
           fontSize: 15,
           fontWeight: FontWeight(700),
         ),
@@ -294,9 +363,9 @@ class _NewClientLoanRequestState extends State<NewClientLoanRequest> {
         filled: true,
         labelText: labelText_,
         labelStyle: TextStyle(
-          color: const Color.fromARGB(105, 21, 21, 21),
-          fontSize: 18,
-          fontWeight: const FontWeight(500),
+          color: Color.fromARGB(105, 21, 21, 21),
+          fontSize: 17,
+          fontWeight: FontWeight(500),
         ),
       ),
       validator: validatorCallback,
@@ -307,7 +376,7 @@ class _NewClientLoanRequestState extends State<NewClientLoanRequest> {
     return Text(
       lable_,
       style: TextStyle(
-        fontSize: 17,
+        fontSize: 16,
         fontWeight: FontWeight(800),
         color: const Color.fromARGB(156, 26, 26, 26),
       ),
@@ -356,7 +425,7 @@ class _NewClientLoanRequestState extends State<NewClientLoanRequest> {
                 Text(
                   "You have unsaved changes. If you leave now, your progress will be lost.",
                   style: TextStyle(
-                    fontSize: 18,
+                    fontSize: 17,
                     fontWeight: FontWeight(descriptionFw),
                     // ignore: deprecated_member_use
                     color: descriptionC.withOpacity(0.5),
@@ -394,7 +463,7 @@ class _NewClientLoanRequestState extends State<NewClientLoanRequest> {
                             "HOME",
                             style: TextStyle(
                               color: Colors.white,
-                              fontSize: 18,
+                              fontSize: btnFontSize,
                               fontWeight: FontWeight(HeaderFW),
                             ),
                             textAlign: TextAlign.center,
@@ -423,7 +492,7 @@ class _NewClientLoanRequestState extends State<NewClientLoanRequest> {
                             "CANCEL",
                             style: TextStyle(
                               color: Colors.black,
-                              fontSize: 18,
+                              fontSize: btnFontSize,
                               fontWeight: FontWeight(HeaderFW),
                             ),
                             textAlign: TextAlign.center,
@@ -477,4 +546,47 @@ class _NewClientLoanRequestState extends State<NewClientLoanRequest> {
   //     ],
   //   );
   // }
+
+  Widget buildUploadBox(String title, File? image, bool isFront) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          title,
+          style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
+        ),
+        const SizedBox(height: 8),
+
+        GestureDetector(
+          // onTap: () => pickImage(isFront),
+          child: Container(
+            height: 130,
+            width: double.infinity,
+            decoration: BoxDecoration(
+              color: const Color(0xFFF5F5F5),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: Colors.grey.shade400),
+            ),
+            child: image == null
+                ? const Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.upload, size: 30),
+                      SizedBox(height: 5),
+                      Text("Tap to upload"),
+                    ],
+                  )
+                : ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: Image.file(
+                      image,
+                      fit: BoxFit.cover,
+                      width: double.infinity,
+                    ),
+                  ),
+          ),
+        ),
+      ],
+    );
+  }
 }

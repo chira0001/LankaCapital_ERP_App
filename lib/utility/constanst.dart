@@ -17,7 +17,7 @@ Color bottomBarIconC = Color.fromARGB(191, 31, 31, 31);
 Color appBarShadow = const Color.fromARGB(55, 50, 50, 50);
 
 // Padding
-double innerBoxPD = 24.0;
+double innerBoxPD = 15.0;
 double outerBoxVerticalPD = 16.0;
 double outerBoxHorizontalPD = 16.0;
 
@@ -32,12 +32,12 @@ double cardImageHeight = 150.0;
 double iconSize = 30.0;
 double selectedIconSize = 33.0;
 
-double descriptionFontSize = 18.0;
+double descriptionFontSize = 17.0;
 double headerFontSize = 22.0; //<-26
-double btnFontSize = 17.0;
+double btnFontSize = 16.0;
 
-double cardDescriptionFS = 16;
-double cardHeaderFS = 21; // <-23
+double cardDescriptionFS = 15; //16
+double cardHeaderFS = 18; // <-20
 int cardDescriptionFW = 450;
 
 double appBarFontS = 20;

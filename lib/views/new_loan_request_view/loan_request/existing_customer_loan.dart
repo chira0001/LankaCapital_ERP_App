@@ -88,7 +88,7 @@ class _ExistingCustomerLoanState extends State<ExistingCustomerLoan> {
                 "Existing Customer Loan",
                 style: TextStyle(
                   fontWeight: FontWeight(HeaderFW),
-                  fontSize: cardHeaderFS,
+                  fontSize: headerFontSize,
                   color: headerTextC,
                   // letterSpacing: 1,
                 ),
@@ -152,7 +152,7 @@ class _ExistingCustomerLoanState extends State<ExistingCustomerLoan> {
                         SizedBox(
                           // width: isMobile(context) ? 200 : 300,
                           width: 240,
-                          // height: 50,
+                          height: 50,
                           child: TextFormField(
                             keyboardType: TextInputType.number,
                             autocorrect: false,
@@ -177,7 +177,7 @@ class _ExistingCustomerLoanState extends State<ExistingCustomerLoan> {
                               labelText: "Enter Customer ID",
                               labelStyle: TextStyle(
                                 color: btnC,
-                                fontSize: 18,
+                                fontSize: 17,
                                 fontWeight: const FontWeight(500),
                               ),
                               // prefixIcon: Icon(Iconsax.user_search_copy),
@@ -230,7 +230,7 @@ class _ExistingCustomerLoanState extends State<ExistingCustomerLoan> {
                             backgroundColor: btnC,
                             padding: const EdgeInsets.symmetric(
                               horizontal: 20,
-                              vertical: 15,
+                              vertical: 13,
                             ),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(
