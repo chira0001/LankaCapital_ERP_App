@@ -5,6 +5,7 @@ import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:nkrs_app/main.dart';
 import 'package:nkrs_app/utility/constanst.dart';
 import 'package:nkrs_app/views/new_loan_request_view/new_loan_request/new_client_loan_request_status.dart';
+import 'package:nkrs_app/views/new_loan_request_view/utility/main_card.dart';
 
 class NewClientLoanRequest extends StatefulWidget {
   const NewClientLoanRequest({super.key});
@@ -42,13 +43,7 @@ class _NewClientLoanRequestState extends State<NewClientLoanRequest> {
           decoration: BoxDecoration(
             color: appBarC,
             borderRadius: BorderRadius.all(Radius.circular(cardBorderRadius)),
-            boxShadow: const [
-              BoxShadow(
-                color: Colors.black26,
-                blurRadius: 10,
-                offset: Offset(0, 5),
-              ),
-            ],
+            boxShadow: [MainCard.customShadow()],
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -104,31 +99,34 @@ class _NewClientLoanRequestState extends State<NewClientLoanRequest> {
         child: Column(
           children: [
             Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(20),
+              margin: EdgeInsets.only(bottom: 30),
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(15),
-                color: Colors.white,
-                boxShadow: [BoxShadow(blurRadius: 8, color: Colors.black12)],
+                color: appBarC,
+                borderRadius: BorderRadius.all(
+                  Radius.circular(cardBorderRadius),
+                ),
+                boxShadow: [MainCard.customShadow()],
               ),
               child: Column(
                 children: [
                   Row(
-                    children: const [
-                      Icon(Icons.credit_card, color: Colors.blue),
-                      SizedBox(width: 8),
+                    children: [
+                      const Icon(Icons.credit_card, color: Colors.blue),
+                      const SizedBox(width: 8),
                       Text(
                         "NIC Details",
                         style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
+                          color: cardHeaderFC,
+                          fontSize: cardHeaderFS,
+                          fontWeight: FontWeight(700),
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 15),
+                  SizedBox(height: _customSize_2),
                   buildUploadBox("NIC Front Side", nicFront, true),
-                  const SizedBox(height: 15),
+                  SizedBox(height: _customSize_2),
                   buildUploadBox("NIC Back Side", nicBack, false),
                 ],
               ),
@@ -142,8 +140,7 @@ class _NewClientLoanRequestState extends State<NewClientLoanRequest> {
       state: _currentStep > 2 ? StepState.complete : StepState.indexed,
       isActive: _currentStep >= 2,
       title: Text(""),
-      content: Column(
-      ),
+      content: Column(),
     ),
   ];
 
@@ -522,27 +519,26 @@ class _NewClientLoanRequestState extends State<NewClientLoanRequest> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          title,
-          style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
-        ),
-        const SizedBox(height: 8),
-
+        customText(title),
+        SizedBox(height: _customSize_1),
         GestureDetector(
           // onTap: () => pickImage(isFront),
           child: Container(
             height: 130,
             width: double.infinity,
             decoration: BoxDecoration(
-              color: const Color(0xFFF5F5F5),
+              color: safeAreaC,
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Colors.grey.shade400),
+              border: Border.all(
+                color: Color.fromARGB(58, 23, 23, 23),
+                width: 1.5,
+              ),
             ),
             child: image == null
                 ? const Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.upload, size: 30),
+                      Icon(Iconsax.document_upload_copy, size: 30),
                       SizedBox(height: 5),
                       Text("Tap to upload"),
                     ],
@@ -559,17 +555,5 @@ class _NewClientLoanRequestState extends State<NewClientLoanRequest> {
         ),
       ],
     );
-  }
-
-  Widget circleStep(String text, bool active) {
-    return CircleAvatar(
-      radius: 14,
-      backgroundColor: active ? Colors.blue : Colors.grey.shade400,
-      child: Text(text, style: const TextStyle(color: Colors.white)),
-    );
-  }
-
-  Widget line() {
-    return Container(width: 50, height: 2, color: Colors.grey);
   }
 }

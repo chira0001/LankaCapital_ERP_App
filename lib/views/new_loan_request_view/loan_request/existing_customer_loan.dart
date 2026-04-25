@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:nkrs_app/main.dart';
 import 'package:nkrs_app/utility/constanst.dart';
 import 'package:nkrs_app/views/new_loan_request_view/utility/custom_dialog_box.dart';
+import 'package:nkrs_app/views/new_loan_request_view/utility/main_card.dart';
 // import 'package:http/http.dart' as http;
 
 class ExistingCustomerLoan extends StatefulWidget {
@@ -74,7 +75,7 @@ class _ExistingCustomerLoanState extends State<ExistingCustomerLoan> {
           ),
         ],
       ),
-      backgroundColor: const Color.fromARGB(255, 245, 245, 245),
+      backgroundColor: safeAreaC,
       body: Padding(
         padding: EdgeInsetsGeometry.symmetric(
           horizontal: safeAreaHorizontalPD,
@@ -110,23 +111,9 @@ class _ExistingCustomerLoanState extends State<ExistingCustomerLoan> {
                 height: 200,
                 padding: EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  color: const Color.fromARGB(255, 255, 255, 255),
+                  color: appBarC,
                   borderRadius: BorderRadius.circular(cardBorderRadius),
-                  boxShadow: [
-                    BoxShadow(
-                      // ignore: deprecated_member_use
-                      color: const Color.fromARGB(
-                        28,
-                        29,
-                        29,
-                        29,
-                        // ignore: deprecated_member_use
-                      ).withOpacity(0.1),
-                      spreadRadius: 2,
-                      blurRadius: 5,
-                      offset: const Offset(0, 3),
-                    ),
-                  ],
+                  boxShadow: [MainCard.customShadow()],
                   // backgroundBlendMode: BlendMode.lighten,
                   // border: BoxBorder.all(
                   //   color: const Color.fromARGB(88, 175, 175, 175),

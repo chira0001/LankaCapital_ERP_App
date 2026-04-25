@@ -92,4 +92,12 @@ class MainCard extends StatelessWidget {
       ),
     );
   }
+
+  static BoxShadow customShadow() {
+    return BoxShadow(
+      color: boxShadowC,
+      blurRadius: 10,
+      offset: const Offset(0, 5),
+    );
+  }
 }

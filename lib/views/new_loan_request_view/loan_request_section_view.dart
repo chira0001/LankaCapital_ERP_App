@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
-import 'package:nkrs_app/test/test_1.dart';
 import 'package:nkrs_app/utility/constanst.dart';
 import 'package:nkrs_app/views/new_loan_request_view/loan_request/existing_customer_loan.dart';
 import 'package:nkrs_app/views/new_loan_request_view/new_loan_request/new_client_loan_request.dart';
@@ -131,7 +130,7 @@ class _LoanRequestSectionState extends State<LoanRequestSection> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => NicUploadPage(),
+                      builder: (context) => NewClientLoanRequest(),
                       // builder: (context)=> LoanSuccessScreen(),
                     ),
                   );
