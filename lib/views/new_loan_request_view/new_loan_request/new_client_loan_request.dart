@@ -1,8 +1,11 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:nkrs_app/main.dart';
 import 'package:nkrs_app/utility/constanst.dart';
 import 'package:nkrs_app/views/new_loan_request_view/new_loan_request/new_client_loan_request_status.dart';
+import 'package:nkrs_app/views/new_loan_request_view/utility/main_card.dart';
 
 class NewClientLoanRequest extends StatefulWidget {
   const NewClientLoanRequest({super.key});
@@ -12,6 +15,9 @@ class NewClientLoanRequest extends StatefulWidget {
 }
 
 class _NewClientLoanRequestState extends State<NewClientLoanRequest> {
+  File? nicFront;
+  File? nicBack;
+
   final _formKey = GlobalKey<FormState>();
   // for step
   final TextEditingController name = TextEditingController();
@@ -37,13 +43,7 @@ class _NewClientLoanRequestState extends State<NewClientLoanRequest> {
           decoration: BoxDecoration(
             color: appBarC,
             borderRadius: BorderRadius.all(Radius.circular(cardBorderRadius)),
-            boxShadow: const [
-              BoxShadow(
-                color: Colors.black26,
-                blurRadius: 10,
-                offset: Offset(0, 5),
-              ),
-            ],
+            boxShadow: [MainCard.customShadow()],
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -56,7 +56,7 @@ class _NewClientLoanRequestState extends State<NewClientLoanRequest> {
                   Text(
                     "Personal Details",
                     style: TextStyle(
-                      fontSize: cardHeaderFS - 2,
+                      fontSize: cardHeaderFS,
                       color: cardHeaderFC,
                       fontWeight: FontWeight(700),
                     ),
@@ -95,8 +95,47 @@ class _NewClientLoanRequestState extends State<NewClientLoanRequest> {
       state: _currentStep > 1 ? StepState.complete : StepState.indexed,
       isActive: _currentStep >= 1,
       title: Text(""),
-      content: Column(),
+      content: SingleChildScrollView(
+        child: Column(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(20),
+              margin: EdgeInsets.only(bottom: 30),
+              decoration: BoxDecoration(
+                color: appBarC,
+                borderRadius: BorderRadius.all(
+                  Radius.circular(cardBorderRadius),
+                ),
+                boxShadow: [MainCard.customShadow()],
+              ),
+              child: Column(
+                children: [
+                  Row(
+                    children: [
+                      const Icon(Icons.credit_card, color: Colors.blue),
+                      const SizedBox(width: 8),
+                      Text(
+                        "NIC Details",
+                        style: TextStyle(
+                          color: cardHeaderFC,
+                          fontSize: cardHeaderFS,
+                          fontWeight: FontWeight(700),
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: _customSize_2),
+                  buildUploadBox("NIC Front Side", nicFront, true),
+                  SizedBox(height: _customSize_2),
+                  buildUploadBox("NIC Back Side", nicBack, false),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
     ),
+
     Step(
       state: _currentStep > 2 ? StepState.complete : StepState.indexed,
       isActive: _currentStep >= 2,
@@ -109,8 +148,6 @@ class _NewClientLoanRequestState extends State<NewClientLoanRequest> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        // elevation: 2.0,
-        // shadowColor: appBarShadow,
         backgroundColor: appBarC,
         leading: IconButton(
           onPressed: () {
@@ -197,7 +234,7 @@ class _NewClientLoanRequestState extends State<NewClientLoanRequest> {
                 children: [
                   SizedBox(
                     width: MediaQuery.of(context).size.width * 0.43,
-                    height: 50,
+                    height: 45,
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         backgroundColor: btnC,
@@ -221,7 +258,7 @@ class _NewClientLoanRequestState extends State<NewClientLoanRequest> {
                   if (_currentStep > 0)
                     SizedBox(
                       width: MediaQuery.of(context).size.width * 0.43,
-                      height: 50,
+                      height: 45,
                       child: ElevatedButton(
                         onPressed: details.onStepCancel,
                         style: ElevatedButton.styleFrom(
@@ -265,9 +302,9 @@ class _NewClientLoanRequestState extends State<NewClientLoanRequest> {
       controller: controllerNames,
       keyboardType: TextInputType.number,
       autocorrect: false,
-      // maxLength: 10,
       cursorColor: const Color.fromARGB(255, 0, 55, 255),
       decoration: InputDecoration(
+        contentPadding: const EdgeInsets.symmetric(vertical: 0, horizontal: 12),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.all(Radius.circular(btnBorderRadius)),
         ),
@@ -286,7 +323,7 @@ class _NewClientLoanRequestState extends State<NewClientLoanRequest> {
           ),
         ),
         errorStyle: TextStyle(
-          color: const Color.fromARGB(255, 233, 1, 1),
+          color: Color.fromARGB(255, 233, 1, 1),
           fontSize: 15,
           fontWeight: FontWeight(700),
         ),
@@ -294,9 +331,9 @@ class _NewClientLoanRequestState extends State<NewClientLoanRequest> {
         filled: true,
         labelText: labelText_,
         labelStyle: TextStyle(
-          color: const Color.fromARGB(105, 21, 21, 21),
-          fontSize: 18,
-          fontWeight: const FontWeight(500),
+          color: Color.fromARGB(105, 21, 21, 21),
+          fontSize: 17,
+          fontWeight: FontWeight(500),
         ),
       ),
       validator: validatorCallback,
@@ -307,7 +344,7 @@ class _NewClientLoanRequestState extends State<NewClientLoanRequest> {
     return Text(
       lable_,
       style: TextStyle(
-        fontSize: 17,
+        fontSize: 16,
         fontWeight: FontWeight(800),
         color: const Color.fromARGB(156, 26, 26, 26),
       ),
@@ -356,7 +393,7 @@ class _NewClientLoanRequestState extends State<NewClientLoanRequest> {
                 Text(
                   "You have unsaved changes. If you leave now, your progress will be lost.",
                   style: TextStyle(
-                    fontSize: 18,
+                    fontSize: 17,
                     fontWeight: FontWeight(descriptionFw),
                     // ignore: deprecated_member_use
                     color: descriptionC.withOpacity(0.5),
@@ -394,7 +431,7 @@ class _NewClientLoanRequestState extends State<NewClientLoanRequest> {
                             "HOME",
                             style: TextStyle(
                               color: Colors.white,
-                              fontSize: 18,
+                              fontSize: btnFontSize,
                               fontWeight: FontWeight(HeaderFW),
                             ),
                             textAlign: TextAlign.center,
@@ -423,7 +460,7 @@ class _NewClientLoanRequestState extends State<NewClientLoanRequest> {
                             "CANCEL",
                             style: TextStyle(
                               color: Colors.black,
-                              fontSize: 18,
+                              fontSize: btnFontSize,
                               fontWeight: FontWeight(HeaderFW),
                             ),
                             textAlign: TextAlign.center,
@@ -477,4 +514,46 @@ class _NewClientLoanRequestState extends State<NewClientLoanRequest> {
   //     ],
   //   );
   // }
+
+  Widget buildUploadBox(String title, File? image, bool isFront) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        customText(title),
+        SizedBox(height: _customSize_1),
+        GestureDetector(
+          // onTap: () => pickImage(isFront),
+          child: Container(
+            height: 130,
+            width: double.infinity,
+            decoration: BoxDecoration(
+              color: safeAreaC,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: Color.fromARGB(58, 23, 23, 23),
+                width: 1.5,
+              ),
+            ),
+            child: image == null
+                ? const Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Iconsax.document_upload_copy, size: 30),
+                      SizedBox(height: 5),
+                      Text("Tap to upload"),
+                    ],
+                  )
+                : ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: Image.file(
+                      image,
+                      fit: BoxFit.cover,
+                      width: double.infinity,
+                    ),
+                  ),
+          ),
+        ),
+      ],
+    );
+  }
 }

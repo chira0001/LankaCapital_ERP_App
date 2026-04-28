@@ -44,14 +44,14 @@ class MainCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Container(
-                padding: const EdgeInsets.all(13),
+                padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
                   color: iconBackgrouundColor,
                   border: Border.all(
                     color: const Color.fromARGB(19, 0, 16, 99),
                     width: 2,
                   ),
-                  borderRadius: BorderRadius.circular(cardBorderRadius),
+                  borderRadius: BorderRadius.circular(cardBorderRadius - 5),
                 ),
                 child: Icon(
                   cusIconRight,
@@ -62,7 +62,7 @@ class MainCard extends StatelessWidget {
               ),
               Icon(
                 Iconsax.arrow_right_3_copy,
-                size: 24,
+                size: 20,
                 color: const Color.fromARGB(119, 21, 21, 21),
                 fontWeight: FontWeight(700),
               ),
@@ -90,6 +90,14 @@ class MainCard extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+
+  static BoxShadow customShadow() {
+    return BoxShadow(
+      color: boxShadowC,
+      blurRadius: 10,
+      offset: const Offset(0, 5),
     );
   }
 }
