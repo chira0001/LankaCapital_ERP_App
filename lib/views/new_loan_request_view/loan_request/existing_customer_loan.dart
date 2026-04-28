@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:nkrs_app/main.dart';
 import 'package:nkrs_app/utility/constanst.dart';
 import 'package:nkrs_app/views/new_loan_request_view/utility/custom_dialog_box.dart';
+import 'package:nkrs_app/views/new_loan_request_view/utility/main_card.dart';
 // import 'package:http/http.dart' as http;
 
 class ExistingCustomerLoan extends StatefulWidget {
@@ -74,7 +75,7 @@ class _ExistingCustomerLoanState extends State<ExistingCustomerLoan> {
           ),
         ],
       ),
-      backgroundColor: const Color.fromARGB(255, 245, 245, 245),
+      backgroundColor: safeAreaC,
       body: Padding(
         padding: EdgeInsetsGeometry.symmetric(
           horizontal: safeAreaHorizontalPD,
@@ -88,7 +89,7 @@ class _ExistingCustomerLoanState extends State<ExistingCustomerLoan> {
                 "Existing Customer Loan",
                 style: TextStyle(
                   fontWeight: FontWeight(HeaderFW),
-                  fontSize: cardHeaderFS,
+                  fontSize: headerFontSize,
                   color: headerTextC,
                   // letterSpacing: 1,
                 ),
@@ -110,23 +111,9 @@ class _ExistingCustomerLoanState extends State<ExistingCustomerLoan> {
                 height: 200,
                 padding: EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  color: const Color.fromARGB(255, 255, 255, 255),
+                  color: appBarC,
                   borderRadius: BorderRadius.circular(cardBorderRadius),
-                  boxShadow: [
-                    BoxShadow(
-                      // ignore: deprecated_member_use
-                      color: const Color.fromARGB(
-                        28,
-                        29,
-                        29,
-                        29,
-                        // ignore: deprecated_member_use
-                      ).withOpacity(0.1),
-                      spreadRadius: 2,
-                      blurRadius: 5,
-                      offset: const Offset(0, 3),
-                    ),
-                  ],
+                  boxShadow: [MainCard.customShadow()],
                   // backgroundBlendMode: BlendMode.lighten,
                   // border: BoxBorder.all(
                   //   color: const Color.fromARGB(88, 175, 175, 175),
@@ -152,7 +139,7 @@ class _ExistingCustomerLoanState extends State<ExistingCustomerLoan> {
                         SizedBox(
                           // width: isMobile(context) ? 200 : 300,
                           width: 240,
-                          // height: 50,
+                          height: 50,
                           child: TextFormField(
                             keyboardType: TextInputType.number,
                             autocorrect: false,
@@ -177,7 +164,7 @@ class _ExistingCustomerLoanState extends State<ExistingCustomerLoan> {
                               labelText: "Enter Customer ID",
                               labelStyle: TextStyle(
                                 color: btnC,
-                                fontSize: 18,
+                                fontSize: 17,
                                 fontWeight: const FontWeight(500),
                               ),
                               // prefixIcon: Icon(Iconsax.user_search_copy),
@@ -230,7 +217,7 @@ class _ExistingCustomerLoanState extends State<ExistingCustomerLoan> {
                             backgroundColor: btnC,
                             padding: const EdgeInsets.symmetric(
                               horizontal: 20,
-                              vertical: 15,
+                              vertical: 13,
                             ),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(
