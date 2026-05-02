@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:nkrs_app/views/customer_collection_views/OnBording/onbordingScreen.dart';
+import 'package:nkrs_app/views/customer_collection_views/loginpage/login_page.dart';
 import 'package:nkrs_app/views/new_loan_request_view/loan_request_section_view.dart';
 
 void main() {
@@ -16,7 +17,8 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(fontFamily: "Inter"),
       home: Onbordingscreen(),
-      // home:  LoanRequestSection(),
+      // home: LoginPage(),
+      // home: LoanRequestSection(),
       // HomePage()
     );
   }

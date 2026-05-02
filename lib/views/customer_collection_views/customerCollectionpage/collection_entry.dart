@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:nkrs_app/utility/constanst.dart';
 import 'package:nkrs_app/views/customer_collection_views/customerCollectionpage/ReceiptPreviewPage.dart';
+import 'package:nkrs_app/views/customer_collection_views/customerCollectionpage/customer_collection_home.dart';
+import 'package:nkrs_app/views/customer_collection_views/profile/profile.dart';
 
 class CollectionEntryPage extends StatelessWidget {
   const CollectionEntryPage({super.key});
@@ -32,7 +34,10 @@ class CollectionEntryPage extends StatelessWidget {
         shadowColor: appBarShadow,
         leading: IconButton(
           onPressed: () {
-            Navigator.pop(context);
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => CustomerCollectionHome()),
+            );
           },
           icon: Icon(
             Icons.arrow_back_ios,
@@ -49,7 +54,12 @@ class CollectionEntryPage extends StatelessWidget {
         ),
         actions: [
           IconButton(
-            onPressed: () {},
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => ProfilePage()),
+              );
+            },
             icon: Icon(
               Iconsax.user_edit_copy,
               color: const Color.fromARGB(255, 0, 0, 0),

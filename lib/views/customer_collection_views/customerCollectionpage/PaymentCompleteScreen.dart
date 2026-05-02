@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:nkrs_app/views/customer_collection_views/customerCollectionpage/collection_entry.dart';
 import 'package:nkrs_app/views/customer_collection_views/customerCollectionpage/customer_collection_home.dart';
 
 class PaymentCompleteScreen extends StatelessWidget {
@@ -120,7 +121,12 @@ class PaymentCompleteScreen extends StatelessWidget {
                     borderRadius: BorderRadius.circular(30),
                     onTap: () {
                       // Add navigation logic here, e.g., returning to home
-                      Navigator.push(context, MaterialPageRoute(builder: (_) =>  CustomerCollectionHome()));
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => CollectionEntryPage(),
+                        ),
+                      );
                     },
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,

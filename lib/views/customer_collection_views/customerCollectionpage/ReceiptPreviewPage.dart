@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:nkrs_app/views/customer_collection_views/customerCollectionpage/PaymentCompleteScreen.dart';
+import 'package:nkrs_app/views/customer_collection_views/customerCollectionpage/collection_entry.dart';
 
 class ReceiptPreviewPage extends StatelessWidget {
   const ReceiptPreviewPage({super.key});
@@ -93,7 +94,14 @@ class ReceiptPreviewPage extends StatelessWidget {
               children: [
                 Expanded(
                   child: OutlinedButton.icon(
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => CollectionEntryPage(),
+                        ),
+                      );
+                    },
                     icon: const Icon(Icons.print, color: Colors.red),
                     label: const Text(
                       "Re-print",

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:nkrs_app/utility/constanst.dart';
 import 'package:nkrs_app/views/customer_collection_views/customerCollectionpage/collection_entry.dart';
+import 'package:nkrs_app/views/customer_collection_views/profile/profile.dart';
 import 'package:nkrs_app/views/customer_collection_views/utility/main_card.dart';
 import 'package:nkrs_app/views/new_loan_request_view/loan_request_section_view.dart';
 
@@ -13,12 +14,13 @@ class CustomerCollectionHome extends StatefulWidget {
 }
 
 class _CustomerCollectionHomeState extends State<CustomerCollectionHome> {
-  int _selectedIndex = 0;
-  double logoSize = 32;
+  // int _selectedIndex = 0;
+  // double logoSize = 32;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         title: Row(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
@@ -35,24 +37,11 @@ class _CustomerCollectionHomeState extends State<CustomerCollectionHome> {
             Text("Lanka Capital"),
           ],
         ),
+
         centerTitle: true,
         backgroundColor: appBarC,
         elevation: 2.0,
         shadowColor: appBarShadow,
-        leading: GestureDetector(
-          onTap: () {
-            // Navigator.pop(context);
-          },
-          // child: IconButton(
-          //   onPressed: () {},
-          //   icon: Icon(
-          //     Icons.arrow_back_ios,
-          //     color: const Color.fromARGB(255, 0, 0, 0),
-          //     size: 10,
-          //     fontWeight: FontWeight.w600,
-          //   ),
-          // ),
-        ),
         titleTextStyle: TextStyle(
           color: btnC,
           fontSize: appBarFontS,
@@ -61,10 +50,15 @@ class _CustomerCollectionHomeState extends State<CustomerCollectionHome> {
         ),
         actions: [
           IconButton(
-            onPressed: () {},
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => ProfilePage()),
+              );
+            },
             icon: Icon(
               Iconsax.user_edit_copy,
-              color: const Color.fromARGB(255, 0, 0, 0),
+              color: Color.fromARGB(255, 0, 0, 0),
               size: appBarIconS,
             ),
           ),
