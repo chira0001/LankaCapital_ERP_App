@@ -24,11 +24,13 @@ class _NewClientLoanRequestState extends State<NewClientLoanRequest> {
   final TextEditingController nic = TextEditingController();
   final TextEditingController email = TextEditingController();
   final TextEditingController address = TextEditingController();
-  // for step 2
+  // final TextEditingController password = TextEditingController();
+  final TextEditingController phoneNumber = TextEditingController();
 
+  // for step 2
   int _currentStep = 0;
   final double _customSize_1 = 10;
-  final double _customSize_2 = 25;
+  final double _customSize_2 = 20;
   bool isCompeleted = false;
 
   List<Step> get getSt => [
@@ -66,26 +68,79 @@ class _NewClientLoanRequestState extends State<NewClientLoanRequest> {
               SizedBox(height: 30),
               customText("Full Name"),
               SizedBox(height: _customSize_1),
-              _customBuild(name, "Enter Customer Name", (value) {
+              _customBuild(name, "John Doe", TextInputType.text, (value) {
                 if (value == null || value.isEmpty) {
-                  return "Incorrect";
+                  return "Please enter your name";
+                } else if (!RegExp(r'^[a-zA-Z\s]+$').hasMatch(value)) {
+                  return "Name cannot contain only numbers or special characters";
                 } else {
                   return null;
                 }
               }),
               SizedBox(height: _customSize_2),
-              customText("Full Name"),
+              customText("Address"),
               SizedBox(height: _customSize_1),
-              _customBuild(nic, "Enter Customer ID", (value) {}),
+              _customBuild(
+                address,
+                "No: 123, Street Name",
+                TextInputType.text,
+                (value) {
+                  if (value == null || value.isEmpty) {
+                    return "Please enter your address";
+                  } else if (value.length < 5) {
+                    return "Please enter a valid address";
+                  } else {
+                    return null;
+                  }
+                },
+              ),
               SizedBox(height: _customSize_2),
               customText("E-mail"),
               SizedBox(height: _customSize_1),
-              _customBuild(email, "Enter Customer ID", (value) {}),
+              _customBuild(
+                email,
+                "Example@email.com",
+                TextInputType.emailAddress,
+                (value) {
+                  if (value == null || value.isEmpty) {
+                    return "Please enter your email";
+                  } else if (!RegExp(
+                    r'^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$',
+                  ).hasMatch(value)) {
+                    return "Please enter a valid email address";
+                  } else {
+                    return null;
+                  }
+                },
+              ),
               SizedBox(height: _customSize_2),
-              customText("Address"),
+              customText("NIC Number"),
               SizedBox(height: _customSize_1),
-              _customBuild(address, "Enter Customer ID", (value) {}),
-              // SizedBox(height: _customSize_1),
+              _customBuild(nic, "Enter NIC Number", TextInputType.text, (
+                value,
+              ) {
+                if (value == null || value.isEmpty) {
+                  return "Please enter your NIC number";
+                } else if (value.length < 8 && value.length > 15) {
+                  return "Please enter a valid NIC number";
+                } else {
+                  return null;
+                }
+              }),
+              SizedBox(height: _customSize_2),
+              customText("Phone Number"),
+              SizedBox(height: _customSize_1),
+              _customBuild(phoneNumber, "0712345678", TextInputType.phone, (
+                value,
+              ) {
+                if (value == null || value.isEmpty) {
+                  return "Please enter your phone number";
+                } else if (value.length != 10 || !value.startsWith('07')) {
+                  return "Please enter a valid phone number";
+                } else {
+                  return null;
+                }
+              }),
             ],
           ),
         ),
@@ -296,14 +351,16 @@ class _NewClientLoanRequestState extends State<NewClientLoanRequest> {
   Widget _customBuild(
     final TextEditingController controllerNames,
     final String labelText_,
+    final TextInputType? type,
     final String? Function(String?)? validatorCallback,
   ) {
     return TextFormField(
       controller: controllerNames,
-      keyboardType: TextInputType.number,
+      keyboardType: type,
       autocorrect: false,
       cursorColor: const Color.fromARGB(255, 0, 55, 255),
       decoration: InputDecoration(
+        errorMaxLines: 2,
         contentPadding: const EdgeInsets.symmetric(vertical: 0, horizontal: 12),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.all(Radius.circular(btnBorderRadius)),
@@ -555,5 +612,13 @@ class _NewClientLoanRequestState extends State<NewClientLoanRequest> {
         ),
       ],
     );
+  }
+
+  void controllerClear() {
+    name.clear();
+    nic.clear();
+    email.clear();
+    address.clear();
+    phoneNumber.clear();
   }
 }
