@@ -2,8 +2,8 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
-import 'package:nkrs_app/main.dart';
 import 'package:nkrs_app/utility/constanst.dart';
+import 'package:nkrs_app/views/new_loan_request_view/loan_request_section_view.dart';
 import 'package:nkrs_app/views/new_loan_request_view/new_loan_request/new_client_loan_request_status.dart';
 import 'package:nkrs_app/views/new_loan_request_view/utility/main_card.dart';
 
@@ -15,8 +15,8 @@ class NewClientLoanRequest extends StatefulWidget {
 }
 
 class _NewClientLoanRequestState extends State<NewClientLoanRequest> {
-  File? nicFront;
-  File? nicBack;
+  // File? nicFront;
+  // File? nicBack;
 
   final _formKey = GlobalKey<FormState>();
   // for step
@@ -26,6 +26,9 @@ class _NewClientLoanRequestState extends State<NewClientLoanRequest> {
   final TextEditingController address = TextEditingController();
   // final TextEditingController password = TextEditingController();
   final TextEditingController phoneNumber = TextEditingController();
+
+  final TextEditingController loanAmount = TextEditingController();
+  final TextEditingController interestRate = TextEditingController();
 
   // for step 2
   int _currentStep = 0;
@@ -38,111 +41,104 @@ class _NewClientLoanRequestState extends State<NewClientLoanRequest> {
       state: _currentStep > 0 ? StepState.complete : StepState.indexed,
       isActive: _currentStep >= 0,
       title: Text(""),
-      content: SingleChildScrollView(
-        child: Container(
-          margin: EdgeInsets.only(bottom: 30),
-          padding: EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            color: appBarC,
-            borderRadius: BorderRadius.all(Radius.circular(cardBorderRadius)),
-            boxShadow: [MainCard.customShadow()],
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Icon(Iconsax.user, size: 30, color: btnC),
-                  SizedBox(width: 10),
-                  Text(
-                    "Personal Details",
-                    style: TextStyle(
-                      fontSize: cardHeaderFS,
-                      color: cardHeaderFC,
-                      fontWeight: FontWeight(700),
-                    ),
+      content: Container(
+        margin: EdgeInsets.only(bottom: 30),
+        padding: EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: appBarC,
+          borderRadius: BorderRadius.all(Radius.circular(cardBorderRadius)),
+          boxShadow: [MainCard.customShadow()],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Icon(Iconsax.user, size: 30, color: btnC),
+                SizedBox(width: 10),
+                Text(
+                  "Personal Details",
+                  style: TextStyle(
+                    fontSize: cardHeaderFS,
+                    color: cardHeaderFC,
+                    fontWeight: FontWeight(700),
                   ),
-                ],
-              ),
-              SizedBox(height: 30),
-              customText("Full Name"),
-              SizedBox(height: _customSize_1),
-              _customBuild(name, "John Doe", TextInputType.text, (value) {
+                ),
+              ],
+            ),
+            SizedBox(height: 30),
+            customText("Full Name"),
+            SizedBox(height: _customSize_1),
+            _customBuild(name, "John Doe", TextInputType.text, (value) {
+              if (value == null || value.isEmpty) {
+                return "Please enter your name";
+              } else if (!RegExp(r'^[a-zA-Z\s]+$').hasMatch(value)) {
+                return "Name cannot contain only numbers or special characters";
+              } else {
+                return null;
+              }
+            }),
+            SizedBox(height: _customSize_2),
+            customText("Address"),
+            SizedBox(height: _customSize_1),
+            _customBuild(address, "No: 123, Street Name", TextInputType.text, (
+              value,
+            ) {
+              if (value == null || value.isEmpty) {
+                return "Please enter your address";
+              } else if (value.length < 5) {
+                return "Please enter a valid address";
+              } else {
+                return null;
+              }
+            }),
+            SizedBox(height: _customSize_2),
+            customText("E-mail"),
+            SizedBox(height: _customSize_1),
+            _customBuild(
+              email,
+              "Example@email.com",
+              TextInputType.emailAddress,
+              (value) {
                 if (value == null || value.isEmpty) {
-                  return "Please enter your name";
-                } else if (!RegExp(r'^[a-zA-Z\s]+$').hasMatch(value)) {
-                  return "Name cannot contain only numbers or special characters";
+                  return "Please enter your email";
+                } else if (!RegExp(
+                  r'^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$',
+                ).hasMatch(value)) {
+                  return "Please enter a valid email address";
                 } else {
                   return null;
                 }
-              }),
-              SizedBox(height: _customSize_2),
-              customText("Address"),
-              SizedBox(height: _customSize_1),
-              _customBuild(
-                address,
-                "No: 123, Street Name",
-                TextInputType.text,
-                (value) {
-                  if (value == null || value.isEmpty) {
-                    return "Please enter your address";
-                  } else if (value.length < 5) {
-                    return "Please enter a valid address";
-                  } else {
-                    return null;
-                  }
-                },
-              ),
-              SizedBox(height: _customSize_2),
-              customText("E-mail"),
-              SizedBox(height: _customSize_1),
-              _customBuild(
-                email,
-                "Example@email.com",
-                TextInputType.emailAddress,
-                (value) {
-                  if (value == null || value.isEmpty) {
-                    return "Please enter your email";
-                  } else if (!RegExp(
-                    r'^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$',
-                  ).hasMatch(value)) {
-                    return "Please enter a valid email address";
-                  } else {
-                    return null;
-                  }
-                },
-              ),
-              SizedBox(height: _customSize_2),
-              customText("NIC Number"),
-              SizedBox(height: _customSize_1),
-              _customBuild(nic, "Enter NIC Number", TextInputType.text, (
-                value,
-              ) {
-                if (value == null || value.isEmpty) {
-                  return "Please enter your NIC number";
-                } else if (value.length < 8 && value.length > 15) {
-                  return "Please enter a valid NIC number";
-                } else {
-                  return null;
-                }
-              }),
-              SizedBox(height: _customSize_2),
-              customText("Phone Number"),
-              SizedBox(height: _customSize_1),
-              _customBuild(phoneNumber, "0712345678", TextInputType.phone, (
-                value,
-              ) {
-                if (value == null || value.isEmpty) {
-                  return "Please enter your phone number";
-                } else if (value.length != 10 || !value.startsWith('07')) {
-                  return "Please enter a valid phone number";
-                } else {
-                  return null;
-                }
-              }),
-            ],
-          ),
+              },
+            ),
+            SizedBox(height: _customSize_2),
+            customText("NIC Number"),
+            SizedBox(height: _customSize_1),
+            _customBuild(nic, "Enter NIC Number", TextInputType.text, (value) {
+              if (value == null || value.isEmpty) {
+                return "Please enter your NIC number";
+              } else if (value.length < 8 && value.length > 15) {
+                return "Please enter a valid NIC number";
+              } else {
+                return null;
+              }
+            }),
+            SizedBox(height: _customSize_2),
+            customText("Phone Number"),
+            SizedBox(height: _customSize_1),
+            _customBuild(phoneNumber, "0712345678", TextInputType.phone, (
+              value,
+            ) {
+              if (value == null || value.isEmpty) {
+                return "Please enter your phone number";
+              } else if (value.length != 10 || !value.startsWith('07')) {
+                return "Please enter a valid phone number";
+              } else {
+                return null;
+              }
+            }),
+          ],
         ),
       ),
     ),
@@ -150,44 +146,136 @@ class _NewClientLoanRequestState extends State<NewClientLoanRequest> {
       state: _currentStep > 1 ? StepState.complete : StepState.indexed,
       isActive: _currentStep >= 1,
       title: Text(""),
-      content: SingleChildScrollView(
-        child: Column(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(20),
-              margin: EdgeInsets.only(bottom: 30),
-              decoration: BoxDecoration(
-                color: appBarC,
-                borderRadius: BorderRadius.all(
-                  Radius.circular(cardBorderRadius),
-                ),
-                boxShadow: [MainCard.customShadow()],
-              ),
-              child: Column(
-                children: [
-                  Row(
-                    children: [
-                      const Icon(Icons.credit_card, color: Colors.blue),
-                      const SizedBox(width: 8),
-                      Text(
-                        "NIC Details",
-                        style: TextStyle(
-                          color: cardHeaderFC,
-                          fontSize: cardHeaderFS,
-                          fontWeight: FontWeight(700),
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: _customSize_2),
-                  buildUploadBox("NIC Front Side", nicFront, true),
-                  SizedBox(height: _customSize_2),
-                  buildUploadBox("NIC Back Side", nicBack, false),
-                ],
-              ),
+      content: Column(
+        children: [
+          Container(
+            margin: EdgeInsets.only(bottom: 30),
+            padding: EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: appBarC,
+              borderRadius: BorderRadius.all(Radius.circular(cardBorderRadius)),
+              boxShadow: [MainCard.customShadow()],
             ),
-          ],
-        ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Icon(Iconsax.user, size: 30, color: btnC),
+                    SizedBox(width: 10),
+                    Text(
+                      "Loan Details",
+                      style: TextStyle(
+                        fontSize: cardHeaderFS,
+                        color: cardHeaderFC,
+                        fontWeight: FontWeight(700),
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 30),
+                customText("Loan Amount"),
+                SizedBox(height: _customSize_1),
+                _customBuild(loanAmount, "XXXXX.XX", TextInputType.number, (
+                  value,
+                ) {
+                  if (value == null || value.isEmpty) {
+                    return "Please enter the loan amount";
+                  } else if (!RegExp(r'^\d+(\.\d+)?$').hasMatch(value)) {
+                    return "Please enter a valid loan amount";
+                  } else {
+                    return null;
+                  }
+                }),
+                SizedBox(height: _customSize_2),
+                customText("Interest Rate"),
+                SizedBox(height: _customSize_1),
+                _customBuild(interestRate, "XX.XX%", TextInputType.number, (
+                  value,
+                ) {
+                  if (value == null || value.isEmpty) {
+                    return "Please enter the interest rate";
+                  } else if (!RegExp(r'^\d+(\.\d+)?%?$').hasMatch(value)) {
+                    return "Please enter a valid interest rate";
+                  } else if (value == 100) {
+                    return "Please enter an interest rate between 0 and 100";
+                  } else {
+                    return null;
+                  }
+                }),
+                SizedBox(height: _customSize_2),
+                customText("Loan Duration"),
+                SizedBox(height: _customSize_1),
+                DropdownButtonFormField<String>(
+                  hint: Text("Choose Loan Duration"),
+                  icon: const Icon(
+                    Icons.keyboard_arrow_down,
+                    color: Color(0xFF1A3D81),
+                  ),
+                  decoration: InputDecoration(
+                    floatingLabelStyle: TextStyle(fontSize: 1),
+                    errorMaxLines: 2,
+                    contentPadding: const EdgeInsets.symmetric(
+                      vertical: 0,
+                      horizontal: 12,
+                    ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(
+                        Radius.circular(btnBorderRadius),
+                      ),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(
+                        Radius.circular(btnBorderRadius),
+                      ),
+                      borderSide: BorderSide(
+                        color: Color.fromARGB(58, 23, 23, 23),
+                        width: 1.5,
+                      ),
+                    ),
+                    errorBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(
+                        Radius.circular(btnBorderRadius),
+                      ),
+                      borderSide: BorderSide(
+                        color: Color.fromARGB(89, 181, 0, 0),
+                        width: 2,
+                      ),
+                    ),
+                    errorStyle: TextStyle(
+                      color: Color.fromARGB(255, 233, 1, 1),
+                      fontSize: 15,
+                      fontWeight: FontWeight(700),
+                    ),
+                    fillColor: safeAreaC,
+                    filled: true,
+                    labelText: "labelText_",
+                    labelStyle: TextStyle(
+                      color: Color.fromARGB(105, 21, 21, 21),
+                      fontSize: 17,
+                      fontWeight: FontWeight(500),
+                    ),
+                  ),
+                  items: ["6 Months", "12 Months", "24 Months"].map((
+                    String value,
+                  ) {
+                    return DropdownMenuItem<String>(
+                      value: value,
+                      child: Text(
+                        value,
+                        style: TextStyle(color: Color(0xFF1A3D81)),
+                      ),
+                    );
+                  }).toList(),
+                  onChanged: (newValue) {
+                    // Logic to update Monthly Payment based on duration
+                  },
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     ),
 
@@ -195,7 +283,74 @@ class _NewClientLoanRequestState extends State<NewClientLoanRequest> {
       state: _currentStep > 2 ? StepState.complete : StepState.indexed,
       isActive: _currentStep >= 2,
       title: Text(""),
-      content: Column(),
+      content: Container(
+        margin: EdgeInsets.only(bottom: 30),
+        padding: EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: appBarC,
+          borderRadius: BorderRadius.all(Radius.circular(cardBorderRadius)),
+          boxShadow: [MainCard.customShadow()],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Icon(Iconsax.document_favorite, size: 30, color: btnC),
+                SizedBox(width: 10),
+                Text(
+                  "Summary Details",
+                  style: TextStyle(
+                    fontSize: cardHeaderFS,
+                    color: cardHeaderFC,
+                    fontWeight: FontWeight(700),
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 20),
+            Container(
+              width: double.infinity,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildDetailRow("Full Name", name.text),
+                  Row(
+                    children: [
+                      Expanded(child: _buildDetailRow("NIC Number", nic.text)),
+                      Expanded(
+                        child: _buildDetailRow("Phone", phoneNumber.text),
+                      ),
+                    ],
+                  ),
+                  _buildDetailRow("Email", email.text),
+                  _buildDetailRow("Permanent Address", address.text),
+                ],
+              ),
+            ),
+            SizedBox(height: 20), // Space between boxes
+            // --- BOX 2: LOAN BREAKDOWN ---
+            Container(
+              width: double.infinity,
+              padding: EdgeInsets.all(0),
+              child: Column(
+                children: [
+                  _buildLoanRow("Principal Amount", "LKR 250,000.00"),
+                  _buildLoanRow("Interest Rate (Annual)", "14.5%"),
+                  _buildLoanRow("Installment Count", "24 Months"),
+                  Divider(height: 30),
+                  _buildLoanRow(
+                    "Monthly Payment",
+                    "LKR 12,065.50",
+                    isBold: true,
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
     ),
   ];
 
@@ -360,6 +515,7 @@ class _NewClientLoanRequestState extends State<NewClientLoanRequest> {
       autocorrect: false,
       cursorColor: const Color.fromARGB(255, 0, 55, 255),
       decoration: InputDecoration(
+        floatingLabelStyle: TextStyle(fontSize: 1),
         errorMaxLines: 2,
         contentPadding: const EdgeInsets.symmetric(vertical: 0, horizontal: 12),
         border: OutlineInputBorder(
@@ -375,7 +531,7 @@ class _NewClientLoanRequestState extends State<NewClientLoanRequest> {
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.all(Radius.circular(btnBorderRadius)),
           borderSide: BorderSide(
-            color: Color.fromARGB(148, 181, 0, 0),
+            color: Color.fromARGB(89, 181, 0, 0),
             width: 2,
           ),
         ),
@@ -468,7 +624,7 @@ class _NewClientLoanRequestState extends State<NewClientLoanRequest> {
                           Navigator.pushAndRemoveUntil(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => const MyApp(),
+                              builder: (context) => const LoanRequestSection(),
                             ),
                             (Route<dynamic> route) =>
                                 false, // 'false' clears the entire history
@@ -620,5 +776,55 @@ class _NewClientLoanRequestState extends State<NewClientLoanRequest> {
     email.clear();
     address.clear();
     phoneNumber.clear();
+  }
+
+  Widget _buildLoanRow(String label, String value, {bool isBold = false}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            label,
+            style: TextStyle(color: Colors.grey.shade700, fontSize: 15),
+          ),
+          Text(
+            value,
+            style: TextStyle(
+              color: Color(0xFF1A3D81),
+              fontSize: isBold ? 18 : 16,
+              fontWeight: isBold ? FontWeight.bold : FontWeight.w600,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDetailRow(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            label.toUpperCase(),
+            style: TextStyle(
+              color: Colors.grey,
+              fontSize: 12,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          Text(
+            value,
+            style: TextStyle(
+              color: Color(0xFF1A3D81),
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
