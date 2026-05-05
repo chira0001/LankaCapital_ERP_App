@@ -53,7 +53,7 @@ class _RegisterPageState extends State<RegisterPage> {
                           ),
                           child: Column(
                             children: [
-                              Image.asset("Assets/logo.png", height: 100),
+                              Image.asset("assets/logo.png", height: 100),
                               const SizedBox(height: 10),
                               const Text(
                                 "N.K.R.S",

@@ -9,7 +9,7 @@ class FrontPage extends StatelessWidget {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Image.asset("Assets/logo.png", width: 250, fit: BoxFit.fill),
+        Image.asset("assets/logo.png", width: 250, fit: BoxFit.fill),
         SizedBox(height: 20),
         Text(
           "N.K.R.S\nLANKA CAPITAL",
