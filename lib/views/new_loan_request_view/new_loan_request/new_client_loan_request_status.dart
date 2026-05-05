@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:nkrs_app/main.dart';
 import 'package:nkrs_app/utility/constanst.dart';
+import 'package:nkrs_app/views/new_loan_request_view/loan_request_section_view.dart';
 import 'package:timeline_tile/timeline_tile.dart';
 
 class NewClientLoanRequestStatus extends StatefulWidget {
@@ -26,7 +26,7 @@ class _NewClientLoanRequestStatusState
             onPressed: () {
               Navigator.pushAndRemoveUntil(
                 context,
-                MaterialPageRoute(builder: (context) => const MyApp()),
+                MaterialPageRoute(builder: (context) => const LoanRequestSection()),
                 (Route<dynamic> route) => false,
               );
             },

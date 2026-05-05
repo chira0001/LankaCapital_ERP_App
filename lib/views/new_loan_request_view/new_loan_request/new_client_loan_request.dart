@@ -2,8 +2,8 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
-import 'package:nkrs_app/main.dart';
 import 'package:nkrs_app/utility/constanst.dart';
+import 'package:nkrs_app/views/new_loan_request_view/loan_request_section_view.dart';
 import 'package:nkrs_app/views/new_loan_request_view/new_loan_request/new_client_loan_request_status.dart';
 import 'package:nkrs_app/views/new_loan_request_view/utility/main_card.dart';
 
@@ -15,8 +15,8 @@ class NewClientLoanRequest extends StatefulWidget {
 }
 
 class _NewClientLoanRequestState extends State<NewClientLoanRequest> {
-  File? nicFront;
-  File? nicBack;
+  // File? nicFront;
+  // File? nicBack;
 
   final _formKey = GlobalKey<FormState>();
   // for step
@@ -24,11 +24,17 @@ class _NewClientLoanRequestState extends State<NewClientLoanRequest> {
   final TextEditingController nic = TextEditingController();
   final TextEditingController email = TextEditingController();
   final TextEditingController address = TextEditingController();
-  // for step 2
+  // final TextEditingController password = TextEditingController();
+  final TextEditingController phoneNumber = TextEditingController();
 
+  final TextEditingController loanAmount = TextEditingController();
+  final TextEditingController interestRate = TextEditingController();
+  final TextEditingController installment = TextEditingController();
+
+  // for step 2
   int _currentStep = 0;
   final double _customSize_1 = 10;
-  final double _customSize_2 = 25;
+  final double _customSize_2 = 20;
   bool isCompeleted = false;
 
   List<Step> get getSt => [
@@ -36,58 +42,104 @@ class _NewClientLoanRequestState extends State<NewClientLoanRequest> {
       state: _currentStep > 0 ? StepState.complete : StepState.indexed,
       isActive: _currentStep >= 0,
       title: Text(""),
-      content: SingleChildScrollView(
-        child: Container(
-          margin: EdgeInsets.only(bottom: 30),
-          padding: EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            color: appBarC,
-            borderRadius: BorderRadius.all(Radius.circular(cardBorderRadius)),
-            boxShadow: [MainCard.customShadow()],
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Icon(Iconsax.user, size: 30, color: btnC),
-                  SizedBox(width: 10),
-                  Text(
-                    "Personal Details",
-                    style: TextStyle(
-                      fontSize: cardHeaderFS,
-                      color: cardHeaderFC,
-                      fontWeight: FontWeight(700),
-                    ),
+      content: Container(
+        margin: EdgeInsets.only(bottom: 30),
+        padding: EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: appBarC,
+          borderRadius: BorderRadius.all(Radius.circular(cardBorderRadius)),
+          boxShadow: [MainCard.customShadow()],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Icon(Iconsax.user, size: 30, color: btnC),
+                SizedBox(width: 10),
+                Text(
+                  "Personal Details",
+                  style: TextStyle(
+                    fontSize: cardHeaderFS,
+                    color: cardHeaderFC,
+                    fontWeight: FontWeight(700),
                   ),
-                ],
-              ),
-              SizedBox(height: 30),
-              customText("Full Name"),
-              SizedBox(height: _customSize_1),
-              _customBuild(name, "Enter Customer Name", (value) {
+                ),
+              ],
+            ),
+            SizedBox(height: 30),
+            customText("Full Name"),
+            SizedBox(height: _customSize_1),
+            _customBuild(name, "John Doe", TextInputType.text, (value) {
+              if (value == null || value.isEmpty) {
+                return "Please enter your name";
+              } else if (!RegExp(r'^[a-zA-Z\s]+$').hasMatch(value)) {
+                return "Name cannot contain only numbers or special characters";
+              } else {
+                return null;
+              }
+            }),
+            SizedBox(height: _customSize_2),
+            customText("Address"),
+            SizedBox(height: _customSize_1),
+            _customBuild(address, "No: 123, Street Name", TextInputType.text, (
+              value,
+            ) {
+              if (value == null || value.isEmpty) {
+                return "Please enter your address";
+              } else if (value.length < 5) {
+                return "Please enter a valid address";
+              } else {
+                return null;
+              }
+            }),
+            SizedBox(height: _customSize_2),
+            customText("E-mail"),
+            SizedBox(height: _customSize_1),
+            _customBuild(
+              email,
+              "Example@email.com",
+              TextInputType.emailAddress,
+              (value) {
                 if (value == null || value.isEmpty) {
-                  return "Incorrect";
+                  return "Please enter your email";
+                } else if (!RegExp(
+                  r'^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$',
+                ).hasMatch(value)) {
+                  return "Please enter a valid email address";
                 } else {
                   return null;
                 }
-              }),
-              SizedBox(height: _customSize_2),
-              customText("Full Name"),
-              SizedBox(height: _customSize_1),
-              _customBuild(nic, "Enter Customer ID", (value) => null),
-              SizedBox(height: _customSize_2),
-              customText("E-mail"),
-              SizedBox(height: _customSize_1),
-              _customBuild(email, "Enter Customer ID", (value) => null),
-              SizedBox(height: _customSize_2),
-              customText("Address"),
-              SizedBox(height: _customSize_1),
-              _customBuild(address, "Enter Customer ID", (value) => null),
-              // SizedBox(height: _customSize_1),
-            ],
-          ),
+              },
+            ),
+            SizedBox(height: _customSize_2),
+            customText("NIC Number"),
+            SizedBox(height: _customSize_1),
+            _customBuild(nic, "Enter NIC Number", TextInputType.text, (value) {
+              if (value == null || value.isEmpty) {
+                return "Please enter your NIC number";
+              } else if (value.length < 8 && value.length > 15) {
+                return "Please enter a valid NIC number";
+              } else {
+                return null;
+              }
+            }),
+            SizedBox(height: _customSize_2),
+            customText("Phone Number"),
+            SizedBox(height: _customSize_1),
+            _customBuild(phoneNumber, "0712345678", TextInputType.phone, (
+              value,
+            ) {
+              if (value == null || value.isEmpty) {
+                return "Please enter your phone number";
+              } else if (value.length != 10 || !value.startsWith('07')) {
+                return "Please enter a valid phone number";
+              } else {
+                return null;
+              }
+            }),
+          ],
         ),
       ),
     ),
@@ -95,44 +147,164 @@ class _NewClientLoanRequestState extends State<NewClientLoanRequest> {
       state: _currentStep > 1 ? StepState.complete : StepState.indexed,
       isActive: _currentStep >= 1,
       title: Text(""),
-      content: SingleChildScrollView(
-        child: Column(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(20),
-              margin: EdgeInsets.only(bottom: 30),
-              decoration: BoxDecoration(
-                color: appBarC,
-                borderRadius: BorderRadius.all(
-                  Radius.circular(cardBorderRadius),
-                ),
-                boxShadow: [MainCard.customShadow()],
-              ),
-              child: Column(
-                children: [
-                  Row(
-                    children: [
-                      const Icon(Icons.credit_card, color: Colors.blue),
-                      const SizedBox(width: 8),
-                      Text(
-                        "NIC Details",
-                        style: TextStyle(
-                          color: cardHeaderFC,
-                          fontSize: cardHeaderFS,
-                          fontWeight: FontWeight(700),
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: _customSize_2),
-                  buildUploadBox("NIC Front Side", nicFront, true),
-                  SizedBox(height: _customSize_2),
-                  buildUploadBox("NIC Back Side", nicBack, false),
-                ],
-              ),
+      content: Column(
+        children: [
+          Container(
+            margin: EdgeInsets.only(bottom: 30),
+            padding: EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: appBarC,
+              borderRadius: BorderRadius.all(Radius.circular(cardBorderRadius)),
+              boxShadow: [MainCard.customShadow()],
             ),
-          ],
-        ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Icon(Iconsax.user, size: 30, color: btnC),
+                    SizedBox(width: 10),
+                    Text(
+                      "Loan Details",
+                      style: TextStyle(
+                        fontSize: cardHeaderFS,
+                        color: cardHeaderFC,
+                        fontWeight: FontWeight(700),
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 30),
+                customText("Loan Amount"),
+                SizedBox(height: _customSize_1),
+                _customBuild(loanAmount, "XXXXX.XX", TextInputType.number, (
+                  value,
+                ) {
+                  // if (value == null || value.isEmpty) {
+                  //   return "Please enter the loan amount";
+                  // } else if (value as int <= 0) {
+                  //   return "Please enter a valid loan amount";
+                  // } else {
+                  //   return null;
+                  // }
+                }),
+                SizedBox(height: _customSize_2),
+                customText("Interest Rate"),
+                SizedBox(height: _customSize_1),
+                _customBuild(interestRate, "XX.XX%", TextInputType.number, (
+                  value,
+                ) {
+                  // if (value == null || value.isEmpty) {
+                  //   return "Please enter the interest rate";
+                  // } else if (value as int < 0) {
+                  //   return "Please enter a valid interest rate";
+                  // } else if (value as int < 0 || value as int >= 100) {
+                  //   return "Please enter an interest rate between 0 and 100";
+                  // } else {
+                  //   return null;
+                  // }
+                }),
+                SizedBox(height: _customSize_2),
+                customText("Loan Duration"),
+                SizedBox(height: _customSize_1),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    SizedBox(
+                      width: MediaQuery.of(context).size.width * 0.4,
+                      child: _customBuild(
+                        installment,
+                        "No of Installments",
+                        TextInputType.number,
+                        (value) {
+                          // if (value == null || value.isEmpty) {
+                          //   return "Please enter the number of installments";
+                          // } else if (value as int < 0) {
+                          //   return "Please enter a valid number of installments";
+                          // } else {
+                          //   return null;
+                          // }
+                        },
+                      ),
+                    ),
+                    SizedBox(
+                      width: MediaQuery.of(context).size.width * 0.35,
+                      child: DropdownButtonFormField<String>(
+                        hint: Text("Choose"),
+                        icon: const Icon(
+                          Icons.keyboard_arrow_down,
+                          color: Color(0xFF1A3D81),
+                        ),
+                        decoration: InputDecoration(
+                          floatingLabelStyle: TextStyle(fontSize: 1),
+                          errorMaxLines: 2,
+                          contentPadding: const EdgeInsets.symmetric(
+                            vertical: 0,
+                            horizontal: 12,
+                          ),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.all(
+                              Radius.circular(btnBorderRadius),
+                            ),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.all(
+                              Radius.circular(btnBorderRadius),
+                            ),
+                            borderSide: BorderSide(
+                              color: Color.fromARGB(58, 23, 23, 23),
+                              width: 1.5,
+                            ),
+                          ),
+                          errorBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.all(
+                              Radius.circular(btnBorderRadius),
+                            ),
+                            borderSide: BorderSide(
+                              color: Color.fromARGB(89, 181, 0, 0),
+                              width: 2,
+                            ),
+                          ),
+                          errorStyle: TextStyle(
+                            color: Color.fromARGB(255, 233, 1, 1),
+                            fontSize: 15,
+                            fontWeight: FontWeight(700),
+                          ),
+                          fillColor: safeAreaC,
+                          filled: true,
+                          labelText: "labelText",
+                          labelStyle: TextStyle(
+                            color: Color.fromARGB(105, 21, 21, 21),
+                            fontSize: 17,
+                            fontWeight: FontWeight(500),
+                          ),
+                        ),
+                        items: ["Days", "Weeks", "Months"].map((String value) {
+                          return DropdownMenuItem<String>(
+                            value: value,
+                            child: Text(
+                              value,
+                              style: TextStyle(color: Color(0xFF1A3D81)),
+                            ),
+                          );
+                        }).toList(),
+                        // validator: (value) {
+                        //   if (value == null || value.isEmpty) {
+                        //     return "Please select a duration type";
+                        //   } else {
+                        //     return null;
+                        //   }
+                        // },
+                        onChanged: (newValue) {},
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     ),
 
@@ -140,7 +312,74 @@ class _NewClientLoanRequestState extends State<NewClientLoanRequest> {
       state: _currentStep > 2 ? StepState.complete : StepState.indexed,
       isActive: _currentStep >= 2,
       title: Text(""),
-      content: Column(),
+      content: Container(
+        margin: EdgeInsets.only(bottom: 30),
+        padding: EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: appBarC,
+          borderRadius: BorderRadius.all(Radius.circular(cardBorderRadius)),
+          boxShadow: [MainCard.customShadow()],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Icon(Iconsax.document_favorite, size: 30, color: btnC),
+                SizedBox(width: 10),
+                Text(
+                  "Summary Details",
+                  style: TextStyle(
+                    fontSize: cardHeaderFS,
+                    color: cardHeaderFC,
+                    fontWeight: FontWeight(700),
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 20),
+            Container(
+              width: double.infinity,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildDetailRow("Full Name", name.text),
+                  Row(
+                    children: [
+                      Expanded(child: _buildDetailRow("NIC Number", nic.text)),
+                      Expanded(
+                        child: _buildDetailRow("Phone", phoneNumber.text),
+                      ),
+                    ],
+                  ),
+                  _buildDetailRow("Email", email.text),
+                  _buildDetailRow("Permanent Address", address.text),
+                ],
+              ),
+            ),
+            SizedBox(height: 20), // Space between boxes
+            // --- BOX 2: LOAN BREAKDOWN ---
+            Container(
+              width: double.infinity,
+              padding: EdgeInsets.all(0),
+              child: Column(
+                children: [
+                  _buildLoanRow("Principal Amount", "LKR 250,000.00"),
+                  _buildLoanRow("Interest Rate (Annual)", "14.5%"),
+                  _buildLoanRow("Installment Count", "24 Months"),
+                  Divider(height: 30),
+                  _buildLoanRow(
+                    "Monthly Payment",
+                    "LKR 12,065.50",
+                    isBold: true,
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
     ),
   ];
 
@@ -196,9 +435,6 @@ class _NewClientLoanRequestState extends State<NewClientLoanRequest> {
                     if (isLastStep) {
                       // ignore: avoid_print
                       print("All steps valid. Submitting to Database...");
-
-                      // Call your database method here
-                      // Dispose/Reset variables if needed
                       Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -206,7 +442,6 @@ class _NewClientLoanRequestState extends State<NewClientLoanRequest> {
                         ),
                       );
                     } else {
-                      // Logic for moving to the next step
                       _currentStep += 1;
                     }
                   });
@@ -296,14 +531,17 @@ class _NewClientLoanRequestState extends State<NewClientLoanRequest> {
   Widget _customBuild(
     final TextEditingController controllerNames,
     final String labelText_,
+    final TextInputType? type,
     final String? Function(String?)? validatorCallback,
   ) {
     return TextFormField(
       controller: controllerNames,
-      keyboardType: TextInputType.number,
+      keyboardType: type,
       autocorrect: false,
       cursorColor: const Color.fromARGB(255, 0, 55, 255),
       decoration: InputDecoration(
+        floatingLabelStyle: TextStyle(fontSize: 1),
+        errorMaxLines: 2,
         contentPadding: const EdgeInsets.symmetric(vertical: 0, horizontal: 12),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.all(Radius.circular(btnBorderRadius)),
@@ -318,7 +556,7 @@ class _NewClientLoanRequestState extends State<NewClientLoanRequest> {
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.all(Radius.circular(btnBorderRadius)),
           borderSide: BorderSide(
-            color: Color.fromARGB(148, 181, 0, 0),
+            color: Color.fromARGB(89, 181, 0, 0),
             width: 2,
           ),
         ),
@@ -411,7 +649,7 @@ class _NewClientLoanRequestState extends State<NewClientLoanRequest> {
                           Navigator.pushAndRemoveUntil(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => const MyApp(),
+                              builder: (context) => const LoanRequestSection(),
                             ),
                             (Route<dynamic> route) =>
                                 false, // 'false' clears the entire history
@@ -479,81 +717,74 @@ class _NewClientLoanRequestState extends State<NewClientLoanRequest> {
     );
   }
 
-  // AppBar customAppBar() {
-  //   return AppBar(
-  //     backgroundColor: appBarC,
-  //     leading: IconButton(
-  //       onPressed: () {
-  //         _showMySheet(context);
-  //       },
-  //       icon: Icon(
-  //         Icons.arrow_back_ios,
-  //         color: const Color.fromARGB(255, 0, 0, 0),
-  //         size: 25,
-  //         fontWeight: FontWeight.w900,
-  //       ),
-  //     ),
-  //     title: Text("New Client Loan Request"),
-  //     titleTextStyle: TextStyle(
-  //       color: btnC,
-  //       fontSize: 22,
-  //       fontWeight: FontWeight.bold,
-  //     ),
-  //     actions: [
-  //       Padding(
-  //         padding: EdgeInsets.only(right: 10),
-  //         child: IconButton(
-  //           onPressed: () {},
-  //           icon: Icon(
-  //             Icons.help_outline,
-  //             color: const Color.fromARGB(118, 17, 17, 17),
-  //             size: 26,
-  //           ),
-  //         ),
-  //       ),
-  //     ],
-  //   );
-  // }
+  void controllerClear() {
+    name.clear();
+    nic.clear();
+    email.clear();
+    address.clear();
+    phoneNumber.clear();
+  }
 
-  Widget buildUploadBox(String title, File? image, bool isFront) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        customText(title),
-        SizedBox(height: _customSize_1),
-        GestureDetector(
-          // onTap: () => pickImage(isFront),
-          child: Container(
-            height: 130,
-            width: double.infinity,
-            decoration: BoxDecoration(
-              color: safeAreaC,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                color: Color.fromARGB(58, 23, 23, 23),
-                width: 1.5,
-              ),
-            ),
-            child: image == null
-                ? const Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Iconsax.document_upload_copy, size: 30),
-                      SizedBox(height: 5),
-                      Text("Tap to upload"),
-                    ],
-                  )
-                : ClipRRect(
-                    borderRadius: BorderRadius.circular(12),
-                    child: Image.file(
-                      image,
-                      fit: BoxFit.cover,
-                      width: double.infinity,
-                    ),
-                  ),
+  @override
+  void dispose() {
+    name.dispose();
+    nic.dispose();
+    email.dispose();
+    address.dispose();
+    phoneNumber.dispose();
+    loanAmount.dispose();
+    interestRate.dispose();
+    installment.dispose();
+    super.dispose();
+  }
+
+  Widget _buildLoanRow(String label, String value, {bool isBold = false}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            label,
+            style: TextStyle(color: Colors.grey.shade700, fontSize: 15),
           ),
-        ),
-      ],
+          Text(
+            value,
+            style: TextStyle(
+              color: Color(0xFF1A3D81),
+              fontSize: isBold ? 18 : 16,
+              fontWeight: isBold ? FontWeight.bold : FontWeight.w600,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDetailRow(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            label.toUpperCase(),
+            style: TextStyle(
+              color: Colors.grey,
+              fontSize: 12,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          Text(
+            value,
+            style: TextStyle(
+              color: Color(0xFF1A3D81),
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
