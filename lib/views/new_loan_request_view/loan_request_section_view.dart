@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:nkrs_app/utility/constanst.dart';
+import 'package:nkrs_app/views/customer_collection_views/customerCollectionpage/customer_collection_home.dart';
 import 'package:nkrs_app/views/new_loan_request_view/loan_request/existing_customer_loan.dart';
 import 'package:nkrs_app/views/new_loan_request_view/new_loan_request/new_client_loan_request.dart';
 import 'package:nkrs_app/views/new_loan_request_view/utility/main_card.dart';
@@ -60,7 +61,9 @@ class _LoanRequestSectionState extends State<LoanRequestSection> {
         ),
         actions: [
           IconButton(
-            onPressed: () {},
+            onPressed: () {
+              MaterialPageRoute(builder: (context) => CustomerCollectionHome());
+            },
             icon: Icon(
               Iconsax.notification_bing_copy,
               color: const Color.fromARGB(255, 0, 0, 0),

@@ -29,6 +29,7 @@ class _NewClientLoanRequestState extends State<NewClientLoanRequest> {
 
   final TextEditingController loanAmount = TextEditingController();
   final TextEditingController interestRate = TextEditingController();
+  final TextEditingController installment = TextEditingController();
 
   // for step 2
   int _currentStep = 0;
@@ -180,13 +181,13 @@ class _NewClientLoanRequestState extends State<NewClientLoanRequest> {
                 _customBuild(loanAmount, "XXXXX.XX", TextInputType.number, (
                   value,
                 ) {
-                  if (value == null || value.isEmpty) {
-                    return "Please enter the loan amount";
-                  } else if (!RegExp(r'^\d+(\.\d+)?$').hasMatch(value)) {
-                    return "Please enter a valid loan amount";
-                  } else {
-                    return null;
-                  }
+                  // if (value == null || value.isEmpty) {
+                  //   return "Please enter the loan amount";
+                  // } else if (value as int <= 0) {
+                  //   return "Please enter a valid loan amount";
+                  // } else {
+                  //   return null;
+                  // }
                 }),
                 SizedBox(height: _customSize_2),
                 customText("Interest Rate"),
@@ -194,25 +195,43 @@ class _NewClientLoanRequestState extends State<NewClientLoanRequest> {
                 _customBuild(interestRate, "XX.XX%", TextInputType.number, (
                   value,
                 ) {
-                  if (value == null || value.isEmpty) {
-                    return "Please enter the interest rate";
-                  } else if (!RegExp(r'^\d+(\.\d+)?%?$').hasMatch(value)) {
-                    return "Please enter a valid interest rate";
-                  } else if (value == 100) {
-                    return "Please enter an interest rate between 0 and 100";
-                  } else {
-                    return null;
-                  }
+                  // if (value == null || value.isEmpty) {
+                  //   return "Please enter the interest rate";
+                  // } else if (value as int < 0) {
+                  //   return "Please enter a valid interest rate";
+                  // } else if (value as int < 0 || value as int >= 100) {
+                  //   return "Please enter an interest rate between 0 and 100";
+                  // } else {
+                  //   return null;
+                  // }
                 }),
                 SizedBox(height: _customSize_2),
                 customText("Loan Duration"),
                 SizedBox(height: _customSize_1),
                 Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     SizedBox(
-                      width: 200,
+                      width: MediaQuery.of(context).size.width * 0.4,
+                      child: _customBuild(
+                        installment,
+                        "No of Installments",
+                        TextInputType.number,
+                        (value) {
+                          // if (value == null || value.isEmpty) {
+                          //   return "Please enter the number of installments";
+                          // } else if (value as int < 0) {
+                          //   return "Please enter a valid number of installments";
+                          // } else {
+                          //   return null;
+                          // }
+                        },
+                      ),
+                    ),
+                    SizedBox(
+                      width: MediaQuery.of(context).size.width * 0.35,
                       child: DropdownButtonFormField<String>(
-                        hint: Text("Choose Loan Duration"),
+                        hint: Text("Choose"),
                         icon: const Icon(
                           Icons.keyboard_arrow_down,
                           color: Color(0xFF1A3D81),
@@ -254,16 +273,14 @@ class _NewClientLoanRequestState extends State<NewClientLoanRequest> {
                           ),
                           fillColor: safeAreaC,
                           filled: true,
-                          labelText: "labelText_",
+                          labelText: "labelText",
                           labelStyle: TextStyle(
                             color: Color.fromARGB(105, 21, 21, 21),
                             fontSize: 17,
                             fontWeight: FontWeight(500),
                           ),
                         ),
-                        items: ["6 Months", "12 Months", "24 Months"].map((
-                          String value,
-                        ) {
+                        items: ["Days", "Weeks", "Months"].map((String value) {
                           return DropdownMenuItem<String>(
                             value: value,
                             child: Text(
@@ -272,9 +289,14 @@ class _NewClientLoanRequestState extends State<NewClientLoanRequest> {
                             ),
                           );
                         }).toList(),
-                        onChanged: (newValue) {
-                          // Logic to update Monthly Payment based on duration
-                        },
+                        // validator: (value) {
+                        //   if (value == null || value.isEmpty) {
+                        //     return "Please select a duration type";
+                        //   } else {
+                        //     return null;
+                        //   }
+                        // },
+                        onChanged: (newValue) {},
                       ),
                     ),
                   ],
@@ -413,9 +435,6 @@ class _NewClientLoanRequestState extends State<NewClientLoanRequest> {
                     if (isLastStep) {
                       // ignore: avoid_print
                       print("All steps valid. Submitting to Database...");
-
-                      // Call your database method here
-                      // Dispose/Reset variables if needed
                       Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -423,7 +442,6 @@ class _NewClientLoanRequestState extends State<NewClientLoanRequest> {
                         ),
                       );
                     } else {
-                      // Logic for moving to the next step
                       _currentStep += 1;
                     }
                   });
@@ -699,90 +717,25 @@ class _NewClientLoanRequestState extends State<NewClientLoanRequest> {
     );
   }
 
-  // AppBar customAppBar() {
-  //   return AppBar(
-  //     backgroundColor: appBarC,
-  //     leading: IconButton(
-  //       onPressed: () {
-  //         _showMySheet(context);
-  //       },
-  //       icon: Icon(
-  //         Icons.arrow_back_ios,
-  //         color: const Color.fromARGB(255, 0, 0, 0),
-  //         size: 25,
-  //         fontWeight: FontWeight.w900,
-  //       ),
-  //     ),
-  //     title: Text("New Client Loan Request"),
-  //     titleTextStyle: TextStyle(
-  //       color: btnC,
-  //       fontSize: 22,
-  //       fontWeight: FontWeight.bold,
-  //     ),
-  //     actions: [
-  //       Padding(
-  //         padding: EdgeInsets.only(right: 10),
-  //         child: IconButton(
-  //           onPressed: () {},
-  //           icon: Icon(
-  //             Icons.help_outline,
-  //             color: const Color.fromARGB(118, 17, 17, 17),
-  //             size: 26,
-  //           ),
-  //         ),
-  //       ),
-  //     ],
-  //   );
-  // }
-
-  Widget buildUploadBox(String title, File? image, bool isFront) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        customText(title),
-        SizedBox(height: _customSize_1),
-        GestureDetector(
-          // onTap: () => pickImage(isFront),
-          child: Container(
-            height: 130,
-            width: double.infinity,
-            decoration: BoxDecoration(
-              color: safeAreaC,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                color: Color.fromARGB(58, 23, 23, 23),
-                width: 1.5,
-              ),
-            ),
-            child: image == null
-                ? const Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Iconsax.document_upload_copy, size: 30),
-                      SizedBox(height: 5),
-                      Text("Tap to upload"),
-                    ],
-                  )
-                : ClipRRect(
-                    borderRadius: BorderRadius.circular(12),
-                    child: Image.file(
-                      image,
-                      fit: BoxFit.cover,
-                      width: double.infinity,
-                    ),
-                  ),
-          ),
-        ),
-      ],
-    );
-  }
-
   void controllerClear() {
     name.clear();
     nic.clear();
     email.clear();
     address.clear();
     phoneNumber.clear();
+  }
+
+  @override
+  void dispose() {
+    name.dispose();
+    nic.dispose();
+    email.dispose();
+    address.dispose();
+    phoneNumber.dispose();
+    loanAmount.dispose();
+    interestRate.dispose();
+    installment.dispose();
+    super.dispose();
   }
 
   Widget _buildLoanRow(String label, String value, {bool isBold = false}) {
