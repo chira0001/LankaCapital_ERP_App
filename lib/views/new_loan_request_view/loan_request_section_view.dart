@@ -15,7 +15,6 @@ class LoanRequestSection extends StatefulWidget {
 
 class _LoanRequestSectionState extends State<LoanRequestSection> {
   // late final TextEditingController name;
-  int _selectedIndex = 0;
   double logoSize = 32;
 
   @override
@@ -45,7 +44,13 @@ class _LoanRequestSectionState extends State<LoanRequestSection> {
           },
           child: IconButton(
             onPressed: () {
-              Navigator.pop(context);
+              // Navigator.pop(context);
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => CustomerCollectionHome(),
+                ),
+              );
             },
             icon: Icon(
               Icons.arrow_back_ios,
