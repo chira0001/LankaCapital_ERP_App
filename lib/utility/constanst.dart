@@ -50,3 +50,27 @@ int HeaderFW = 700;
 int descriptionFw = 500;
 
 // Color primaryColor = const Color.fromARGB(255, 255, 255, 255);
+
+const double kSmallSpacing = 10.0;
+const double kMediumSpacing = 20.0;
+const double kTinySpacing = 4.0;
+const double kLargeSpacing = 30.0;
+
+// Padding constants
+const double kCardPadding = 16.0;
+const double kIconPadding = 12.0;
+const double kContainerPadding = 8.0;
+
+// Border radius constants
+const double kBorderRadiusSmall = 8.0;
+const double kBorderRadiusMedium = 12.0;
+const double kBorderRadiusLarge = 16.0;
+const double kBorderRadiusExtraLarge = 20.0;
+
+// Form-specific constants
+const double kFormHorizontalPadding = 20.0;
+const double kFormVerticalPadding = 10.0;
+const double kFieldSpacing = 8.0;
+const double kSectionSpacing = 15.0;
+const double kExtraSmallSpacing = 8.0;
+const double kXSmallSpacing = 6.0;
