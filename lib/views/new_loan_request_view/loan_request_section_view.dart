@@ -14,7 +14,6 @@ class LoanRequestSection extends StatefulWidget {
 
 class _LoanRequestSectionState extends State<LoanRequestSection> {
   // late final TextEditingController name;
-  int _selectedIndex = 0;
   double logoSize = 32;
 
   @override

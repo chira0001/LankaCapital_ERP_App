@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 
 class NicUploadPage extends StatefulWidget {
   const NicUploadPage({super.key});
@@ -37,10 +36,7 @@ class _NicUploadPageState extends State<NicUploadPage> {
       children: [
         Text(
           title,
-          style: const TextStyle(
-            fontWeight: FontWeight.w600,
-            fontSize: 15,
-          ),
+          style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
         ),
         const SizedBox(height: 8),
 
@@ -114,12 +110,7 @@ class _NicUploadPageState extends State<NicUploadPage> {
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(15),
                 color: Colors.white,
-                boxShadow: [
-                  BoxShadow(
-                    blurRadius: 8,
-                    color: Colors.black12,
-                  )
-                ],
+                boxShadow: [BoxShadow(blurRadius: 8, color: Colors.black12)],
               ),
               child: Column(
                 children: [
@@ -133,7 +124,7 @@ class _NicUploadPageState extends State<NicUploadPage> {
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
                         ),
-                      )
+                      ),
                     ],
                   ),
 
@@ -159,12 +150,9 @@ class _NicUploadPageState extends State<NicUploadPage> {
                     borderRadius: BorderRadius.circular(10),
                   ),
                 ),
-                child: const Text(
-                  "Next",
-                  style: TextStyle(fontSize: 16),
-                ),
+                child: const Text("Next", style: TextStyle(fontSize: 16)),
               ),
-            )
+            ),
           ],
         ),
       ),
@@ -180,10 +168,6 @@ class _NicUploadPageState extends State<NicUploadPage> {
   }
 
   Widget line() {
-    return Container(
-      width: 50,
-      height: 2,
-      color: Colors.grey,
-    );
+    return Container(width: 50, height: 2, color: Colors.grey);
   }
 }

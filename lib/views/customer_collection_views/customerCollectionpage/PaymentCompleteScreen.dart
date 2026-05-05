@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:nkrs_app/views/customer_collection_views/customerCollectionpage/collection_entry.dart';
-import 'package:nkrs_app/views/customer_collection_views/customerCollectionpage/customer_collection_home.dart';
 
 class PaymentCompleteScreen extends StatelessWidget {
   const PaymentCompleteScreen({super.key});
