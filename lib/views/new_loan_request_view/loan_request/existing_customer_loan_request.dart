@@ -3,6 +3,8 @@ import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:nkrs_app/utility/constanst.dart';
 import 'package:nkrs_app/views/new_loan_request_view/utility/main_card.dart';
 import 'package:nkrs_app/views/new_loan_request_view/loan_request_section_view.dart';
+import 'package:nkrs_app/views/new_loan_request_view/utility/navigator_back.dart';
+import 'package:nkrs_app/views/new_loan_request_view/utility/successfull_message_view.dart';
 
 class ExistingCustomerLoanRequest extends StatefulWidget {
   const ExistingCustomerLoanRequest({super.key});
@@ -20,7 +22,7 @@ class _ExistingCustomerLoanRequestState
   final TextEditingController installment = TextEditingController();
   final TextEditingController nic = TextEditingController();
   final double _customSize_1 = 10;
-  final double _customSize_2 = 20;
+  final double _customSize_2 = 25;
 
   @override
   Widget build(BuildContext context) {
@@ -112,13 +114,13 @@ class _ExistingCustomerLoanRequestState
                     _customBuild(loanAmount, "XXXXX.XX", TextInputType.number, (
                       value,
                     ) {
-                      // if (value == null || value.isEmpty) {
-                      //   return "Please enter the loan amount";
-                      // } else if (value as double == 0) {
-                      //   return "Please enter a valid loan amount";
-                      // } else {
-                      //   return null;
-                      // }
+                      if (value == null || value.isEmpty) {
+                        return "Please enter the loan amount";
+                      } else if (value as double == 0) {
+                        return "Please enter a valid loan amount";
+                      } else {
+                        return null;
+                      }
                     }),
                     SizedBox(height: _customSize_2),
                     customText("Interest Rate"),
@@ -126,15 +128,15 @@ class _ExistingCustomerLoanRequestState
                     _customBuild(interestRate, "XX.XX%", TextInputType.number, (
                       value,
                     ) {
-                      // if (value == null || value.isEmpty) {
-                      //   return "Please enter the interest rate";
-                      // } else if (value as int < 0) {
-                      //   return "Please enter a valid interest rate";
-                      // } else if (value as int < 0 || value as int >= 100) {
-                      //   return "Please enter an interest rate between 0 and 100";
-                      // } else {
-                      //   return null;
-                      // }
+                      if (value == null || value.isEmpty) {
+                        return "Please enter the interest rate";
+                      } else if (value as int < 0) {
+                        return "Please enter a valid interest rate";
+                      } else if (value as int < 0 || value as int >= 100) {
+                        return "Please enter an interest rate between 0 and 100";
+                      } else {
+                        return null;
+                      }
                     }),
                     SizedBox(height: _customSize_2),
                     customText("Loan Duration"),
@@ -149,13 +151,13 @@ class _ExistingCustomerLoanRequestState
                             "No of Installments",
                             TextInputType.number,
                             (value) {
-                              // if (value == null || value.isEmpty) {
-                              //   return "Please enter the number of installments";
-                              // } else if (value as int < 0) {
-                              //   return "Please enter a valid number of installments";
-                              // } else {
-                              //   return null;
-                              // }
+                              if (value == null || value.isEmpty) {
+                                return "Please enter the number of installments";
+                              } else if (value as int < 0) {
+                                return "Please enter a valid number of installments";
+                              } else {
+                                return null;
+                              }
                             },
                           ),
                         ),
@@ -222,17 +224,64 @@ class _ExistingCustomerLoanRequestState
                                 ),
                               );
                             }).toList(),
-                            // validator: (value) {
-                            //   if (value == null || value.isEmpty) {
-                            //     return "Please select a duration type";
-                            //   } else {
-                            //     return null;
-                            //   }
-                            // },
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return "Please select a duration type";
+                              } else {
+                                return null;
+                              }
+                            },
                             onChanged: (newValue) {},
                           ),
                         ),
                       ],
+                    ),
+                    SizedBox(height: 30),
+                    GestureDetector(
+                      onTap: () {
+                        if (_formKey.currentState!.validate()) {
+                          _formKey.currentState!.save();
+                        }
+                        // Navigator.pop(context);
+                        // Navigator.push(
+                        //   context,
+                        //   MaterialPageRoute(
+                        //     builder: (context) => LoanSuccessScreen(),
+                        //   ),
+                        // );
+                      },
+                      child: Container(
+                        width: double.infinity,
+                        margin: const EdgeInsets.only(top: 20),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 13,
+                        ),
+                        decoration: BoxDecoration(
+                          color: btnC,
+                          borderRadius: BorderRadius.circular(btnBorderRadius),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              "Apply for Loan",
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: btnFontSize,
+                                fontWeight: FontWeight(700),
+                              ),
+                            ),
+                            SizedBox(width: 10),
+                            Icon(
+                              Icons.arrow_forward_ios,
+                              color: Colors.white,
+                              size: 16,
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
                   ],
                 ),

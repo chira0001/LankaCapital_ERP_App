@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:nkrs_app/utility/constanst.dart';
+import 'package:nkrs_app/views/new_loan_request_view/loan_request/existing_customer_loan_request.dart';
 import 'package:nkrs_app/views/new_loan_request_view/new_loan_request/new_client_loan_request.dart';
 import 'package:nkrs_app/views/new_loan_request_view/utility/main_card.dart';
 // import 'package:http/http.dart' as http;
@@ -70,7 +71,6 @@ class _ExistingCustomerLoanState extends State<ExistingCustomerLoan> {
     },
   ];
 
-  NewClientLoanRequest s = NewClientLoanRequest();
   TextEditingController address = TextEditingController();
 
   @override
@@ -82,7 +82,6 @@ class _ExistingCustomerLoanState extends State<ExistingCustomerLoan> {
         shadowColor: appBarShadow,
         leading: IconButton(
           onPressed: () {
-            // _showMySheet(context);
             Navigator.pop(context);
           },
           icon: Icon(
@@ -161,23 +160,25 @@ class _ExistingCustomerLoanState extends State<ExistingCustomerLoan> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      "Customer Verification".toUpperCase(),
+                      "Search for Customer",
                       style: TextStyle(
-                        fontSize: cardDescriptionFS,
-                        color: cardDescriptionFC,
-                        fontWeight: FontWeight(cardDescriptionFW),
-                        letterSpacing: 1,
+                        fontSize: 16,
+                        fontWeight: FontWeight(800),
+                        color: const Color.fromARGB(156, 26, 26, 26),
                       ),
                     ),
                     SizedBox(height: 10),
                     Form(
+                      // key: ;,
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           SizedBox(
                             width: 240,
                             height: 50,
                             child: TextFormField(
+                              controller: address,
                               keyboardType: TextInputType.number,
                               autocorrect: false,
                               cursorColor: const Color.fromARGB(
@@ -187,6 +188,12 @@ class _ExistingCustomerLoanState extends State<ExistingCustomerLoan> {
                                 255,
                               ),
                               decoration: InputDecoration(
+                                floatingLabelStyle: TextStyle(fontSize: 1),
+                                errorMaxLines: 2,
+                                contentPadding: const EdgeInsets.symmetric(
+                                  vertical: 0,
+                                  horizontal: 12,
+                                ),
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.all(
                                     Radius.circular(btnBorderRadius),
@@ -201,23 +208,30 @@ class _ExistingCustomerLoanState extends State<ExistingCustomerLoan> {
                                     width: 1.5,
                                   ),
                                 ),
+                                errorBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.all(
+                                    Radius.circular(btnBorderRadius),
+                                  ),
+                                  borderSide: BorderSide(
+                                    color: Color.fromARGB(89, 181, 0, 0),
+                                    width: 2,
+                                  ),
+                                ),
+                                errorStyle: TextStyle(
+                                  color: Color.fromARGB(255, 233, 1, 1),
+                                  fontSize: 15,
+                                  fontWeight: FontWeight(700),
+                                ),
                                 fillColor: safeAreaC,
                                 filled: true,
                                 labelText: "Enter Customer ID",
                                 labelStyle: TextStyle(
-                                  color: btnC,
+                                  color: Color.fromARGB(105, 21, 21, 21),
                                   fontSize: 17,
-                                  fontWeight: const FontWeight(500),
+                                  fontWeight: FontWeight(500),
                                 ),
-                                // prefixIcon: Icon(Iconsax.user_search_copy),
-                                // prefixIconColor: Color.fromARGB(255, 0, 55, 255),
                               ),
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return 'Please enter a customer ID';
-                                }
-                                return null;
-                              },
+                              // validator: validatorCallback,
                             ),
                           ),
                           ElevatedButton(
@@ -262,7 +276,7 @@ class _ExistingCustomerLoanState extends State<ExistingCustomerLoan> {
                               backgroundColor: btnC,
                               padding: const EdgeInsets.symmetric(
                                 horizontal: 20,
-                                vertical: 13,
+                                vertical: 12,
                               ),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(
@@ -299,7 +313,7 @@ class _ExistingCustomerLoanState extends State<ExistingCustomerLoan> {
   Widget customBox() {
     if (showDetails) {
       return Column(
-        crossAxisAlignment: CrossAxisAlignment.start, 
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text(
             "Active & Past Loans",
@@ -310,6 +324,43 @@ class _ExistingCustomerLoanState extends State<ExistingCustomerLoan> {
             ),
           ),
           const SizedBox(height: 15),
+          GestureDetector(
+            onTap: () {
+              // Navigate to new loan request page
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const ExistingCustomerLoanRequest(),
+                ),
+              );
+            },
+            child: Container(
+              width: double.infinity,
+              margin: const EdgeInsets.only(top: 20),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 13),
+              decoration: BoxDecoration(
+                color: btnC,
+                borderRadius: BorderRadius.circular(btnBorderRadius),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    "Request New Loan",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: btnFontSize,
+                      fontWeight: FontWeight(700),
+                    ),
+                  ),
+                  SizedBox(width: 10),
+                  Icon(Icons.arrow_forward_ios, color: Colors.white, size: 16),
+                ],
+              ),
+            ),
+          ),
+          SizedBox(height: 20),
           ListView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
@@ -387,42 +438,6 @@ class _ExistingCustomerLoanState extends State<ExistingCustomerLoan> {
                 ),
               );
             },
-          ),
-          GestureDetector(
-            onTap: () {
-              // Navigate to new loan request page
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const NewClientLoanRequest(),
-                ),
-              );
-            },
-            child: Container(
-              width: double.infinity,
-              margin: const EdgeInsets.only(top: 20),
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 13),
-              decoration: BoxDecoration(
-                color: btnC,
-                borderRadius: BorderRadius.circular(btnBorderRadius),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    "Request New Loan",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: btnFontSize,
-                      fontWeight: FontWeight(700),
-                    ),
-                  ),
-                  SizedBox(width: 10),
-                  Icon(Icons.arrow_forward_ios, color: Colors.white, size: 16),
-                ],
-              ),
-            ),
           ),
         ],
       );
