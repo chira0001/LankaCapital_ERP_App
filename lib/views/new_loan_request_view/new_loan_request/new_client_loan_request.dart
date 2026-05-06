@@ -6,6 +6,7 @@ import 'package:nkrs_app/utility/constanst.dart';
 import 'package:nkrs_app/views/new_loan_request_view/loan_request_section_view.dart';
 import 'package:nkrs_app/views/new_loan_request_view/new_loan_request/new_client_loan_request_status.dart';
 import 'package:nkrs_app/views/new_loan_request_view/utility/main_card.dart';
+import 'package:nkrs_app/views/new_loan_request_view/utility/navigator_back.dart';
 
 class NewClientLoanRequest extends StatefulWidget {
   const NewClientLoanRequest({super.key});
@@ -26,11 +27,9 @@ class _NewClientLoanRequestState extends State<NewClientLoanRequest> {
   final TextEditingController address = TextEditingController();
   // final TextEditingController password = TextEditingController();
   final TextEditingController phoneNumber = TextEditingController();
-
   final TextEditingController loanAmount = TextEditingController();
   final TextEditingController interestRate = TextEditingController();
   final TextEditingController installment = TextEditingController();
-
   // for step 2
   int _currentStep = 0;
   final double _customSize_1 = 10;
@@ -86,13 +85,13 @@ class _NewClientLoanRequestState extends State<NewClientLoanRequest> {
             _customBuild(address, "No: 123, Street Name", TextInputType.text, (
               value,
             ) {
-              if (value == null || value.isEmpty) {
-                return "Please enter your address";
-              } else if (value.length < 5) {
-                return "Please enter a valid address";
-              } else {
-                return null;
-              }
+              // if (value == null || value.isEmpty) {
+              //   return "Please enter your address";
+              // } else if (value.length < 5) {
+              //   return "Please enter a valid address";
+              // } else {
+              //   return null;
+              // }
             }),
             SizedBox(height: _customSize_2),
             customText("E-mail"),
@@ -102,28 +101,28 @@ class _NewClientLoanRequestState extends State<NewClientLoanRequest> {
               "Example@email.com",
               TextInputType.emailAddress,
               (value) {
-                if (value == null || value.isEmpty) {
-                  return "Please enter your email";
-                } else if (!RegExp(
-                  r'^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$',
-                ).hasMatch(value)) {
-                  return "Please enter a valid email address";
-                } else {
-                  return null;
-                }
+                // if (value == null || value.isEmpty) {
+                //   return "Please enter your email";
+                // } else if (!RegExp(
+                //   r'^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$',
+                // ).hasMatch(value)) {
+                //   return "Please enter a valid email address";
+                // } else {
+                //   return null;
+                // }
               },
             ),
             SizedBox(height: _customSize_2),
             customText("NIC Number"),
             SizedBox(height: _customSize_1),
             _customBuild(nic, "Enter NIC Number", TextInputType.text, (value) {
-              if (value == null || value.isEmpty) {
-                return "Please enter your NIC number";
-              } else if (value.length < 8 && value.length > 15) {
-                return "Please enter a valid NIC number";
-              } else {
-                return null;
-              }
+              // if (value == null || value.isEmpty) {
+              //   return "Please enter your NIC number";
+              // } else if (value.length < 8 && value.length > 15) {
+              //   return "Please enter a valid NIC number";
+              // } else {
+              //   return null;
+              // }
             }),
             SizedBox(height: _customSize_2),
             customText("Phone Number"),
@@ -131,13 +130,13 @@ class _NewClientLoanRequestState extends State<NewClientLoanRequest> {
             _customBuild(phoneNumber, "0712345678", TextInputType.phone, (
               value,
             ) {
-              if (value == null || value.isEmpty) {
-                return "Please enter your phone number";
-              } else if (value.length != 10 || !value.startsWith('07')) {
-                return "Please enter a valid phone number";
-              } else {
-                return null;
-              }
+              // if (value == null || value.isEmpty) {
+              //   return "Please enter your phone number";
+              // } else if (value.length != 10 || !value.startsWith('07')) {
+              //   return "Please enter a valid phone number";
+              // } else {
+              //   return null;
+              // }
             }),
           ],
         ),
@@ -183,7 +182,7 @@ class _NewClientLoanRequestState extends State<NewClientLoanRequest> {
                 ) {
                   // if (value == null || value.isEmpty) {
                   //   return "Please enter the loan amount";
-                  // } else if (value as int <= 0) {
+                  // } else if (value as double == 0) {
                   //   return "Please enter a valid loan amount";
                   // } else {
                   //   return null;
@@ -390,7 +389,10 @@ class _NewClientLoanRequestState extends State<NewClientLoanRequest> {
         backgroundColor: appBarC,
         leading: IconButton(
           onPressed: () {
-            _showMySheet(context);
+            NavigatorBack.customPopUpBox(
+              context,
+              destination: LoanRequestSection(),
+            );
           },
           icon: Icon(
             Icons.arrow_back_ios,
@@ -442,10 +444,17 @@ class _NewClientLoanRequestState extends State<NewClientLoanRequest> {
                         ),
                       );
                     } else {
-                      _currentStep += 1;
+                      setState(() {
+                        _currentStep += 1;
+                      });
                     }
                   });
                 } else {
+                  // if (_currentStep == 1) {
+                  //   setState(() {
+                  //     _currentStep -= 1;
+                  //   });
+                  // }
                   // ignore: avoid_print
                   print(
                     "Validation failed. Please fix the errors in the form.",
@@ -586,134 +595,6 @@ class _NewClientLoanRequestState extends State<NewClientLoanRequest> {
         fontWeight: FontWeight(800),
         color: const Color.fromARGB(156, 26, 26, 26),
       ),
-    );
-  }
-
-  void _showMySheet(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (BuildContext context) {
-        return Container(
-          height: MediaQuery.of(context).size.height * 0.37,
-          padding: const EdgeInsets.all(16),
-          child: Padding(
-            padding: const EdgeInsetsGeometry.symmetric(
-              horizontal: 20,
-              vertical: 30,
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Icon(
-                  Iconsax.warning_2_copy,
-                  color: const Color.fromARGB(164, 175, 6, 6),
-                  size: 43,
-                  fontWeight: FontWeight(700),
-                  shadows: [
-                    Shadow(
-                      blurRadius: 60,
-                      color: const Color.fromARGB(255, 252, 0, 0),
-                    ),
-                  ],
-                ),
-                Text(
-                  "Are you sure?",
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 24,
-                    fontWeight: FontWeight(HeaderFW),
-                  ),
-                ),
-                Text(
-                  "You have unsaved changes. If you leave now, your progress will be lost.",
-                  style: TextStyle(
-                    fontSize: 17,
-                    fontWeight: FontWeight(descriptionFw),
-                    // ignore: deprecated_member_use
-                    color: descriptionC.withOpacity(0.5),
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                SizedBox(height: 10),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    SizedBox(
-                      width: MediaQuery.of(context).size.width * 0.39,
-                      child: GestureDetector(
-                        onTap: () {
-                          Navigator.pushAndRemoveUntil(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const LoanRequestSection(),
-                            ),
-                            (Route<dynamic> route) =>
-                                false, // 'false' clears the entire history
-                          );
-                        },
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: btnC,
-                            borderRadius: BorderRadius.circular(
-                              btnBorderRadius,
-                            ),
-                          ),
-                          padding: EdgeInsetsDirectional.symmetric(
-                            vertical: 10,
-                          ),
-                          child: Text(
-                            "HOME",
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: btnFontSize,
-                              fontWeight: FontWeight(HeaderFW),
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                      ),
-                    ),
-                    SizedBox(
-                      width: MediaQuery.of(context).size.width * 0.39,
-                      child: GestureDetector(
-                        onTap: () {
-                          Navigator.pop(context);
-                        },
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: appBarC,
-                            borderRadius: BorderRadius.circular(
-                              btnBorderRadius,
-                            ),
-                            border: Border.all(color: btnC, width: 2),
-                          ),
-                          padding: EdgeInsetsDirectional.symmetric(
-                            vertical: 10,
-                          ),
-                          child: Text(
-                            "CANCEL",
-                            style: TextStyle(
-                              color: Colors.black,
-                              fontSize: btnFontSize,
-                              fontWeight: FontWeight(HeaderFW),
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const Divider(color: Colors.transparent),
-              ],
-            ),
-          ),
-        );
-      },
     );
   }
 
