@@ -266,8 +266,8 @@ class _ExistingCustomerLoanRequestState
                             amount: amount,
                             customerId: 12,
                             employeeId: 1,
-                            interestRate: interestRates,
-                            noOfInstallments: noOfInstallments
+                            // interestRate: interestRates,
+                            // noOfInstallments: noOfInstallments
                           );
                         }
                         // Navigator.pop(context);

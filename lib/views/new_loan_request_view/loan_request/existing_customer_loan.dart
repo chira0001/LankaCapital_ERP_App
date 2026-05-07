@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:nkrs_app/data/Data.dart';
 import 'package:nkrs_app/data/view_model/loan_view_model.dart';
 import 'package:nkrs_app/models/loan_model.dart';
 import 'package:nkrs_app/utility/constanst.dart';
@@ -17,7 +16,7 @@ class ExistingCustomerLoan extends StatefulWidget {
 class _ExistingCustomerLoanState extends State<ExistingCustomerLoan> {
   bool showDetails = false;
 
-  late List<Map<String, String>> userLoans = Data.userLoans;
+  late List<Map<String, String>> userLoans = [];
   LoanViewModel loanData = LoanViewModel();
   TextEditingController nicNumber = TextEditingController();
   final _formKey = GlobalKey<FormState>();
