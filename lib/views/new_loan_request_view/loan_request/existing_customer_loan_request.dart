@@ -4,10 +4,10 @@ import 'package:nkrs_app/utility/constanst.dart';
 import 'package:nkrs_app/views/new_loan_request_view/utility/main_card.dart';
 import 'package:nkrs_app/views/new_loan_request_view/loan_request_section_view.dart';
 import 'package:nkrs_app/views/new_loan_request_view/utility/navigator_back.dart';
-import 'package:nkrs_app/views/new_loan_request_view/utility/successfull_message_view.dart';
 
 class ExistingCustomerLoanRequest extends StatefulWidget {
-  const ExistingCustomerLoanRequest({super.key});
+  final int nicNumber;
+  const ExistingCustomerLoanRequest({super.key, required this.nicNumber});
 
   @override
   State<ExistingCustomerLoanRequest> createState() =>
@@ -213,9 +213,7 @@ class _ExistingCustomerLoanRequestState
                                 fontWeight: FontWeight(500),
                               ),
                             ),
-                            items: ["Days", "Weeks", "Months"].map((
-                              String value,
-                            ) {
+                            items: ["Days", "Weeks"].map((String value) {
                               return DropdownMenuItem<String>(
                                 value: value,
                                 child: Text(
