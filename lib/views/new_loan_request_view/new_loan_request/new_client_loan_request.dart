@@ -85,13 +85,13 @@ class _NewClientLoanRequestState extends State<NewClientLoanRequest> {
             _customBuild(address, "No: 123, Street Name", TextInputType.text, (
               value,
             ) {
-              // if (value == null || value.isEmpty) {
-              //   return "Please enter your address";
-              // } else if (value.length < 5) {
-              //   return "Please enter a valid address";
-              // } else {
-              //   return null;
-              // }
+              if (value == null || value.isEmpty) {
+                return "Please enter your address";
+              } else if (value.length < 5) {
+                return "Please enter a valid address";
+              } else {
+                return null;
+              }
             }),
             SizedBox(height: _customSize_2),
             customText("E-mail"),
@@ -101,28 +101,28 @@ class _NewClientLoanRequestState extends State<NewClientLoanRequest> {
               "Example@email.com",
               TextInputType.emailAddress,
               (value) {
-                // if (value == null || value.isEmpty) {
-                //   return "Please enter your email";
-                // } else if (!RegExp(
-                //   r'^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$',
-                // ).hasMatch(value)) {
-                //   return "Please enter a valid email address";
-                // } else {
-                //   return null;
-                // }
+                if (value == null || value.isEmpty) {
+                  return "Please enter your email";
+                } else if (!RegExp(
+                  r'^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$',
+                ).hasMatch(value)) {
+                  return "Please enter a valid email address";
+                } else {
+                  return null;
+                }
               },
             ),
             SizedBox(height: _customSize_2),
             customText("NIC Number"),
             SizedBox(height: _customSize_1),
             _customBuild(nic, "Enter NIC Number", TextInputType.text, (value) {
-              // if (value == null || value.isEmpty) {
-              //   return "Please enter your NIC number";
-              // } else if (value.length < 8 && value.length > 15) {
-              //   return "Please enter a valid NIC number";
-              // } else {
-              //   return null;
-              // }
+              if (value == null || value.isEmpty) {
+                return "Please enter your NIC number";
+              } else if (value.length < 8 || value.length > 15) {
+                return "Please enter a valid NIC number";
+              } else {
+                return null;
+              }
             }),
             SizedBox(height: _customSize_2),
             customText("Phone Number"),
@@ -130,13 +130,13 @@ class _NewClientLoanRequestState extends State<NewClientLoanRequest> {
             _customBuild(phoneNumber, "0712345678", TextInputType.phone, (
               value,
             ) {
-              // if (value == null || value.isEmpty) {
-              //   return "Please enter your phone number";
-              // } else if (value.length != 10 || !value.startsWith('07')) {
-              //   return "Please enter a valid phone number";
-              // } else {
-              //   return null;
-              // }
+              if (value == null || value.isEmpty) {
+                return "Please enter your phone number";
+              } else if (value.length != 10 || !value.startsWith('07')) {
+                return "Please enter a valid phone number";
+              } else {
+                return null;
+              }
             }),
           ],
         ),
@@ -180,13 +180,13 @@ class _NewClientLoanRequestState extends State<NewClientLoanRequest> {
                 _customBuild(loanAmount, "XXXXX.XX", TextInputType.number, (
                   value,
                 ) {
-                  // if (value == null || value.isEmpty) {
-                  //   return "Please enter the loan amount";
-                  // } else if (value as double == 0) {
-                  //   return "Please enter a valid loan amount";
-                  // } else {
-                  //   return null;
-                  // }
+                  if (value == null || value.isEmpty) {
+                    return "Please enter the loan amount";
+                  } else if (double.tryParse(value) == null || double.parse(value) <= 0) {
+                    return "Please enter a valid loan amount";
+                  } else {
+                    return null;
+                  }
                 }),
                 SizedBox(height: _customSize_2),
                 customText("Interest Rate"),
@@ -194,15 +194,18 @@ class _NewClientLoanRequestState extends State<NewClientLoanRequest> {
                 _customBuild(interestRate, "XX.XX%", TextInputType.number, (
                   value,
                 ) {
-                  // if (value == null || value.isEmpty) {
-                  //   return "Please enter the interest rate";
-                  // } else if (value as int < 0) {
-                  //   return "Please enter a valid interest rate";
-                  // } else if (value as int < 0 || value as int >= 100) {
-                  //   return "Please enter an interest rate between 0 and 100";
-                  // } else {
-                  //   return null;
-                  // }
+                  if (value == null || value.isEmpty) {
+                    return "Please enter the interest rate";
+                  } else {
+                    double? parsedValue = double.tryParse(value);
+                    if (parsedValue == null || parsedValue < 0) {
+                      return "Please enter a valid interest rate";
+                    } else if (parsedValue < 0 || parsedValue >= 100) {
+                      return "Please enter an interest rate between 0 and 100";
+                    } else {
+                      return null;
+                    }
+                  }
                 }),
                 SizedBox(height: _customSize_2),
                 customText("Loan Duration"),
@@ -217,13 +220,16 @@ class _NewClientLoanRequestState extends State<NewClientLoanRequest> {
                         "No of Installments",
                         TextInputType.number,
                         (value) {
-                          // if (value == null || value.isEmpty) {
-                          //   return "Please enter the number of installments";
-                          // } else if (value as int < 0) {
-                          //   return "Please enter a valid number of installments";
-                          // } else {
-                          //   return null;
-                          // }
+                          if (value == null || value.isEmpty) {
+                            return "Please enter the number of installments";
+                          } else {
+                            int? parsedValue = int.tryParse(value);
+                            if (parsedValue == null || parsedValue <= 0) {
+                              return "Please enter a valid number of installments";
+                            } else {
+                              return null;
+                            }
+                          }
                         },
                       ),
                     ),
@@ -288,13 +294,13 @@ class _NewClientLoanRequestState extends State<NewClientLoanRequest> {
                             ),
                           );
                         }).toList(),
-                        // validator: (value) {
-                        //   if (value == null || value.isEmpty) {
-                        //     return "Please select a duration type";
-                        //   } else {
-                        //     return null;
-                        //   }
-                        // },
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return "Please select a duration type";
+                          } else {
+                            return null;
+                          }
+                        },
                         onChanged: (newValue) {},
                       ),
                     ),

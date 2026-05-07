@@ -18,8 +18,9 @@ dependencies:
   timeline_tile: 2.0.0
   http: ^1.6.0 
   image_picker: ^1.0.4
-  flutter_secure_storage: ^9.0.0
-  dio: ^5.4.0
+  dio: ^5.9.2
+  flutter_secure_storage: ^10.1.0
+  jwt_decoder: ^2.0.1
 
 dev_dependencies:
   flutter_test:

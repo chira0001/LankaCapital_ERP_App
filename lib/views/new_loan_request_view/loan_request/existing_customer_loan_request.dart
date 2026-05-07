@@ -126,14 +126,16 @@ class _ExistingCustomerLoanRequestState
                       (value) {
                         if (value == null || value.isEmpty) {
                           return "Please enter the loan amount";
-                        } else if (value as double == 0) {
+                        } else if (double.tryParse(value) == null || double.parse(value) <= 0) {
                           return "Please enter a valid loan amount";
                         } else {
                           return null;
                         }
                       },
                       (value) {
-                        amount = value as double;
+                        if (value != null && value.isNotEmpty) {
+                          amount = double.parse(value);
+                        }
                       },
                     ),
                     SizedBox(height: _customSize_2),
@@ -146,16 +148,21 @@ class _ExistingCustomerLoanRequestState
                       (value) {
                         if (value == null || value.isEmpty) {
                           return "Please enter the interest rate";
-                        } else if (value as int < 0) {
-                          return "Please enter a valid interest rate";
-                        } else if (value as int < 0 || value as int >= 100) {
-                          return "Please enter an interest rate between 0 and 100";
                         } else {
-                          return null;
+                          double? parsedValue = double.tryParse(value);
+                          if (parsedValue == null || parsedValue < 0) {
+                            return "Please enter a valid interest rate";
+                          } else if (parsedValue < 0 || parsedValue >= 100) {
+                            return "Please enter an interest rate between 0 and 100";
+                          } else {
+                            return null;
+                          }
                         }
                       },
                       (value) {
-                        interestRates = value as double;
+                        if (value != null && value.isNotEmpty) {
+                          interestRates = double.parse(value);
+                        }
                       },
                     ),
                     SizedBox(height: _customSize_2),
@@ -173,14 +180,19 @@ class _ExistingCustomerLoanRequestState
                             (value) {
                               if (value == null || value.isEmpty) {
                                 return "Please enter the number of installments";
-                              } else if (value as int < 0) {
-                                return "Please enter a valid number of installments";
                               } else {
-                                return null;
+                                int? parsedValue = int.tryParse(value);
+                                if (parsedValue == null || parsedValue <= 0) {
+                                  return "Please enter a valid number of installments";
+                                } else {
+                                  return null;
+                                }
                               }
                             },
                             (value) {
-                              noOfInstallments = value as int;
+                              if (value != null && value.isNotEmpty) {
+                                noOfInstallments = int.parse(value);
+                              }
                             },
                           ),
                         ),
@@ -326,7 +338,7 @@ class _ExistingCustomerLoanRequestState
     final String labelText_,
     final TextInputType? type,
     final String? Function(String?)? validatorCallback,
-    final String? Function(String?)? onSaveCallback,
+    final void Function(String?)? onSaveCallback,
   ) {
     return TextFormField(
       controller: controllerNames,

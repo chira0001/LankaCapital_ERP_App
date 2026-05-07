@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'dart:convert';
-import 'package:http/http.dart' as http;
 import 'package:nkrs_app/views/customer_collection_views/customerCollectionpage/customer_collection_home.dart';
 import 'package:nkrs_app/views/customer_collection_views/loginpage/register_page.dart';
+import 'package:nkrs_app/services/auth_service.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -14,6 +13,7 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   bool obscurePassword = true;
   bool _isLoading = false;
+  final AuthService _authService = AuthService();
 
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _emailController = TextEditingController();
@@ -27,24 +27,12 @@ class _LoginPageState extends State<LoginPage> {
     });
 
     try {
-      final url = Uri.parse('http://10.0.2.2:8080/api/v1/auth/login');
-
-      final response = await http.post(
-        url,
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          'username': _emailController.text.trim(),
-          'password': _passwordController.text,
-        }),
+      final success = await _authService.login(
+        _emailController.text.trim(),
+        _passwordController.text,
       );
 
-      if (response.statusCode == 200) {
-        // Parse the JWT response if needed
-        final responseData = jsonDecode(response.body);
-        // ignore: unused_local_variable
-        final token =
-            responseData['token']; // Adjust based on JwtAuthenticationResponse structure
-
+      if (success) {
         if (mounted) {
           Navigator.pushReplacement(
             context,
