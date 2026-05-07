@@ -39,7 +39,7 @@ class LoanService {
   // }
 
   Future<(User, List<Loan>)> fetchUserAndLoans(int nic) async {
-      final Uri url = Uri.parse('http://10.0.2.2:8080/');
+      final Uri url = Uri.parse('http://10.0.2.2:8080/api/v1/recep/customers/${nic}');
 
     try {
       final response = await http.post(
