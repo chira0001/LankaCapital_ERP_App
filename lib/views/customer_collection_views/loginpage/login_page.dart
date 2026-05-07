@@ -41,6 +41,7 @@ class _LoginPageState extends State<LoginPage> {
       if (response.statusCode == 200) {
         // Parse the JWT response if needed
         final responseData = jsonDecode(response.body);
+        // ignore: unused_local_variable
         final token =
             responseData['token']; // Adjust based on JwtAuthenticationResponse structure
 
