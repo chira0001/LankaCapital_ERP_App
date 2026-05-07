@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:nkrs_app/models/add_loan_model.dart';
 import 'package:nkrs_app/models/loan_model.dart';
 import 'package:http/http.dart' as http;
 import 'package:nkrs_app/models/user_model.dart';
@@ -38,7 +39,7 @@ class LoanService {
   // }
 
   Future<(User, List<Loan>)> fetchUserAndLoans(int nic) async {
-      final Uri url = Uri.parse('https://your-api.com/user-summary');
+      final Uri url = Uri.parse('http://10.0.2.2:8080/');
 
     try {
       final response = await http.post(
@@ -64,6 +65,29 @@ class LoanService {
       }
     } catch (e) {
       throw Exception("Failed to fetch data: $e");
+    }
+  }
+
+  Future<void> addLoan(AddLoanModel loan) async{
+      final Uri url = Uri.parse('https://your-api.com/user-summary');
+      
+      try {
+      final response = await http.post(
+        url,
+        headers: {"Content-Type": "application/json"},
+        body: json.encode(loan.toJson()),
+      );
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        print("Response ${response}");
+        // Product newProduct = Product.formJson(json.decode(response.body));
+        // return newProduct;
+      } else {
+        print("Failed to loan product");
+        throw Exception("Failed");
+      }
+    } catch (e) {
+      print("Failed ${e}");
+      throw Exception("Failed to add loan ${e}");
     }
   }
 }

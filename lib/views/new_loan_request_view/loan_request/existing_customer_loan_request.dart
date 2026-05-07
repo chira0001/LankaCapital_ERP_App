@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
+import 'package:nkrs_app/models/add_loan_model.dart';
 import 'package:nkrs_app/utility/constanst.dart';
 import 'package:nkrs_app/views/new_loan_request_view/utility/main_card.dart';
 import 'package:nkrs_app/views/new_loan_request_view/loan_request_section_view.dart';
@@ -23,6 +24,13 @@ class _ExistingCustomerLoanRequestState
   final TextEditingController nic = TextEditingController();
   final double _customSize_1 = 10;
   final double _customSize_2 = 25;
+
+  // loan variable
+  double amount = 0.0;
+  double interestRates = 0.0;
+  // int customerId = 0; //customer NIC
+  // int employeeId = 0;
+  int noOfInstallments = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -111,33 +119,45 @@ class _ExistingCustomerLoanRequestState
                     SizedBox(height: 30),
                     customText("Loan Amount"),
                     SizedBox(height: _customSize_1),
-                    _customBuild(loanAmount, "XXXXX.XX", TextInputType.number, (
-                      value,
-                    ) {
-                      if (value == null || value.isEmpty) {
-                        return "Please enter the loan amount";
-                      } else if (value as double == 0) {
-                        return "Please enter a valid loan amount";
-                      } else {
-                        return null;
-                      }
-                    }),
+                    _customBuild(
+                      loanAmount,
+                      "XXXXX.XX",
+                      TextInputType.number,
+                      (value) {
+                        if (value == null || value.isEmpty) {
+                          return "Please enter the loan amount";
+                        } else if (value as double == 0) {
+                          return "Please enter a valid loan amount";
+                        } else {
+                          return null;
+                        }
+                      },
+                      (value) {
+                        amount = value as double;
+                      },
+                    ),
                     SizedBox(height: _customSize_2),
                     customText("Interest Rate"),
                     SizedBox(height: _customSize_1),
-                    _customBuild(interestRate, "XX.XX%", TextInputType.number, (
-                      value,
-                    ) {
-                      if (value == null || value.isEmpty) {
-                        return "Please enter the interest rate";
-                      } else if (value as int < 0) {
-                        return "Please enter a valid interest rate";
-                      } else if (value as int < 0 || value as int >= 100) {
-                        return "Please enter an interest rate between 0 and 100";
-                      } else {
-                        return null;
-                      }
-                    }),
+                    _customBuild(
+                      interestRate,
+                      "XX.XX%",
+                      TextInputType.number,
+                      (value) {
+                        if (value == null || value.isEmpty) {
+                          return "Please enter the interest rate";
+                        } else if (value as int < 0) {
+                          return "Please enter a valid interest rate";
+                        } else if (value as int < 0 || value as int >= 100) {
+                          return "Please enter an interest rate between 0 and 100";
+                        } else {
+                          return null;
+                        }
+                      },
+                      (value) {
+                        interestRates = value as double;
+                      },
+                    ),
                     SizedBox(height: _customSize_2),
                     customText("Loan Duration"),
                     SizedBox(height: _customSize_1),
@@ -158,6 +178,9 @@ class _ExistingCustomerLoanRequestState
                               } else {
                                 return null;
                               }
+                            },
+                            (value) {
+                              noOfInstallments = value as int;
                             },
                           ),
                         ),
@@ -239,6 +262,13 @@ class _ExistingCustomerLoanRequestState
                       onTap: () {
                         if (_formKey.currentState!.validate()) {
                           _formKey.currentState!.save();
+                          AddLoanModel addLoanModel = AddLoanModel(
+                            amount: amount,
+                            customerId: 12,
+                            employeeId: 1,
+                            interestRate: interestRates,
+                            noOfInstallments: noOfInstallments
+                          );
                         }
                         // Navigator.pop(context);
                         // Navigator.push(
@@ -296,6 +326,7 @@ class _ExistingCustomerLoanRequestState
     final String labelText_,
     final TextInputType? type,
     final String? Function(String?)? validatorCallback,
+    final String? Function(String?)? onSaveCallback,
   ) {
     return TextFormField(
       controller: controllerNames,
@@ -338,6 +369,7 @@ class _ExistingCustomerLoanRequestState
         ),
       ),
       validator: validatorCallback,
+      onSaved: onSaveCallback,
     );
   }
 
