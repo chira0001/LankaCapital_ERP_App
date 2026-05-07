@@ -15,9 +15,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(fontFamily: "Inter"),
       home: Onbordingscreen(),
-      // home: LoginPage(),
-      // home: LoanRequestSection(),
-      // HomePage()
+      
     );
   }
 }

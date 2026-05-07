@@ -78,7 +78,7 @@ class _CustomerCollectionHomeState extends State<CustomerCollectionHome> {
               children: [
                 // Greeting
                 const Text(
-                  "Hello, Alex",
+                  "Hello, ",
                   style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
                 ),
                 SizedBox(height: kTinySpacing),
