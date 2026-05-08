@@ -5,7 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:nkrs_app/models/user_model.dart';
 
 class LoanService {
-    static const String jwtToken = "he;fsf";
+  static const String jwtToken = "he;fsf";
   // Future<List<Loan>> fetchAllLoans(String jwtToken) async {
   //   final Uri url = Uri.parse('https://fakestoreapi.com/products');
 
@@ -39,7 +39,9 @@ class LoanService {
   // }
 
   Future<(User, List<Loan>)> fetchUserAndLoans(int nic) async {
-      final Uri url = Uri.parse('http://10.0.2.2:8080/api/v1/recep/customers/${nic}');
+    final Uri url = Uri.parse(
+      'http://10.0.2.2:8080/api/v1/recep/customers/${nic}',
+    );
 
     try {
       final response = await http.post(
@@ -68,10 +70,10 @@ class LoanService {
     }
   }
 
-  Future<void> addLoan(AddLoanModel loan) async{
-      final Uri url = Uri.parse('https://your-api.com/user-summary');
-      
-      try {
+  Future<bool> addLoan(AddLoanModel loan) async {
+    final Uri url = Uri.parse('https://your-api.com/user-summary');
+
+    try {
       final response = await http.post(
         url,
         headers: {"Content-Type": "application/json"},
@@ -81,8 +83,10 @@ class LoanService {
         print("Response ${response}");
         // Product newProduct = Product.formJson(json.decode(response.body));
         // return newProduct;
+        return true;
       } else {
         print("Failed to loan product");
+        return false;
         throw Exception("Failed");
       }
     } catch (e) {

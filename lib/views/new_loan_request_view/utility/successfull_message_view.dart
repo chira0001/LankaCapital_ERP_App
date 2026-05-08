@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:nkrs_app/utility/constanst.dart';
+import 'package:nkrs_app/views/new_loan_request_view/loan_request_section_view.dart';
 
 class LoanSuccessScreen extends StatelessWidget {
   final VoidCallback? appBarNavigator;
@@ -33,7 +34,14 @@ class LoanSuccessScreen extends StatelessWidget {
             //   MaterialPageRoute(builder: (context) => const MyApp()),
             //   (Route<dynamic> route) => false,
             // );
-            appBarNavigator?.call();
+            // appBarNavigator?.call();
+            Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const LoanRequestSection(),
+              ),
+              (route) => false,
+            );
           },
         ),
         title: const Text('Success'),
@@ -92,7 +100,14 @@ class LoanSuccessScreen extends StatelessWidget {
                 height: 55,
                 child: ElevatedButton(
                   onPressed: () {
-                    bottomNavigatorBackButton?.call();
+                    // bottomNavigatorBackButton?.call();
+                    Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const LoanRequestSection(),
+                      ),
+                      (route) => false,
+                    );
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF1E88E5),

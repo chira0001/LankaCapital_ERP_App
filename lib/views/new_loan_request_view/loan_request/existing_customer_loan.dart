@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:nkrs_app/data/view_model/loan_view_model.dart';
 import 'package:nkrs_app/models/loan_model.dart';
+import 'package:nkrs_app/models/user_model.dart';
 import 'package:nkrs_app/utility/constanst.dart';
 import 'package:nkrs_app/views/new_loan_request_view/loan_request/existing_customer_loan_request.dart';
 import 'package:nkrs_app/views/new_loan_request_view/utility/main_card.dart';
@@ -16,15 +17,15 @@ class ExistingCustomerLoan extends StatefulWidget {
 class _ExistingCustomerLoanState extends State<ExistingCustomerLoan> {
   bool showDetails = false;
 
-  late List<Map<String, String>> userLoans = [];
   LoanViewModel loanData = LoanViewModel();
   TextEditingController nicNumber = TextEditingController();
   final _formKey = GlobalKey<FormState>();
+  String message = '';
 
   @override
   Widget build(BuildContext context) {
     late String customerID;
-    String dateOnly;
+    // String message = '';
 
     return Scaffold(
       appBar: AppBar(
@@ -191,15 +192,30 @@ class _ExistingCustomerLoanState extends State<ExistingCustomerLoan> {
                             ),
                           ),
                           ElevatedButton(
-                            onPressed: () {
-                              if (_formKey.currentState!.validate()) {
-                                _formKey.currentState!.save();
-                                if (true) {
-                                  setState(() {
-                                    showDetails = true;
-                                  });
-                                }
+                            onPressed: () async {
+                              if (!_formKey.currentState!.validate()) return;
+
+                              final customerId = int.tryParse(nicNumber.text.trim());
+                              if (customerId == null) {
+                                setState(() {
+                                  showDetails = false;
+                                  message = "Please enter a valid numeric customer ID.";
+                                });
+                                return;
                               }
+
+                              await loanData.searchByNic(customerId, 'test');
+                              final User? user = loanData.user;
+
+                              setState(() {
+                                if (user != null) {
+                                  showDetails = true;
+                                  message = '';
+                                } else {
+                                  showDetails = false;
+                                  message = "No matching user was found";
+                                }
+                              });
                             },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: btnC,
@@ -240,6 +256,7 @@ class _ExistingCustomerLoanState extends State<ExistingCustomerLoan> {
   }
 
   Widget customBox() {
+    // User? user = loanData.user;
     if (showDetails) {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -263,7 +280,7 @@ class _ExistingCustomerLoanState extends State<ExistingCustomerLoan> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text("name"),
+                // Text(user!.name),
                 Text("Email"),
                 Text("0766303435"),
                 GestureDetector(
@@ -328,7 +345,18 @@ class _ExistingCustomerLoanState extends State<ExistingCustomerLoan> {
               } else if (snapshot.hasError) {
                 return const Center(child: Text("Errors "));
               } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                return const Center(child: Text("No Products found"));
+                return Center(
+                  child: Text(
+                    "This user does not have any loan records.",
+                    style: TextStyle(
+                      fontSize: 17,
+                      fontWeight: FontWeight.w600,
+                      color: const Color.fromARGB(255, 72, 56, 56),
+                      letterSpacing: 0.5,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                );
               } else {
                 return ListView.builder(
                   shrinkWrap: true,
@@ -421,7 +449,20 @@ class _ExistingCustomerLoanState extends State<ExistingCustomerLoan> {
         ],
       );
     } else {
-      return const SizedBox.shrink();
+      nicNumber.clear();
+      // setState(() {});
+      return Center(
+        child: Text(
+          message,
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+            color: const Color.fromARGB(255, 205, 8, 8),
+            letterSpacing: 0.5,
+          ),
+          textAlign: TextAlign.center,
+        ),
+      );
     }
   }
 }
