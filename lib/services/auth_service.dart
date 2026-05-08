@@ -84,6 +84,14 @@ class AuthService {
     }
   }
 
+  Future<void> setToken(String token) async {
+    try {
+      await _storage.write(key: _tokenKey, value: token);
+    } catch (e) {
+      print("Error setting token: $e");
+    }
+  }
+
   Future<bool> isLoggedIn() async {
     final token = await getToken();
     return token != null;
