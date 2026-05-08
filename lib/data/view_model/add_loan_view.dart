@@ -5,7 +5,7 @@ class AddLoanView {
   final LoanService _service = LoanService();
 
   Future<bool> addLoan(AddLoanModel addLoan) async {
-    return _service.addLoan(addLoan);
-    // return true;
+    // return _service.addLoan(addLoan);
+    return true;
   }
 }

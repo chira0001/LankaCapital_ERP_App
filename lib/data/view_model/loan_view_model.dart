@@ -7,8 +7,12 @@ class LoanViewModel extends ChangeNotifier {
   final LoanService _service = LoanService();
   User? _user;
 
-  User? get user =>
-      User(id: 1, email: "email", name: "name", phoneNumber: "phoneNumber");
+  User? get user => User(
+    id: 200227800587, // Maps from 'customerNIC' (acts as the ID)
+    name: "Chirath Wijesinghe", // Maps from 'businessName'
+    email: "chirath@gmail.com", // Maps from 'businessEmail'
+    phoneNumber: "0786268640", // Maps from 'contactNumber'
+  );
   // ignore: unused_field
   List<Loan> _loans = [];
   // ignore: unused_field

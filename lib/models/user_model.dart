@@ -13,19 +13,19 @@ class User {
 
   factory User.fromJson(Map<String, dynamic> json) {
     return User(
-      id: json['id'] as int,
-      email: json['email'] as String,
-      name: json['name'] as String,
-      phoneNumber: json['phone_number'] as String,
+      id: json['customerNIC'] as int,
+      email: json['businessEmail'] as String,
+      name: json['businessName'] as String,
+      phoneNumber: json['contactNumber'] as String,
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
-      'id': id,
-      'email': email,
-      'name': name,
-      'phone_number': phoneNumber,
+      'customerNIC': id,
+      'businessEmail': email,
+      'businessName': name,
+      'contactNumber': phoneNumber,
     };
   }
 }

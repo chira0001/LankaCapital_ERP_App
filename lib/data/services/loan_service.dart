@@ -40,17 +40,17 @@ class LoanService {
 
   Future<(User, List<Loan>)> fetchUserAndLoans(int nic) async {
     final Uri url = Uri.parse(
-      'http://10.0.2.2:8080/api/v1/recep/customers/${nic}',
+      'http://10.0.2.2:8080/api/v1/recep/customers/loans/${nic}',
     );
 
     try {
-      final response = await http.post(
+      final response = await http.get(
         url,
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer $jwtToken',
+          'Authorization': 'Bearer ',
         },
-        body: json.encode({'id': nic}),
+        // body: json.encode({'id': nic}),
       );
       if (response.statusCode == 200) {
         final Map<String, dynamic> data = json.decode(response.body);
@@ -71,7 +71,9 @@ class LoanService {
   }
 
   Future<bool> addLoan(AddLoanModel loan) async {
-    final Uri url = Uri.parse('https://your-api.com/user-summary');
+    final Uri url = Uri.parse(
+      'http://10.0.2.2:8080/api/v1/field/customers/loans',
+    );
 
     try {
       final response = await http.post(
