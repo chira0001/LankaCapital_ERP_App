@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:nkrs_app/utility/constanst.dart';
@@ -358,7 +356,6 @@ class _NewClientLoanRequestState extends State<NewClientLoanRequest> {
               ),
             ),
             SizedBox(height: 20), // Space between boxes
-            // --- BOX 2: LOAN BREAKDOWN ---
             Container(
               width: double.infinity,
               padding: EdgeInsets.all(0),

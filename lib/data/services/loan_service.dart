@@ -40,28 +40,27 @@ class LoanService {
 
   Future<(User, List<Loan>)> fetchUserAndLoans(int nic) async {
     final Uri url = Uri.parse(
-      'http://10.0.2.2:8080/api/v1/recep/customers/loans/${nic}',
+      'http://10.0.2.2:8080/api/v1/recep/customers/loans/$nic',
     );
 
     try {
-      final response = await http.get(
-        url,
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer ',
-        },
-        // body: json.encode({'id': nic}),
-      );
+      final response = await http.get(url);
+
       if (response.statusCode == 200) {
         final Map<String, dynamic> data = json.decode(response.body);
-        final user = User.fromJson(data['user']);
+        final user = User.fromJson(data);
+        print(user.id);
         final loans = (data['loans'] as List)
             .map((json) => Loan.fromJson(json))
             .toList();
 
+        print("return");
         return (user, loans);
+      } else if (response.statusCode == 404) {
+        final Map<String, dynamic> error = json.decode(response.body);
+        print(error['message']);
+        throw Exception("Error");
       } else {
-        // ignore: avoid_print
         print("Error null data in user & loans");
         throw Exception("Server Error: ${response.statusCode}");
       }
@@ -72,7 +71,7 @@ class LoanService {
 
   Future<bool> addLoan(AddLoanModel loan) async {
     final Uri url = Uri.parse(
-      'http://10.0.2.2:8080/api/v1/field/customers/loans',
+      'http://192.168.56.1/api/v1/field/customers/loans',
     );
 
     try {

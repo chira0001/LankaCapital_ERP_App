@@ -7,19 +7,10 @@ class LoanViewModel extends ChangeNotifier {
   final LoanService _service = LoanService();
   User? _user;
 
-  User? get user => User(
-    id: 200227800587, // Maps from 'customerNIC' (acts as the ID)
-    name: "Chirath Wijesinghe", // Maps from 'businessName'
-    email: "chirath@gmail.com", // Maps from 'businessEmail'
-    phoneNumber: "0786268640", // Maps from 'contactNumber'
-  );
-  // ignore: unused_field
+  User? get user => _user;
   List<Loan> _loans = [];
-  // ignore: unused_field
-  bool _isLoading = false;
 
-  Future<void> searchByNic(int nic, String token) async {
-    _isLoading = true;
+  Future<void> searchByNic(int nic) async {
     notifyListeners();
 
     try {
@@ -28,52 +19,14 @@ class LoanViewModel extends ChangeNotifier {
       _user = user;
       _loans = loans;
     } catch (e) {
-      debugPrint(e.toString());
       _user = null;
       _loans = [];
     } finally {
-      _isLoading = false;
       notifyListeners();
     }
   }
 
-  // Future<User?> getUserByID() async {
-  //   return _user;
-  //   // return User(id: 1, email: "f", name: "fsf", phoneNumber: "0766303435");
-  // }
-
   Future<List<Loan>> getLoansByID() async {
     return _loans;
-
-    // return [
-    //   Loan(
-    //     amount: 8000.00,
-    //     createdAt: "2026-06-03 13:33:22",
-    //     interestRate: 18.0,
-    //     customerId: 200227800587,
-    //     employeeId: 3,
-    //     noOfInstallments: 1,
-    //     status: "REJECTED",
-    //     rejectionNote: "Low income",
-    //   ),
-    //   Loan(
-    //     amount: 99989.99,
-    //     createdAt: "2026-04-24 12:27:14",
-    //     interestRate: 11.5,
-    //     customerId: 200227800577,
-    //     employeeId: 3,
-    //     noOfInstallments: 1,
-    //     status: "APPROVED",
-    //   ),
-    //   Loan(
-    //     amount: 100000.80,
-    //     createdAt: "2026-05-03 11:09:58",
-    //     interestRate: 14.5,
-    //     customerId: 200227800587,
-    //     employeeId: 3,
-    //     noOfInstallments: 1,
-    //     status: "PENDING",
-    //   ),
-    // ];
   }
 }

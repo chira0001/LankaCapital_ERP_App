@@ -5,7 +5,7 @@ import 'package:nkrs_app/models/user_model.dart';
 import 'package:nkrs_app/utility/constanst.dart';
 import 'package:nkrs_app/views/new_loan_request_view/loan_request/existing_customer_loan_request.dart';
 import 'package:nkrs_app/views/new_loan_request_view/utility/main_card.dart';
-// import 'package:http/http.dart' as http;
+import 'package:nkrs_app/views/new_loan_request_view/utility/popup_box_message.dart';
 
 class ExistingCustomerLoan extends StatefulWidget {
   const ExistingCustomerLoan({super.key});
@@ -24,8 +24,7 @@ class _ExistingCustomerLoanState extends State<ExistingCustomerLoan> {
 
   @override
   Widget build(BuildContext context) {
-    late String customerID;
-    // String message = '';
+    late int? customerID;
 
     return Scaffold(
       appBar: AppBar(
@@ -180,14 +179,14 @@ class _ExistingCustomerLoanState extends State<ExistingCustomerLoan> {
                               validator: (value) {
                                 if (value == null || value.trim().isEmpty) {
                                   return "Please fill this field";
-                                } else if (value.length < 10) {
+                                } else if (value.length < 0) {
                                   return "Enter a valid NIC number";
                                 } else {
                                   return null;
                                 }
                               },
                               onSaved: (newValue) {
-                                customerID = nicNumber.text;
+                                customerID = int.tryParse(nicNumber.text);
                               },
                             ),
                           ),
@@ -195,16 +194,19 @@ class _ExistingCustomerLoanState extends State<ExistingCustomerLoan> {
                             onPressed: () async {
                               if (!_formKey.currentState!.validate()) return;
 
-                              final customerId = int.tryParse(nicNumber.text.trim());
+                              final customerId = int.tryParse(
+                                nicNumber.text.trim(),
+                              );
                               if (customerId == null) {
                                 setState(() {
                                   showDetails = false;
-                                  message = "Please enter a valid numeric customer ID.";
+                                  message =
+                                      "Please enter a valid numeric customer ID.";
                                 });
                                 return;
                               }
 
-                              await loanData.searchByNic(customerId, 'test');
+                              await loanData.searchByNic(customerId);
                               final User? user = loanData.user;
 
                               setState(() {
@@ -216,6 +218,11 @@ class _ExistingCustomerLoanState extends State<ExistingCustomerLoan> {
                                   message = "No matching user was found";
                                 }
                               });
+                              showTopNotification(
+                                // ignore: use_build_context_synchronously
+                                context,
+                                "Please fix the validation errors before submitting.",
+                              );
                             },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: btnC,
@@ -410,32 +417,32 @@ class _ExistingCustomerLoanState extends State<ExistingCustomerLoan> {
                               ),
                             ),
                             const SizedBox(height: 4),
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 8,
-                                vertical: 2,
-                              ),
-                              decoration: BoxDecoration(
-                                color:
-                                    loan.status.toString().toLowerCase() ==
-                                        "active"
-                                    ? Colors.green[50]
-                                    : Colors.grey[100],
-                                borderRadius: BorderRadius.circular(5),
-                              ),
-                              child: Text(
-                                loan.status.toString().toLowerCase(),
-                                style: TextStyle(
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.bold,
-                                  color:
-                                      loan.status.toString().toLowerCase() ==
-                                          "active"
-                                      ? Colors.green[700]
-                                      : Colors.grey[600],
-                                ),
-                              ),
-                            ),
+                            // Container(
+                            //   padding: const EdgeInsets.symmetric(
+                            //     horizontal: 8,
+                            //     vertical: 2,
+                            //   ),
+                            //   decoration: BoxDecoration(
+                            //     color:
+                            //         loan.status.toString().toLowerCase() ==
+                            //             "active"
+                            //         ? Colors.green[50]
+                            //         : Colors.grey[100],
+                            //     borderRadius: BorderRadius.circular(5),
+                            //   ),
+                            //   child: Text(
+                            //     loan.status.toString().toLowerCase(),
+                            //     style: TextStyle(
+                            //       fontSize: 10,
+                            //       fontWeight: FontWeight.bold,
+                            //       color:
+                            //           loan.status.toString().toLowerCase() ==
+                            //               "active"
+                            //           ? Colors.green[700]
+                            //           : Colors.grey[600],
+                            //     ),
+                            //   ),
+                            // ),
                           ],
                         ),
                         onTap: () {},
@@ -464,5 +471,70 @@ class _ExistingCustomerLoanState extends State<ExistingCustomerLoan> {
         ),
       );
     }
+  }
+
+  void showCustomMessageBox(
+    BuildContext context,
+    String message, {
+    bool isError = false,
+  }) {
+    // 1. Clear any existing snackbars instantly
+    ScaffoldMessenger.of(context).clearSnackBars();
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        behavior: SnackBarBehavior.floating, // Floats above bottom navigation
+        backgroundColor: Colors.white,
+        elevation: 6,
+
+        // 2. Set the automatic close time to 10 seconds
+        duration: const Duration(seconds: 10),
+
+        // 3. Custom Physics/Animation Settings
+        dismissDirection:
+            DismissDirection.horizontal, // Allows swiping away to close
+
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+          side: BorderSide(
+            color: isError
+                ? Colors.black
+                : Colors.black12, // Bold border for errors
+            width: isError ? 2.0 : 1.0,
+          ),
+        ),
+        content: Row(
+          children: [
+            // Animated Icon swap based on state
+            AnimatedSwitcher(
+              duration: const Duration(milliseconds: 300),
+              child: Icon(
+                isError ? Icons.error_outline : Icons.check_circle_outline,
+                key: ValueKey<bool>(isError),
+                color: Colors.black,
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                message,
+                style: const TextStyle(
+                  color: Colors.black,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ],
+        ),
+        action: SnackBarAction(
+          label: "DISMISS",
+          textColor: Colors.black87,
+          onPressed: () {
+            ScaffoldMessenger.of(context).hideCurrentSnackBar();
+          },
+        ),
+      ),
+    );
   }
 }
