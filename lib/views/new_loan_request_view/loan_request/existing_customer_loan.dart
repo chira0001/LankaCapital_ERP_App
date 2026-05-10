@@ -3,9 +3,9 @@ import 'package:nkrs_app/data/view_model/loan_view_model.dart';
 import 'package:nkrs_app/models/loan_model.dart';
 import 'package:nkrs_app/models/user_model.dart';
 import 'package:nkrs_app/utility/constanst.dart';
+import 'package:nkrs_app/views/new_loan_request_view/loan_request/existing_customer_loan_details.dart';
 import 'package:nkrs_app/views/new_loan_request_view/loan_request/existing_customer_loan_request.dart';
 import 'package:nkrs_app/views/new_loan_request_view/utility/main_card.dart';
-import 'package:nkrs_app/views/new_loan_request_view/utility/popup_box_message.dart';
 
 class ExistingCustomerLoan extends StatefulWidget {
   const ExistingCustomerLoan({super.key});
@@ -21,6 +21,7 @@ class _ExistingCustomerLoanState extends State<ExistingCustomerLoan> {
   TextEditingController nicNumber = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   String message = '';
+  late final User? _user;
 
   @override
   Widget build(BuildContext context) {
@@ -63,199 +64,206 @@ class _ExistingCustomerLoanState extends State<ExistingCustomerLoan> {
         ],
       ),
       backgroundColor: safeAreaC,
-      body: Padding(
-        padding: EdgeInsetsGeometry.symmetric(
-          horizontal: safeAreaHorizontalPD,
-          vertical: safeAreaVerticalPD,
-        ),
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                "Existing Customer Loan",
-                style: TextStyle(
-                  fontWeight: FontWeight(HeaderFW),
-                  fontSize: headerFontSize,
-                  color: headerTextC,
-                  // letterSpacing: 1,
+      body: SafeArea(
+        child: Padding(
+          padding: EdgeInsetsGeometry.symmetric(
+            horizontal: safeAreaHorizontalPD,
+            vertical: safeAreaVerticalPD,
+          ),
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "Existing Customer Loan",
+                  style: TextStyle(
+                    fontWeight: FontWeight(HeaderFW),
+                    fontSize: headerFontSize,
+                    color: headerTextC,
+                    // letterSpacing: 1,
+                  ),
                 ),
-              ),
-              SizedBox(height: 5),
-              Text(
-                "Loan Management for Existing Customers",
-                textAlign: TextAlign.start,
-                style: TextStyle(
-                  fontSize: cardDescriptionFS,
-                  fontWeight: FontWeight(descriptionFw),
-                  color: descriptionC,
-                  // letterSpacing:
+                SizedBox(height: 5),
+                Text(
+                  "Loan Management for Existing Customers",
+                  textAlign: TextAlign.start,
+                  style: TextStyle(
+                    fontSize: cardDescriptionFS,
+                    fontWeight: FontWeight(descriptionFw),
+                    color: descriptionC,
+                    // letterSpacing:
+                  ),
                 ),
-              ),
-              SizedBox(height: 30),
-              Container(
-                width: double.infinity,
-                padding: EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: appBarC,
-                  borderRadius: BorderRadius.circular(cardBorderRadius),
-                  boxShadow: [MainCard.customShadow()],
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Search for Customer",
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight(800),
-                        color: const Color.fromARGB(156, 26, 26, 26),
+                SizedBox(height: 30),
+                Container(
+                  width: double.infinity,
+                  padding: EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: appBarC,
+                    borderRadius: BorderRadius.circular(cardBorderRadius),
+                    boxShadow: [MainCard.customShadow()],
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Search for Customer",
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight(800),
+                          color: const Color.fromARGB(156, 26, 26, 26),
+                        ),
                       ),
-                    ),
-                    SizedBox(height: 10),
-                    Form(
-                      key: _formKey,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          SizedBox(
-                            width: 240,
-                            height: 100,
-                            child: TextFormField(
-                              controller: nicNumber,
-                              keyboardType: TextInputType.number,
-                              autocorrect: false,
-                              cursorColor: const Color.fromARGB(
-                                255,
-                                0,
-                                55,
-                                255,
+                      SizedBox(height: 10),
+                      Form(
+                        key: _formKey,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            SizedBox(
+                              width: 240,
+                              height: 100,
+                              child: TextFormField(
+                                controller: nicNumber,
+                                keyboardType: TextInputType.number,
+                                autocorrect: false,
+                                cursorColor: const Color.fromARGB(
+                                  255,
+                                  0,
+                                  55,
+                                  255,
+                                ),
+                                decoration: InputDecoration(
+                                  floatingLabelStyle: TextStyle(fontSize: 1),
+                                  errorMaxLines: 2,
+                                  contentPadding: const EdgeInsets.symmetric(
+                                    vertical: 0,
+                                    horizontal: 12,
+                                  ),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.all(
+                                      Radius.circular(btnBorderRadius),
+                                    ),
+                                  ),
+                                  enabledBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.all(
+                                      Radius.circular(btnBorderRadius),
+                                    ),
+                                    borderSide: BorderSide(
+                                      color: Color.fromARGB(58, 23, 23, 23),
+                                      width: 1.5,
+                                    ),
+                                  ),
+                                  errorBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.all(
+                                      Radius.circular(btnBorderRadius),
+                                    ),
+                                    borderSide: BorderSide(
+                                      color: Color.fromARGB(89, 181, 0, 0),
+                                      width: 2,
+                                    ),
+                                  ),
+                                  errorStyle: TextStyle(
+                                    color: Color.fromARGB(255, 233, 1, 1),
+                                    fontSize: 15,
+                                    fontWeight: FontWeight(700),
+                                  ),
+                                  fillColor: safeAreaC,
+                                  filled: true,
+                                  labelText: "Enter Customer ID",
+                                  labelStyle: TextStyle(
+                                    color: Color.fromARGB(105, 21, 21, 21),
+                                    fontSize: 17,
+                                    fontWeight: FontWeight(500),
+                                  ),
+                                ),
+                                validator: (value) {
+                                  if (value == null || value.trim().isEmpty) {
+                                    return "Please fill this field";
+                                  } else if (value.length < 0) {
+                                    return "Enter a valid NIC number";
+                                  } else {
+                                    return null;
+                                  }
+                                },
+                                onSaved: (newValue) {
+                                  customerID = int.tryParse(nicNumber.text);
+                                },
                               ),
-                              decoration: InputDecoration(
-                                floatingLabelStyle: TextStyle(fontSize: 1),
-                                errorMaxLines: 2,
-                                contentPadding: const EdgeInsets.symmetric(
-                                  vertical: 0,
-                                  horizontal: 12,
+                            ),
+                            ElevatedButton(
+                              onPressed: () async {
+                                if (!_formKey.currentState!.validate()) return;
+
+                                final customerId = int.tryParse(
+                                  nicNumber.text.trim(),
+                                );
+                                // if (customerId == null) {
+                                //   setState(() {
+                                //     showDetails = false;
+                                //     message =
+                                //         "Please enter a valid numeric customer ID.";
+                                //   });
+                                //   return;
+                                // }
+
+                                await loanData.searchByNic(customerId!);
+                                _user = loanData.user;
+
+                                setState(() {
+                                  if (_user != null) {
+                                    showDetails = true;
+                                    message = '';
+                                  } else {
+                                    showDetails = false;
+                                    message = "No matching user was found";
+                                  }
+                                });
+                                // showTopNotification(
+                                //   // ignore: use_build_context_synchronously
+                                //   context,
+                                //   "Please fix the validation errors before submitting.",
+                                // );
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: btnC,
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 20,
+                                  vertical: 12,
                                 ),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.all(
-                                    Radius.circular(btnBorderRadius),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(
+                                    btnBorderRadius,
                                   ),
                                 ),
-                                enabledBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.all(
-                                    Radius.circular(btnBorderRadius),
+                              ),
+                              child: Text(
+                                "FIND",
+                                style: TextStyle(
+                                  letterSpacing: 2,
+                                  color: const Color.fromARGB(
+                                    255,
+                                    255,
+                                    255,
+                                    255,
                                   ),
-                                  borderSide: BorderSide(
-                                    color: Color.fromARGB(58, 23, 23, 23),
-                                    width: 1.5,
-                                  ),
-                                ),
-                                errorBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.all(
-                                    Radius.circular(btnBorderRadius),
-                                  ),
-                                  borderSide: BorderSide(
-                                    color: Color.fromARGB(89, 181, 0, 0),
-                                    width: 2,
-                                  ),
-                                ),
-                                errorStyle: TextStyle(
-                                  color: Color.fromARGB(255, 233, 1, 1),
-                                  fontSize: 15,
-                                  fontWeight: FontWeight(700),
-                                ),
-                                fillColor: safeAreaC,
-                                filled: true,
-                                labelText: "Enter Customer ID",
-                                labelStyle: TextStyle(
-                                  color: Color.fromARGB(105, 21, 21, 21),
-                                  fontSize: 17,
+                                  fontSize: btnFontSize,
                                   fontWeight: FontWeight(500),
                                 ),
                               ),
-                              validator: (value) {
-                                if (value == null || value.trim().isEmpty) {
-                                  return "Please fill this field";
-                                } else if (value.length < 0) {
-                                  return "Enter a valid NIC number";
-                                } else {
-                                  return null;
-                                }
-                              },
-                              onSaved: (newValue) {
-                                customerID = int.tryParse(nicNumber.text);
-                              },
                             ),
-                          ),
-                          ElevatedButton(
-                            onPressed: () async {
-                              if (!_formKey.currentState!.validate()) return;
-
-                              final customerId = int.tryParse(
-                                nicNumber.text.trim(),
-                              );
-                              if (customerId == null) {
-                                setState(() {
-                                  showDetails = false;
-                                  message =
-                                      "Please enter a valid numeric customer ID.";
-                                });
-                                return;
-                              }
-
-                              await loanData.searchByNic(customerId);
-                              final User? user = loanData.user;
-
-                              setState(() {
-                                if (user != null) {
-                                  showDetails = true;
-                                  message = '';
-                                } else {
-                                  showDetails = false;
-                                  message = "No matching user was found";
-                                }
-                              });
-                              showTopNotification(
-                                // ignore: use_build_context_synchronously
-                                context,
-                                "Please fix the validation errors before submitting.",
-                              );
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: btnC,
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 20,
-                                vertical: 12,
-                              ),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(
-                                  btnBorderRadius,
-                                ),
-                              ),
-                            ),
-                            child: Text(
-                              "FIND",
-                              style: TextStyle(
-                                letterSpacing: 2,
-                                color: const Color.fromARGB(255, 255, 255, 255),
-                                fontSize: btnFontSize,
-                                fontWeight: FontWeight(500),
-                              ),
-                            ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-              SizedBox(height: 30),
-              customBox(),
-              SizedBox(height: 30),
-            ],
+                SizedBox(height: 30),
+                customBox(),
+                SizedBox(height: 30),
+              ],
+            ),
           ),
         ),
       ),
@@ -287,9 +295,11 @@ class _ExistingCustomerLoanState extends State<ExistingCustomerLoan> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Text(user!.name),
-                Text("Email"),
-                Text("0766303435"),
+                // Text(_user!.name),
+                _buildDetailRow("Full Name", _user!.name),
+                _buildDetailRow("Address", _user.address),
+                // _buildDetailRow("Email", "_user.email"),
+                _buildDetailRow("Phone Number", _user.phoneNumber),
                 GestureDetector(
                   onTap: () {
                     // Navigate to new loan request page
@@ -396,7 +406,7 @@ class _ExistingCustomerLoanState extends State<ExistingCustomerLoan> {
                           ),
                         ),
                         title: Text(
-                          "Loan ID: ${loan.interestRate.toString()}",
+                          "Loan ID : ${loan.fileNumber.toString()}",
                           style: const TextStyle(
                             fontWeight: FontWeight.bold,
                             color: Color(0xFF1A3D81),
@@ -445,7 +455,14 @@ class _ExistingCustomerLoanState extends State<ExistingCustomerLoan> {
                             // ),
                           ],
                         ),
-                        onTap: () {},
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => LoanDetailsPage(),
+                            ),
+                          );
+                        },
                       ),
                     );
                   },
@@ -457,7 +474,7 @@ class _ExistingCustomerLoanState extends State<ExistingCustomerLoan> {
       );
     } else {
       nicNumber.clear();
-      // setState(() {});
+      // nicNumber.dispose();
       return Center(
         child: Text(
           message,
@@ -534,6 +551,39 @@ class _ExistingCustomerLoanState extends State<ExistingCustomerLoan> {
             ScaffoldMessenger.of(context).hideCurrentSnackBar();
           },
         ),
+      ),
+    );
+  }
+
+  Widget _buildDetailRow(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4.0),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        mainAxisSize: MainAxisSize.max,
+        children: [
+          Text(
+            label.toUpperCase(),
+            style: const TextStyle(
+              color: Colors.grey,
+              fontSize: 12,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Text(
+              value,
+              textAlign: TextAlign.end,
+              style: const TextStyle(
+                color: Color(0xFF1A3D81),
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
