@@ -117,4 +117,89 @@ class DatabaseService {
     final db = await _instance.database;
     db?.close();
   }
+
+  Future<void> insertCustomer({
+    required int nic,
+    required String address,
+    required String email,
+    required String name,
+    required String phoneNumber,
+  }) async {
+    try {
+      final db = await _instance.database;
+      final Map<String, dynamic> customerData = {
+        'nic': nic,
+        'address': address,
+        'email': email,
+        'name': name,
+        'phone_number': phoneNumber,
+      };
+
+      // 2. Use conflictAlgorithm to handle duplicate emails/NICs gracefully
+      await db?.insert(
+        'customers',
+        customerData,
+        conflictAlgorithm: ConflictAlgorithm
+            .replace, // Replaces old data if NIC/Email duplicates
+      );
+
+      print('Customer $name inserted successfully.');
+    } catch (e) {
+      print('Error inserting customer: $e');
+      rethrow;
+    }
+  }
+
+  Future<void> getAllCustomers() async {
+    try {
+      final db = await _instance.database;
+      final List<Map<String, dynamic>> maps = await db!.query('customers');
+      print(maps);
+      for (var data in maps) {
+        print('-----------------------------------');
+        print('  NIC:          ${data['nic']}');
+        print('  Name:         ${data['name']}');
+        print('  Email:        ${data['email']}');
+        print('  Address:      ${data['address']}');
+        print('  Phone Number: ${data['phone_number']}');
+        print('-----------------------------------');
+      }
+      // return maps;
+    } catch (e) {
+      print('Error retrieving customers: $e');
+      // return [];
+    }
+  }
+
+  Future<void> deleteCustomerByNic(int nic) async {
+    try {
+      final db = await _instance.database;
+      final rowsDeleted = await db!.delete(
+        'customers',
+        where: 'nic = ?',
+        whereArgs: [nic],
+      );
+      if (rowsDeleted > 0) {
+        print('Successfully deleted customer with NIC: $nic');
+      } else {
+        print('No customer found with NIC: $nic');
+      }
+      // return rowsDeleted;
+    } catch (e) {
+      print('Error deleting customer: $e');
+      // return 0;
+    }
+  }
+
+  Future<int> deleteAllCustomers(String tableName) async {
+    try {
+      final db = await _instance.database;
+      final rowsDeleted = await db!.delete(tableName);
+      // print('Successfully cleared table. Deleted $rowsDeleted customers.');
+      return rowsDeleted;
+    } catch (e) {
+      // print('Error clearing customers table: $e');
+      return 0;
+    }
+  }
 }

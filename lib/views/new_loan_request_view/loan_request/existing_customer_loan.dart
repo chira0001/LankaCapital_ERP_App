@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:nkrs_app/data/services/database_service.dart';
+import 'package:nkrs_app/data/view_model/check_connection.dart';
 import 'package:nkrs_app/data/view_model/loan_view_model.dart';
 import 'package:nkrs_app/models/loan_model.dart';
 import 'package:nkrs_app/models/user_model.dart';
@@ -27,7 +28,6 @@ class _ExistingCustomerLoanState extends State<ExistingCustomerLoan> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     // DatabaseService().database;
     DatabaseService().printAllTables();
@@ -205,7 +205,15 @@ class _ExistingCustomerLoanState extends State<ExistingCustomerLoan> {
                             ),
                             ElevatedButton(
                               onPressed: () async {
-                                database();
+                                // database();
+                                bool online =
+                                    await CheckConnection.isInternet();
+
+                                if (online) {
+                                  print("Internet Available");
+                                } else {
+                                  print("No Internet");
+                                }
                                 if (!_formKey.currentState!.validate()) return;
 
                                 final customerId = int.tryParse(
@@ -601,8 +609,22 @@ class _ExistingCustomerLoanState extends State<ExistingCustomerLoan> {
   }
 
   void database() async {
-    // await DatabaseService().database;
-
+    // await DatabaseService().insertCustomer(
+    //   address: "116/3",
+    //   email: "example@gmail.com",
+    //   name: "vihaga",
+    //   nic: 200210801480,
+    //   phoneNumber: "07766303438",
+    // );
+    // await DatabaseService().insertCustomer(
+    //   address: "116/3",
+    //   email: "example2@gmail.com",
+    //   name: "vihaga",
+    //   nic: 200210801481,
+    //   phoneNumber: "07766303438",
+    // );
+    await DatabaseService().deleteCustomerByNic(200210801481);
+    await DatabaseService().getAllCustomers();
     // await DatabaseService().printAllTables();
     // await DatabaseService().isTableExists("");
     // await DatabaseService().dropTables();
