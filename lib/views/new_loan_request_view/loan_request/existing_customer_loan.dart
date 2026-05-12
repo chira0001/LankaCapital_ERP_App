@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:nkrs_app/data/services/database_service.dart';
 import 'package:nkrs_app/data/view_model/loan_view_model.dart';
 import 'package:nkrs_app/models/loan_model.dart';
 import 'package:nkrs_app/models/user_model.dart';
@@ -6,6 +7,7 @@ import 'package:nkrs_app/utility/constanst.dart';
 import 'package:nkrs_app/views/new_loan_request_view/loan_request/existing_customer_loan_details.dart';
 import 'package:nkrs_app/views/new_loan_request_view/loan_request/existing_customer_loan_request.dart';
 import 'package:nkrs_app/views/new_loan_request_view/utility/main_card.dart';
+import 'package:nkrs_app/views/new_loan_request_view/utility/popup_box_message.dart';
 
 class ExistingCustomerLoan extends StatefulWidget {
   const ExistingCustomerLoan({super.key});
@@ -22,6 +24,15 @@ class _ExistingCustomerLoanState extends State<ExistingCustomerLoan> {
   final _formKey = GlobalKey<FormState>();
   String message = '';
   late final User? _user;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    // DatabaseService().database;
+    DatabaseService().printAllTables();
+    DatabaseService().isTableExists("");
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -194,6 +205,7 @@ class _ExistingCustomerLoanState extends State<ExistingCustomerLoan> {
                             ),
                             ElevatedButton(
                               onPressed: () async {
+                                database();
                                 if (!_formKey.currentState!.validate()) return;
 
                                 final customerId = int.tryParse(
@@ -220,11 +232,11 @@ class _ExistingCustomerLoanState extends State<ExistingCustomerLoan> {
                                     message = "No matching user was found";
                                   }
                                 });
-                                // showTopNotification(
-                                //   // ignore: use_build_context_synchronously
-                                //   context,
-                                //   "Please fix the validation errors before submitting.",
-                                // );
+                                showTopNotification(
+                                  // ignore: use_build_context_synchronously
+                                  context,
+                                  "Please fix the validation errors before submitting.",
+                                );
                               },
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: btnC,
@@ -586,5 +598,15 @@ class _ExistingCustomerLoanState extends State<ExistingCustomerLoan> {
         ],
       ),
     );
+  }
+
+  void database() async {
+    // await DatabaseService().database;
+
+    // await DatabaseService().printAllTables();
+    // await DatabaseService().isTableExists("");
+    // await DatabaseService().dropTables();
+    // await DatabaseService().deleteDatabaseFile();
+    // DatabaseService().close();
   }
 }
