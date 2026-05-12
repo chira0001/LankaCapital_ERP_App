@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
+import 'package:nkrs_app/services/auth_service.dart' show AuthService;
 import 'package:nkrs_app/utility/constanst.dart';
 import 'package:nkrs_app/views/customer_collection_views/customerCollectionpage/collection_entry.dart';
 import 'package:nkrs_app/views/customer_collection_views/profile/profile.dart';
@@ -14,6 +15,27 @@ class CustomerCollectionHome extends StatefulWidget {
 }
 
 class _CustomerCollectionHomeState extends State<CustomerCollectionHome> {
+  final AuthService _authService = AuthService();
+
+  bool _isLoading = true;
+  String _username = "";
+
+  @override
+  void initState() {
+    super.initState();
+    lordUserName();
+  }
+
+  Future<void> lordUserName() async {
+    final String? userName = await _authService.getUserName();
+    if (mounted) {
+      setState(() {
+        _username = userName ?? "";
+        _isLoading = false;
+      });
+    }
+  }
+
   // int _selectedIndex = 0;
   // double logoSize = 32;
   @override
@@ -38,7 +60,7 @@ class _CustomerCollectionHomeState extends State<CustomerCollectionHome> {
           ],
         ),
 
-        centerTitle: true,
+        centerTitle: false,
         backgroundColor: appBarC,
         elevation: 2.0,
         shadowColor: appBarShadow,
@@ -77,10 +99,29 @@ class _CustomerCollectionHomeState extends State<CustomerCollectionHome> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Greeting
-                const Text(
-                  "Hello, ",
-                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                Column(
+                  children: [
+                    Row(
+                      children: [
+                        const Text(
+                          "Hello ",
+                          style: TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        Text(
+                          _username,
+                          style: TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
+
                 SizedBox(height: kTinySpacing),
                 const Text(
                   "Manage your daily collections and loan requests.",
