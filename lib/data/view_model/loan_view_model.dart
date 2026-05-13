@@ -10,14 +10,7 @@ class LoanViewModel extends ChangeNotifier {
   bool _isLoading = false;
 
   User? get user => _user;
-  // User(
-  //   id: 1,
-  //   email: "email",
-  //   name: "name",
-  //   phoneNumber: "phoneNumber",
-  //   address: "address",
-  // );
-  // List<Loan> get loans => _loans;
+
   bool get isLoading => _isLoading;
 
   Future<void> searchByNic(int nic) async {
@@ -41,8 +34,6 @@ class LoanViewModel extends ChangeNotifier {
 
   Future<void> searchByNicOffline(int nic) async {
     final DatabaseService service = DatabaseService();
-
-    _isLoading = true;
     notifyListeners();
 
     try {
@@ -55,7 +46,7 @@ class LoanViewModel extends ChangeNotifier {
 
       final userData = result['customer'] as Map<String, dynamic>;
       final loanData = result['loans'] as List<Map<String, dynamic>>;
-      print(userData['name']);
+      // print(userData['name']);
 
       _user = User(
         id: userData['nic'],
@@ -64,12 +55,6 @@ class LoanViewModel extends ChangeNotifier {
         name: userData['name'].toString(),
         phoneNumber: userData['phone_number'].toString(),
       );
-      // print(userData['address']);
-      // print(userData['name']);
-
-      // _loans = loanData.map((loan) {
-      //   return Loan.fromMap(loan);
-      // }).toList();
     } catch (e) {
       _user = null;
       _loans = [];
@@ -88,30 +73,5 @@ class LoanViewModel extends ChangeNotifier {
 
   Future<List<Loan>> getLoansByID() async {
     return _loans;
-    // return [
-    //   Loan(
-    //     amount: 1000,
-    //     interestRate: 1.1,
-    //     noOfInstallments: 1,
-    //     fileNumber: "121",
-    //     documentCharge: 100,
-    //   ),
-
-    //   Loan(
-    //     amount: 5000,
-    //     interestRate: 2.5,
-    //     noOfInstallments: 6,
-    //     fileNumber: "122",
-    //     documentCharge: 200,
-    //   ),
-
-    //   Loan(
-    //     amount: 10000,
-    //     interestRate: 3.0,
-    //     noOfInstallments: 12,
-    //     fileNumber: "123",
-    //     documentCharge: 300,
-    //   ),
-    // ];
   }
 }

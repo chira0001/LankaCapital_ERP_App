@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 class CheckConnection {
-  // A global notifier holding the current internet state (defaults to true)
   static final ValueNotifier<bool> isOnline = ValueNotifier<bool>(true);
 
   static void initialize() {

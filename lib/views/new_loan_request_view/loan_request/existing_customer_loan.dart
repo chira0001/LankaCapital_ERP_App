@@ -25,7 +25,7 @@ class _ExistingCustomerLoanState extends State<ExistingCustomerLoan> {
   TextEditingController nicNumber = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   String message = '';
-  late final User? _user;
+  User? _user;
 
   @override
   void initState() {
@@ -39,7 +39,7 @@ class _ExistingCustomerLoanState extends State<ExistingCustomerLoan> {
   @override
   Widget build(BuildContext context) {
     late int? customerID;
-    setState(() {});
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: appBarC,
@@ -229,35 +229,56 @@ class _ExistingCustomerLoanState extends State<ExistingCustomerLoan> {
                               ),
                             ),
                             ElevatedButton(
-                              onPressed: () {
-                                // database();
-                                // setState(() {});
+                              onPressed: () async {
                                 if (_formKey.currentState!.validate()) {
-                                  final customerId = int.tryParse(
+                                  var customerId = int.tryParse(
                                     nicNumber.text.trim(),
                                   );
-                                  // print("set value");
-                                  if (customerId != null) {
-                                    // loanData.searchByNic(customerId!);
-                                    loanData.searchByNicOffline(customerId!);
-                                    _user = loanData.user;
+                                  if (customerId == null) {
+                                    showTopNotification(
+                                      context,
+                                      "Invalid NIC number",
+                                    );
+                                    return;
+                                  }
+                                  if (CheckConnection.isOnline.value) {
+                                    await loanData.searchByNic(customerId);
                                     setState(() {
+                                      _user = loanData.user;
                                       if (_user != null) {
                                         showDetails = true;
-                                        message = 'hellow';
+                                        message = "";
                                       } else {
                                         showDetails = false;
-                                        message = "No matching user was found";
+                                        message =
+                                            "No matching user was found $customerId";
+                                      }
+                                    });
+                                  } else {
+                                    await loanData.searchByNicOffline(
+                                      customerId,
+                                    );
+                                    setState(() {
+                                      _user = loanData.user;
+                                      if (_user != null) {
+                                        showDetails = true;
+                                        message = "";
+                                      } else {
+                                        showDetails = false;
+                                        message =
+                                            "No matching user was found $customerId";
                                       }
                                     });
                                   }
                                 } else {
                                   showTopNotification(
-                                    // ignore: use_build_context_synchronously
                                     context,
                                     "Please fix the validation errors before submitting.",
                                   );
-                                  nicNumber.clear();
+                                  setState(() {
+                                    showDetails = false;
+                                  });
+                                  return;
                                 }
                               },
                               style: ElevatedButton.styleFrom(
@@ -272,20 +293,24 @@ class _ExistingCustomerLoanState extends State<ExistingCustomerLoan> {
                                   ),
                                 ),
                               ),
-                              child: Text(
-                                "FIND",
-                                style: TextStyle(
-                                  letterSpacing: 2,
-                                  color: const Color.fromARGB(
-                                    255,
-                                    255,
-                                    255,
-                                    255,
-                                  ),
-                                  fontSize: btnFontSize,
-                                  fontWeight: FontWeight(500),
-                                ),
-                              ),
+                              child: loanData.isLoading
+                                  ? const SizedBox(
+                                      height: 20,
+                                      width: 20,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                        color: Colors.white,
+                                      ),
+                                    )
+                                  : Text(
+                                      "FIND",
+                                      style: TextStyle(
+                                        letterSpacing: 2,
+                                        color: Colors.white,
+                                        fontSize: btnFontSize,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
                             ),
                           ],
                         ),
@@ -331,9 +356,9 @@ class _ExistingCustomerLoanState extends State<ExistingCustomerLoan> {
               children: [
                 // Text(_user!.name),
                 _buildDetailRow("Full Name", _user!.name),
-                _buildDetailRow("Address", _user.address),
+                _buildDetailRow("Address", _user!.address),
                 // _buildDetailRow("Email", "_user.email"),
-                _buildDetailRow("Phone Number", _user.phoneNumber),
+                _buildDetailRow("Phone Number", _user!.phoneNumber),
                 GestureDetector(
                   onTap: () {
                     // Navigate to new loan request page
@@ -447,7 +472,7 @@ class _ExistingCustomerLoanState extends State<ExistingCustomerLoan> {
                           ),
                         ),
                         subtitle: Text(
-                          "Issued: ${loan.createdAt?.split(' ')[0]}",
+                          "Issued: ${loan.createdAt?.split('T')[0]}",
                         ),
                         trailing: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
