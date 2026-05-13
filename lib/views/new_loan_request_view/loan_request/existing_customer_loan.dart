@@ -32,7 +32,7 @@ class _ExistingCustomerLoanState extends State<ExistingCustomerLoan> {
     super.initState();
     CheckConnection.initialize();
     // DatabaseService().database;
-    // DatabaseService().printAllTables();
+    DatabaseService().printAllTables();
     // DatabaseService().isTableExists("");
   }
 
@@ -217,7 +217,7 @@ class _ExistingCustomerLoanState extends State<ExistingCustomerLoan> {
                                 validator: (value) {
                                   if (value == null || value.trim().isEmpty) {
                                     return "Please fill this field";
-                                  } else if (value.length < 0) {
+                                  } else if (value.length < 1) {
                                     return "Enter a valid NIC number";
                                   } else {
                                     return null;
@@ -229,38 +229,28 @@ class _ExistingCustomerLoanState extends State<ExistingCustomerLoan> {
                               ),
                             ),
                             ElevatedButton(
-                              onPressed: () async {
+                              onPressed: () {
                                 // database();
-                                if (!_formKey.currentState!.validate()) {
+                                // setState(() {});
+                                if (_formKey.currentState!.validate()) {
                                   final customerId = int.tryParse(
                                     nicNumber.text.trim(),
                                   );
-                                  // if (customerId == null) {
-                                  //   setState(() {
-                                  //     showDetails = false;
-                                  //     message =
-                                  //         "Please enter a valid numeric customer ID.";
-                                  //   });
-                                  //   return;
-                                  // }
-
-                                  await loanData.searchByNic(customerId!);
-                                  _user = loanData.user;
-
-                                  setState(() {
-                                    if (_user != null) {
-                                      showDetails = true;
-                                      message = 'hellow';
-                                    } else {
-                                      showDetails = false;
-                                      message = "No matching user was found";
-                                    }
-                                  });
-                                  // showTopNotification(
-                                  //   // ignore: use_build_context_synchronously
-                                  //   context,
-                                  //   "Please fix the validation errors before submitting.",
-                                  // );
+                                  // print("set value");
+                                  if (customerId != null) {
+                                    // loanData.searchByNic(customerId!);
+                                    loanData.searchByNicOffline(customerId!);
+                                    _user = loanData.user;
+                                    setState(() {
+                                      if (_user != null) {
+                                        showDetails = true;
+                                        message = 'hellow';
+                                      } else {
+                                        showDetails = false;
+                                        message = "No matching user was found";
+                                      }
+                                    });
+                                  }
                                 } else {
                                   showTopNotification(
                                     // ignore: use_build_context_synchronously
@@ -647,7 +637,7 @@ class _ExistingCustomerLoanState extends State<ExistingCustomerLoan> {
     //   nic: 200210801481,
     //   phoneNumber: "07766303438",
     // );
-    await DatabaseService().deleteCustomerByNic(200210801481);
+    // await DatabaseService().deleteCustomerByNic(200210801481);
     await DatabaseService().getAllCustomers();
     // await DatabaseService().printAllTables();
     // await DatabaseService().isTableExists("");

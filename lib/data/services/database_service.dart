@@ -1,86 +1,22 @@
+import 'package:nkrs_app/data/services/database_initializer_service.dart';
 import 'package:path/path.dart';
 import 'package:sqflite_sqlcipher/sqflite.dart';
 
 class DatabaseService {
-  static final DatabaseService _instance = DatabaseService._internal();
-  static Database? _databse;
-  factory DatabaseService() => _instance;
-  DatabaseService._internal();
-
-  final String _filePath = "lankacapitals.db";
-  final String password = "1234";
-
-  Future<Database?> get database async {
-    if (_databse != null) return _databse;
-    return _databse = await _initDatabase();
-  }
-
-  Future<Database> _initDatabase() async {
-    final dbPath = await getDatabasesPath();
-    final path = join(dbPath, _filePath);
-
-    return await openDatabase(
-      path,
-      password: password,
-      version: 1,
-      onCreate: _createDB,
-    );
-  }
-
-  Future<void> _createDB(Database db, int version) async {
-    // create employee table
-    await db.execute('''
-      CREATE TABLE IF NOT EXISTS employees (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        address VARCHAR(255) NOT NULL,
-        email VARCHAR(255) NOT NULL UNIQUE,
-        first_name VARCHAR(255) NOT NULL,
-        last_name VARCHAR(255) NOT NULL,
-        nic BIGINT NOT NULL,
-        phone_number VARCHAR(255) NOT NULL
-      )
-    ''');
-    // create customer table
-    await db.execute('''
-      CREATE TABLE IF NOT EXISTS customers (
-        nic BIGINT PRIMARY KEY,
-        address VARCHAR(255) NOT NULL,
-        email VARCHAR(255) NOT NULL UNIQUE,
-        name VARCHAR(255) NOT NULL,
-        phone_number VARCHAR(255) NOT NULL
-      )
-    ''');
-    // create loan table
-    await db.execute('''
-      CREATE TABLE IF NOT EXISTS loans (
-        file_number VARCHAR(255) PRIMARY KEY,
-        amount DECIMAL(12,2),
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        interest_rate DOUBLE,
-        customer_id BIGINT,
-        employee_id BIGINT,
-        no_of_installments DOUBLE,
-        rejection_note VARCHAR(1000),
-        risk TEXT CHECK(risk IN ('HIGH', 'LOW', 'MEDIUM')),
-        status TEXT CHECK(status IN ('APPROVED', 'PENDING', 'REJECTED')),
-        FOREIGN KEY (customer_id) REFERENCES customers(id) ON DELETE CASCADE,
-        FOREIGN KEY (employee_id) REFERENCES employees(id) ON DELETE SET NULL
-      )
-    ''');
-  }
+  final DatabaseInitializerService _databaseService =
+      DatabaseInitializerService();
 
   Future<bool?> isTableExists(String tableName) async {
-    //risk
-    final db = await DatabaseService._instance.database;
+    final db = await _databaseService.database; //risk
     final result = await db?.rawQuery(
       "SELECT name FROM sqlite_master WHERE type='table' AND name=?",
-      ["employees"],
+      [tableName],
     );
     return result?.isNotEmpty;
   }
 
   Future<void> printAllTables() async {
-    final db = await _instance.database;
+    final db = await _databaseService.database;
     final tables = await db?.rawQuery(
       "SELECT name FROM sqlite_master WHERE type='table'",
     );
@@ -90,7 +26,7 @@ class DatabaseService {
   }
 
   Future<void> dropTables() async {
-    final db = await _instance.database;
+    final db = await _databaseService.database;
     await db?.execute('PRAGMA foreign_keys = OFF');
     try {
       await db?.execute('DROP TABLE IF EXISTS loans');
@@ -108,13 +44,13 @@ class DatabaseService {
 
   Future<void> deleteDatabaseFile() async {
     final dbPath = await getDatabasesPath();
-    final path = join(dbPath, 'loan_system.db');
+    final path = join(dbPath, _databaseService.filePath);
     await deleteDatabase(path);
     print("Database deleted");
   }
 
   Future close() async {
-    final db = await _instance.database;
+    final db = await _databaseService.database;
     db?.close();
   }
 
@@ -126,7 +62,7 @@ class DatabaseService {
     required String phoneNumber,
   }) async {
     try {
-      final db = await _instance.database;
+      final db = await _databaseService.database;
       final Map<String, dynamic> customerData = {
         'nic': nic,
         'address': address,
@@ -139,8 +75,7 @@ class DatabaseService {
       await db?.insert(
         'customers',
         customerData,
-        conflictAlgorithm: ConflictAlgorithm
-            .replace, // Replaces old data if NIC/Email duplicates
+        conflictAlgorithm: ConflictAlgorithm.replace,
       );
 
       print('Customer $name inserted successfully.');
@@ -152,7 +87,7 @@ class DatabaseService {
 
   Future<void> getAllCustomers() async {
     try {
-      final db = await _instance.database;
+      final db = await _databaseService.database;
       final List<Map<String, dynamic>> maps = await db!.query('customers');
       print(maps);
       for (var data in maps) {
@@ -173,7 +108,7 @@ class DatabaseService {
 
   Future<void> deleteCustomerByNic(int nic) async {
     try {
-      final db = await _instance.database;
+      final db = await _databaseService.database;
       final rowsDeleted = await db!.delete(
         'customers',
         where: 'nic = ?',
@@ -193,7 +128,7 @@ class DatabaseService {
 
   Future<int> deleteAllCustomers(String tableName) async {
     try {
-      final db = await _instance.database;
+      final db = await _databaseService.database;
       final rowsDeleted = await db!.delete(tableName);
       // print('Successfully cleared table. Deleted $rowsDeleted customers.');
       return rowsDeleted;
@@ -201,5 +136,29 @@ class DatabaseService {
       // print('Error clearing customers table: $e');
       return 0;
     }
+  }
+
+  Future<Map<String, dynamic>?> getCustomerWithLoans(int nic) async {
+    final db = await _databaseService.database;
+    final customerResult = await db!.query(
+      'customers',
+      where: 'nic = ?',
+      whereArgs: [nic],
+    );
+    print(customerResult);
+    if (customerResult.isEmpty) {
+      return null;
+    }else{
+      
+    }
+
+    final loansResult = await db.query(
+      'loans',
+      where: 'customer_id = ?',
+      whereArgs: [nic],
+      orderBy: 'created_at DESC',
+    );
+
+    return {'customer': customerResult.first, 'loans': loansResult};
   }
 }

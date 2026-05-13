@@ -44,4 +44,6 @@ class Loan {
       // 'status': status,
     };
   }
+
+  static Object? fromMap(Map<String, dynamic> loan) {}
 }
