@@ -19,6 +19,7 @@ class ExistingCustomerLoan extends StatefulWidget {
 
 class _ExistingCustomerLoanState extends State<ExistingCustomerLoan> {
   bool showDetails = false;
+  late bool online;
 
   LoanViewModel loanData = LoanViewModel();
   TextEditingController nicNumber = TextEditingController();
@@ -29,15 +30,16 @@ class _ExistingCustomerLoanState extends State<ExistingCustomerLoan> {
   @override
   void initState() {
     super.initState();
+    CheckConnection.initialize();
     // DatabaseService().database;
-    DatabaseService().printAllTables();
-    DatabaseService().isTableExists("");
+    // DatabaseService().printAllTables();
+    // DatabaseService().isTableExists("");
   }
 
   @override
   Widget build(BuildContext context) {
     late int? customerID;
-
+    setState(() {});
     return Scaffold(
       appBar: AppBar(
         backgroundColor: appBarC,
@@ -62,14 +64,37 @@ class _ExistingCustomerLoanState extends State<ExistingCustomerLoan> {
         ),
         actions: [
           Padding(
-            padding: EdgeInsets.only(right: 10),
-            child: IconButton(
-              onPressed: () {},
-              icon: Icon(
-                Icons.help_outline,
-                color: const Color.fromARGB(118, 17, 17, 17),
-                size: 26,
-              ),
+            padding: const EdgeInsets.only(right: 10),
+            child: ValueListenableBuilder<bool>(
+              valueListenable: CheckConnection.isOnline,
+              builder: (context, online, child) {
+                return IconButton(
+                  onPressed: () {
+                    CheckConnection.initialize();
+                    showTopNotification(
+                      context,
+                      online ? "Device is Online" : "Device is Offline",
+                    );
+                  },
+                  icon: Icon(
+                    online ? Icons.wifi_rounded : Icons.wifi_off_rounded,
+                    color: online
+                        ? const Color.fromARGB(
+                            255,
+                            9,
+                            172,
+                            58,
+                          ) // Green when online
+                        : const Color.fromARGB(
+                            255,
+                            172,
+                            9,
+                            9,
+                          ), // Red when offline
+                    size: 28,
+                  ),
+                );
+              },
             ),
           ),
         ],
@@ -206,45 +231,44 @@ class _ExistingCustomerLoanState extends State<ExistingCustomerLoan> {
                             ElevatedButton(
                               onPressed: () async {
                                 // database();
-                                bool online =
-                                    await CheckConnection.isInternet();
+                                if (!_formKey.currentState!.validate()) {
+                                  final customerId = int.tryParse(
+                                    nicNumber.text.trim(),
+                                  );
+                                  // if (customerId == null) {
+                                  //   setState(() {
+                                  //     showDetails = false;
+                                  //     message =
+                                  //         "Please enter a valid numeric customer ID.";
+                                  //   });
+                                  //   return;
+                                  // }
 
-                                if (online) {
-                                  print("Internet Available");
+                                  await loanData.searchByNic(customerId!);
+                                  _user = loanData.user;
+
+                                  setState(() {
+                                    if (_user != null) {
+                                      showDetails = true;
+                                      message = 'hellow';
+                                    } else {
+                                      showDetails = false;
+                                      message = "No matching user was found";
+                                    }
+                                  });
+                                  // showTopNotification(
+                                  //   // ignore: use_build_context_synchronously
+                                  //   context,
+                                  //   "Please fix the validation errors before submitting.",
+                                  // );
                                 } else {
-                                  print("No Internet");
+                                  showTopNotification(
+                                    // ignore: use_build_context_synchronously
+                                    context,
+                                    "Please fix the validation errors before submitting.",
+                                  );
+                                  nicNumber.clear();
                                 }
-                                if (!_formKey.currentState!.validate()) return;
-
-                                final customerId = int.tryParse(
-                                  nicNumber.text.trim(),
-                                );
-                                // if (customerId == null) {
-                                //   setState(() {
-                                //     showDetails = false;
-                                //     message =
-                                //         "Please enter a valid numeric customer ID.";
-                                //   });
-                                //   return;
-                                // }
-
-                                await loanData.searchByNic(customerId!);
-                                _user = loanData.user;
-
-                                setState(() {
-                                  if (_user != null) {
-                                    showDetails = true;
-                                    message = '';
-                                  } else {
-                                    showDetails = false;
-                                    message = "No matching user was found";
-                                  }
-                                });
-                                showTopNotification(
-                                  // ignore: use_build_context_synchronously
-                                  context,
-                                  "Please fix the validation errors before submitting.",
-                                );
                               },
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: btnC,
