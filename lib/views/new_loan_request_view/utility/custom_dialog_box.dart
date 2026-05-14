@@ -108,16 +108,15 @@ class CustomDialogBox extends StatelessWidget {
               ),
             ),
             SizedBox(height: 100),
-            Container(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        leftBtn();
-                      },
+            Column(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      leftBtn();
+                    },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: btnC,
                         padding: const EdgeInsets.symmetric(
@@ -178,7 +177,6 @@ class CustomDialogBox extends StatelessWidget {
                   ),
                 ],
               ),
-            ),
             // StreamBuilder(stream: stream, builder: builder)
           ],
         ),

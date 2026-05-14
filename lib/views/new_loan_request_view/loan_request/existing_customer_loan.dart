@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:nkrs_app/data/services/database_initializer_service.dart';
 import 'package:nkrs_app/data/services/database_service.dart';
 import 'package:nkrs_app/data/view_model/check_connection.dart';
 import 'package:nkrs_app/data/view_model/loan_view_model.dart';
@@ -31,7 +32,7 @@ class _ExistingCustomerLoanState extends State<ExistingCustomerLoan> {
   void initState() {
     super.initState();
     CheckConnection.initialize();
-    // DatabaseService().database;
+    DatabaseInitializerService().database;
     DatabaseService().printAllTables();
     // DatabaseService().isTableExists("");
   }
@@ -217,7 +218,7 @@ class _ExistingCustomerLoanState extends State<ExistingCustomerLoan> {
                                 validator: (value) {
                                   if (value == null || value.trim().isEmpty) {
                                     return "Please fill this field";
-                                  } else if (value.length < 1) {
+                                  } else if (value.isEmpty) {
                                     return "Enter a valid NIC number";
                                   } else {
                                     return null;

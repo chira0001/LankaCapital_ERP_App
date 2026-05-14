@@ -58,7 +58,7 @@ class LoanFailureScreen extends StatelessWidget {
                   color: const Color(0xFFE53935), // Failure Red
                   boxShadow: [
                     BoxShadow(
-                      color: const Color(0xFFE53935).withOpacity(0.3),
+                      color: const Color(0xFFE53935).withValues(alpha: 77),
                       blurRadius: 40,
                       spreadRadius: 10,
                     ),

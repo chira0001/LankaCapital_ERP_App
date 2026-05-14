@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
+import 'package:nkrs_app/data/view_model/loan_view_model.dart';
 import 'package:nkrs_app/models/loan_model.dart';
 import 'package:nkrs_app/models/user_model.dart';
-import 'package:nkrs_app/services/auth_service.dart';
+import 'package:nkrs_app/data/services/auth_service.dart';
 import 'package:nkrs_app/utility/constanst.dart';
-import 'package:nkrs_app/views/customer_collection_views/customerCollectionpage/ReceiptPreviewPage.dart';
+import 'package:nkrs_app/views/customer_collection_views/customerCollectionpage/receipt_preview_page.dart';
 import 'package:nkrs_app/views/customer_collection_views/customerCollectionpage/customer_collection_home.dart';
 import 'package:nkrs_app/views/customer_collection_views/profile/profile.dart';
 import 'package:nkrs_app/views/customer_collection_views/utility/dialog_box.dart';
+import 'package:nkrs_app/data/view_model/check_connection.dart';
 
 class CollectionEntryPage extends StatefulWidget {
   const CollectionEntryPage({super.key});
@@ -17,11 +19,11 @@ class CollectionEntryPage extends StatefulWidget {
 }
 
 class _CollectionEntryPageState extends State<CollectionEntryPage> {
-  final String _todayDate = DateTime.now().toString().split(' ')[0];
-  final TextEditingController NICcontroller = TextEditingController();
+  String todayDate = DateTime.now().toString().split(' ')[0];
+  final TextEditingController nicController = TextEditingController();
   final TextEditingController lorncontroller = TextEditingController();
   final AuthService _authService = AuthService();
-
+  LoanViewModel loanData = LoanViewModel();
 
   bool _isLoading = false;
   String? _errorMessage;
@@ -30,14 +32,13 @@ class _CollectionEntryPageState extends State<CollectionEntryPage> {
 
   @override
   void dispose() {
-    NICcontroller.dispose();
+    nicController.dispose();
     lorncontroller.dispose();
     super.dispose();
   }
 
- 
   Future<void> _findCustomerByNic() async {
-    final nicText = NICcontroller.text.trim();
+    final nicText = nicController.text.trim();
     if (nicText.isEmpty) {
       setState(() => _errorMessage = 'Please enter a NIC number first.');
       return;
@@ -57,21 +58,26 @@ class _CollectionEntryPageState extends State<CollectionEntryPage> {
     });
 
     try {
-      final (user, loans) = await _authService.fetchCustomerAndLoans(nic);
+      await loanData.searchByNic(nic);
+
+      final loans = await loanData.getLoansByID();
+
       setState(() {
-        _customer = user;
+        _customer = loanData.user;
         _loans = loans;
         _isLoading = false;
       });
 
-      if (loans.isEmpty) {
+      if (_customer == null) {
+        setState(() => _errorMessage = 'No customer found for this NIC.');
+      } else if (loans.isEmpty) {
         setState(() => _errorMessage = 'No loans found for this customer.');
       } else {
-        // Show the loan selection dialog
+        
         if (mounted) {
           DialogBox(
             loans: _loans,
-            NICcontroller: NICcontroller,
+            nicController: nicController,
             lorncontroller: lorncontroller,
           ).showLoanDialog(context);
         }
@@ -84,16 +90,16 @@ class _CollectionEntryPageState extends State<CollectionEntryPage> {
     }
   }
 
-  /// Called when the user taps FIND next to the Loan Number field.
-  /// Opens the dialog directly if loans are already loaded.
   void _showLoanDialog() {
     if (_loans.isEmpty) {
-      setState(() => _errorMessage = 'Please search by NIC first to load loans.');
+      setState(
+        () => _errorMessage = 'Please search by NIC first to load loans.',
+      );
       return;
     }
     DialogBox(
       loans: _loans,
-      NICcontroller: NICcontroller,
+      nicController: nicController,
       lorncontroller: lorncontroller,
     ).showLoanDialog(context);
   }
@@ -180,29 +186,36 @@ class _CollectionEntryPageState extends State<CollectionEntryPage> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
-                    "April #, 2026 • Session Active",
+                  Text(
+                    "$todayDate  • Session Active",
                     style: TextStyle(color: Colors.grey, fontSize: 12),
                   ),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: kSmallSpacing,
-                      vertical: kExtraSmallSpacing,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.green.shade50,
-                      borderRadius: BorderRadius.circular(
-                        kBorderRadiusExtraLarge,
-                      ),
-                    ),
-                    child: const Text(
-                      "● SYNCED",
-                      style: TextStyle(
-                        color: Colors.green,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
+                  ValueListenableBuilder<bool>(
+                    valueListenable: CheckConnection.isOnline,
+                    builder: (context, isOnline, child) {
+                      return Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: kSmallSpacing,
+                          vertical: kExtraSmallSpacing,
+                        ),
+                        decoration: BoxDecoration(
+                          color: isOnline
+                              ? Colors.green.shade50
+                              : Colors.red.shade50,
+                          borderRadius: BorderRadius.circular(
+                            kBorderRadiusExtraLarge,
+                          ),
+                        ),
+                        child: Text(
+                          isOnline ? "● ONLINE" : "● OFFLINE",
+                          style: TextStyle(
+                            color: isOnline ? Colors.green : Colors.red,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      );
+                    },
                   ),
                 ],
               ),
@@ -216,7 +229,7 @@ class _CollectionEntryPageState extends State<CollectionEntryPage> {
                   borderRadius: BorderRadius.circular(kBorderRadiusExtraLarge),
                   boxShadow: [
                     BoxShadow(
-                      // ignore: deprecated_member_use
+                    
                       color: Colors.black.withOpacity(0.05),
                       blurRadius: 10,
                       offset: const Offset(0, 4),
@@ -237,7 +250,7 @@ class _CollectionEntryPageState extends State<CollectionEntryPage> {
                       children: [
                         Expanded(
                           child: TextField(
-                            controller: NICcontroller,
+                            controller: nicController,
                             keyboardType: TextInputType.number,
                             decoration: InputDecoration(
                               hintText: "Enter Customer NIC",
@@ -289,7 +302,11 @@ class _CollectionEntryPageState extends State<CollectionEntryPage> {
                       const SizedBox(height: kXSmallSpacing),
                       Row(
                         children: [
-                          const Icon(Icons.person, size: 14, color: Colors.green),
+                          const Icon(
+                            Icons.person,
+                            size: 14,
+                            color: Colors.green,
+                          ),
                           const SizedBox(width: 4),
                           Text(
                             _customer!.name,
@@ -308,7 +325,11 @@ class _CollectionEntryPageState extends State<CollectionEntryPage> {
                       const SizedBox(height: kXSmallSpacing),
                       Row(
                         children: [
-                          const Icon(Icons.error_outline, size: 14, color: Colors.red),
+                          const Icon(
+                            Icons.error_outline,
+                            size: 14,
+                            color: Colors.red,
+                          ),
                           const SizedBox(width: 4),
                           Expanded(
                             child: Text(
@@ -489,7 +510,7 @@ class _CollectionEntryPageState extends State<CollectionEntryPage> {
 
               const SizedBox(height: kSmallSpacing),
 
-              _recentItem("#1 - John Doe", "2 hours ago", "40.00"),
+              // _recentItem("#1 - John Doe", "2 hours ago", "40.00"),
             ],
           ),
         ),
@@ -497,7 +518,7 @@ class _CollectionEntryPageState extends State<CollectionEntryPage> {
     );
   }
 
-  // FIXED AMOUNT FIELD (with proper hint text)
+ 
   Widget _amountField(bool highlight) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: kIconPadding),
@@ -530,51 +551,51 @@ class _CollectionEntryPageState extends State<CollectionEntryPage> {
     );
   }
 
-  Widget _recentItem(String title, String time, String amount) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: kSmallSpacing),
-      padding: const EdgeInsets.all(kIconPadding),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(kBorderRadiusMedium),
-      ),
-      child: Row(
-        children: [
-          const Icon(Icons.person, color: Colors.grey),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: const TextStyle(fontWeight: FontWeight.w600),
-                ),
-                Text(
-                  time,
-                  style: const TextStyle(fontSize: 12, color: Colors.grey),
-                ),
-              ],
-            ),
-          ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Text(
-                amount,
-                style: const TextStyle(
-                  color: Colors.green,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const Text(
-                "LKR",
-                style: TextStyle(fontSize: 11, color: Colors.grey),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
+  // Widget _recentItem(String title, String time, String amount) {
+  //   return Container(
+  //     margin: const EdgeInsets.only(bottom: kSmallSpacing),
+  //     padding: const EdgeInsets.all(kIconPadding),
+  //     decoration: BoxDecoration(
+  //       color: Colors.white,
+  //       borderRadius: BorderRadius.circular(kBorderRadiusMedium),
+  //     ),
+  //     child: Row(
+  //       children: [
+  //         const Icon(Icons.person, color: Colors.grey),
+  //         const SizedBox(width: 10),
+  //         Expanded(
+  //           child: Column(
+  //             crossAxisAlignment: CrossAxisAlignment.start,
+  //             children: [
+  //               Text(
+  //                 title,
+  //                 style: const TextStyle(fontWeight: FontWeight.w600),
+  //               ),
+  //               Text(
+  //                 time,
+  //                 style: const TextStyle(fontSize: 12, color: Colors.grey),
+  //               ),
+  //             ],
+  //           ),
+  //         ),
+  //         Column(
+  //           crossAxisAlignment: CrossAxisAlignment.end,
+  //           children: [
+  //             Text(
+  //               amount,
+  //               style: const TextStyle(
+  //                 color: Colors.green,
+  //                 fontWeight: FontWeight.bold,
+  //               ),
+  //             ),
+  //             const Text(
+  //               "LKR",
+  //               style: TextStyle(fontSize: 11, color: Colors.grey),
+  //             ),
+  //           ],
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
 }

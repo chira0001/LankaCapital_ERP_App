@@ -157,7 +157,6 @@ class AuthService {
     final token = await getToken();
     if (token != null) {
       Map<String, dynamic> decodedToken = JwtDecoder.decode(token);
-      // Usually, the subject ('sub') contains the username or ID.
       return decodedToken['sub']?.toString();
     }
     return null;
@@ -217,7 +216,7 @@ class AuthService {
     Map<String, dynamic> data,
   ) async {
     try {
-      // Changed to /recep/employees/{email} to match the employee update endpoint
+     
       final response = await _dio.put('/recep/employees/$userId', data: data);
       return response.statusCode == 200 || response.statusCode == 204;
     } catch (e) {
@@ -226,12 +225,10 @@ class AuthService {
     }
   }
 
-  // Expose dio so we can use it in other places if needed
   Dio get dio => _dio;
 
-  /// Fetches the customer profile and their loans by NIC number.
-  /// The API returns a flat JSON object with customer fields + a `loans` array.
-  /// Uses the authenticated Dio instance so JWT is auto-attached.
+  get currentUser => null;
+
   Future<(User, List<Loan>)> fetchCustomerAndLoans(int nic) async {
     try {
       final response = await _dio.get('/recep/customers/$nic');
@@ -239,10 +236,8 @@ class AuthService {
       if (response.statusCode == 200) {
         final data = response.data as Map<String, dynamic>;
 
-        // The customer fields (nic, name, email, etc.) are at the root level.
         final user = User.fromJson(data);
 
-        // The loans array is also at root level.
         final rawLoans = data['loans'] as List<dynamic>? ?? [];
         final loans = rawLoans
             .map((json) => Loan.fromJson(json as Map<String, dynamic>))

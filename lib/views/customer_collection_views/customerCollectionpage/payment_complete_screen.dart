@@ -31,7 +31,7 @@ class PaymentCompleteScreen extends StatelessWidget {
                   shape: BoxShape.circle,
                   boxShadow: [
                     BoxShadow(
-                      color: primaryGreen.withOpacity(0.4),
+                      color: primaryGreen.withValues(alpha: 102),
                       blurRadius: 40,
                       spreadRadius: 10,
                       offset: const Offset(0, 0),
@@ -107,7 +107,7 @@ class PaymentCompleteScreen extends StatelessWidget {
                   borderRadius: BorderRadius.circular(30),
                   boxShadow: [
                     BoxShadow(
-                      color: primaryGreen.withOpacity(0.3),
+                      color: primaryGreen.withValues(alpha: 77),
                       blurRadius: 15,
                       spreadRadius: 2,
                       offset: const Offset(0, 8),

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:nkrs_app/views/customer_collection_views/customerCollectionpage/PaymentCompleteScreen.dart';
 import 'package:nkrs_app/views/customer_collection_views/customerCollectionpage/collection_entry.dart';
+import 'package:nkrs_app/views/customer_collection_views/customerCollectionpage/payment_complete_screen.dart' show PaymentCompleteScreen;
 
 class ReceiptPreviewPage extends StatelessWidget {
   const ReceiptPreviewPage({super.key});

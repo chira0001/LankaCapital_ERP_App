@@ -3,12 +3,12 @@ import 'package:nkrs_app/models/loan_model.dart';
 
 class DialogBox {
   final List<Loan> loans;
-  final TextEditingController NICcontroller;
+  final TextEditingController nicController;
   final TextEditingController lorncontroller;
 
   DialogBox({
     required this.loans,
-    required this.NICcontroller,
+    required this.nicController,
     required this.lorncontroller,
   });
 
