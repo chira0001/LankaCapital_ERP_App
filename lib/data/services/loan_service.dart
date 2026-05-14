@@ -44,13 +44,6 @@ class LoanService {
   // }
 
   Future<(User, List<Loan>)> fetchUserAndLoans(int nic) async {
-    // bool online = await hasInternet();
-
-    // if (online) {
-    //   print("Internet Available");
-    // } else {
-    //   print("No Internet");
-    // }
     final Uri url = Uri.parse(
       'http://10.0.2.2:8080/api/v1/recep/customers/loans/$nic',
     );
