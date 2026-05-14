@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:nkrs_app/data/services/auth_service.dart';
+import 'package:nkrs_app/views/customer_collection_views/loginpage/login_page.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -8,6 +10,78 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
+  final AuthService _authService = AuthService();
+  
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _phoneController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _addressController = TextEditingController();
+
+  bool _isLoading = true;
+  bool _isSaving = false;
+  String? _userId;
+  Map<String, dynamic>? _profileData;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadProfile();
+  }
+
+  Future<void> _loadProfile() async {
+    final profile = await _authService.getCustomerProfile();
+    final userId = await _authService.getUserIdFromToken();
+    if (mounted) {
+      setState(() {
+        _profileData = profile;
+        _userId = userId;
+        _isLoading = false;
+        
+        if (profile != null) {
+          _nameController.text = "${profile['firstName'] ?? ''} ${profile['lastName'] ?? ''}".trim();
+          _phoneController.text = profile['phoneNumber'] ?? '';
+          _emailController.text = profile['email'] ?? '';
+          _addressController.text = profile['address'] ?? '';
+        }
+      });
+    }
+  }
+
+  Future<void> _saveProfile() async {
+    if (_userId == null || _profileData == null) return;
+    
+    setState(() {
+      _isSaving = true;
+    });
+
+    final updatedData = {
+      ..._profileData!,
+      'address': _addressController.text.trim(),
+    };
+
+    final success = await _authService.updateCustomerProfile(_userId!, updatedData);
+    
+    if (mounted) {
+      setState(() {
+        _isSaving = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(success ? 'Profile updated successfully!' : 'Failed to update profile.')),
+      );
+    }
+  }
+
+  Future<void> _logout() async {
+    await _authService.logout();
+    if (mounted) {
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => const LoginPage()),
+        (route) => false,
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -21,8 +95,10 @@ class _ProfilePageState extends State<ProfilePage> {
           style: TextStyle(color: Colors.black, fontWeight: FontWeight.w600),
         ),
       ),
-      body: Column(
-        children: [
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : Column(
+              children: [
           Expanded(
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(16),
@@ -33,7 +109,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   borderRadius: BorderRadius.circular(16),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.grey.withOpacity(0.1),
+                      color: Colors.grey.withValues(alpha: 26),
                       blurRadius: 10,
                       spreadRadius: 2,
                     ),
@@ -69,19 +145,19 @@ class _ProfilePageState extends State<ProfilePage> {
                     const SizedBox(height: 24),
 
                     _label("FULL NAME"),
-                    _textField(),
+                    _textField(_nameController, readOnly: true),
                     const SizedBox(height: 16),
 
                     _label("PHONE NUMBER"),
-                    _textField(prefixIcon: Icons.phone_outlined),
+                    _textField(_phoneController, prefixIcon: Icons.phone_outlined, readOnly: true),
                     const SizedBox(height: 16),
 
                     _label("EMAIL ADDRESS"),
-                    _textField(prefixIcon: Icons.email_outlined),
+                    _textField(_emailController, prefixIcon: Icons.email_outlined, readOnly: true),
                     const SizedBox(height: 16),
 
                     _label("RESIDENTIAL ADDRESS"),
-                    _textField(prefixIcon: Icons.location_on_outlined),
+                    _textField(_addressController, prefixIcon: Icons.location_on_outlined, readOnly: false),
                   ],
                 ),
               ),
@@ -103,11 +179,13 @@ class _ProfilePageState extends State<ProfilePage> {
                         borderRadius: BorderRadius.circular(12),
                       ),
                     ),
-                    onPressed: () {},
-                    icon: const Icon(Icons.save_outlined, color: Colors.white),
-                    label: const Text(
-                      "Save Changes",
-                      style: TextStyle(
+                    onPressed: _isSaving ? null : _saveProfile,
+                    icon: _isSaving 
+                        ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                        : const Icon(Icons.save_outlined, color: Colors.white),
+                    label: Text(
+                      _isSaving ? "Saving..." : "Save Changes",
+                      style: const TextStyle(
                         fontWeight: FontWeight.w600,
                         color: Colors.white,
                       ),
@@ -120,17 +198,16 @@ class _ProfilePageState extends State<ProfilePage> {
                   height: 50,
                   child: OutlinedButton.icon(
                     style: OutlinedButton.styleFrom(
+                      side: const BorderSide(color: Colors.red),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
                     ),
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                    icon: const Icon(Icons.close, color: Colors.red),
+                    onPressed: _logout,
+                    icon: const Icon(Icons.logout, color: Colors.red),
                     label: const Text(
-                      "Cancel",
-                      style: TextStyle(color: Colors.red),
+                      "Logout",
+                      style: TextStyle(color: Colors.red, fontWeight: FontWeight.w600),
                     ),
                   ),
                 ),
@@ -156,10 +233,15 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Widget _textField({IconData? prefixIcon}) {
+  Widget _textField(TextEditingController controller, {IconData? prefixIcon, bool readOnly = false}) {
     return TextField(
+      controller: controller,
+      readOnly: readOnly,
+      style: TextStyle(color: readOnly ? Colors.grey.shade700 : Colors.black),
       decoration: InputDecoration(
         prefixIcon: prefixIcon != null ? Icon(prefixIcon, size: 20) : null,
+        filled: readOnly,
+        fillColor: readOnly ? Colors.grey.shade100 : Colors.white,
         contentPadding: const EdgeInsets.symmetric(
           horizontal: 16,
           vertical: 14,

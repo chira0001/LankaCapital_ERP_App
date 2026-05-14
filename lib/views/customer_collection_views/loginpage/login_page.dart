@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:nkrs_app/views/customer_collection_views/customerCollectionpage/customer_collection_home.dart';
 import 'package:nkrs_app/views/customer_collection_views/loginpage/register_page.dart';
+import 'package:nkrs_app/data/services/auth_service.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -11,6 +14,81 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   bool obscurePassword = true;
+  bool rememberMe = false;
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final AuthService _authService = AuthService();
+  final FlutterSecureStorage _storage = const FlutterSecureStorage();
+  bool _isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadSavedCredentials();
+  }
+
+  Future<void> _loadSavedCredentials() async {
+    final savedEmail = await _storage.read(key: 'saved_email');
+    if (savedEmail != null && savedEmail.isNotEmpty) {
+      setState(() {
+        _emailController.text = savedEmail;
+        rememberMe = true;
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  void _login() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    final email = _emailController.text.trim();
+    final password = _passwordController.text.trim();
+
+    if (email.isEmpty || password.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please enter email and password')),
+      );
+      setState(() {
+        _isLoading = false;
+      });
+      return;
+    }
+
+    if (rememberMe) {
+      await _storage.write(key: 'saved_email', value: email);
+    } else {
+      await _storage.delete(key: 'saved_email');
+    }
+
+    final success = await _authService.login(email, password);
+
+    if (mounted) {
+      setState(() {
+        _isLoading = false;
+      });
+
+      if (success) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const CustomerCollectionHome(),
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Login failed. Please check your credentials.')),
+        );
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -74,6 +152,7 @@ class _LoginPageState extends State<LoginPage> {
 
                 // EMAIL FIELD
                 TextField(
+                  controller: _emailController,
                   decoration: InputDecoration(
                     hintText: "Enter your email",
                     hintStyle: TextStyle(color: Colors.grey.shade500),
@@ -113,6 +192,7 @@ class _LoginPageState extends State<LoginPage> {
 
                 // PASSWORD FIELD
                 TextField(
+                  controller: _passwordController,
                   obscureText: obscurePassword,
                   decoration: InputDecoration(
                     hintText: "Enter your password",
@@ -143,9 +223,16 @@ class _LoginPageState extends State<LoginPage> {
                 const SizedBox(height: 10),
 
                 Row(
-                  children: const [
-                    Checkbox(value: false, onChanged: null),
-                    Text("Remember this device"),
+                  children: [
+                    Checkbox(
+                      value: rememberMe,
+                      onChanged: (value) {
+                        setState(() {
+                          rememberMe = value ?? false;
+                        });
+                      },
+                    ),
+                    const Text("Remember this device"),
                   ],
                 ),
                 const SizedBox(height: 10),
@@ -155,24 +242,26 @@ class _LoginPageState extends State<LoginPage> {
                   width: double.infinity,
                   height: 50,
                   child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const CustomerCollectionHome(),
-                        ),
-                      );
-                    },
+                    onPressed: _isLoading ? null : _login,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color.fromARGB(255, 0, 140, 255),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
                     ),
-                    child: const Text(
-                      "Login",
-                      style: TextStyle(fontSize: 16, color: Colors.white),
-                    ),
+                    child: _isLoading
+                        ? const SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(
+                              color: Colors.white,
+                              strokeWidth: 2,
+                            ),
+                          )
+                        : const Text(
+                            "Login",
+                            style: TextStyle(fontSize: 16, color: Colors.white),
+                          ),
                   ),
                 ),
 

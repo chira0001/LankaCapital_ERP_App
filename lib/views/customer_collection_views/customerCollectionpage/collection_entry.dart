@@ -1,12 +1,108 @@
 import 'package:flutter/material.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
+import 'package:nkrs_app/data/view_model/loan_view_model.dart';
+import 'package:nkrs_app/models/loan_model.dart';
+import 'package:nkrs_app/models/user_model.dart';
+import 'package:nkrs_app/data/services/auth_service.dart';
 import 'package:nkrs_app/utility/constanst.dart';
-import 'package:nkrs_app/views/customer_collection_views/customerCollectionpage/ReceiptPreviewPage.dart';
+import 'package:nkrs_app/views/customer_collection_views/customerCollectionpage/receipt_preview_page.dart';
 import 'package:nkrs_app/views/customer_collection_views/customerCollectionpage/customer_collection_home.dart';
 import 'package:nkrs_app/views/customer_collection_views/profile/profile.dart';
+import 'package:nkrs_app/views/customer_collection_views/utility/dialog_box.dart';
+import 'package:nkrs_app/data/view_model/check_connection.dart';
 
-class CollectionEntryPage extends StatelessWidget {
+class CollectionEntryPage extends StatefulWidget {
   const CollectionEntryPage({super.key});
+
+  @override
+  State<CollectionEntryPage> createState() => _CollectionEntryPageState();
+}
+
+class _CollectionEntryPageState extends State<CollectionEntryPage> {
+  String todayDate = DateTime.now().toString().split(' ')[0];
+  final TextEditingController nicController = TextEditingController();
+  final TextEditingController lorncontroller = TextEditingController();
+  final AuthService _authService = AuthService();
+  LoanViewModel loanData = LoanViewModel();
+
+  bool _isLoading = false;
+  String? _errorMessage;
+  User? _customer;
+  List<Loan> _loans = [];
+
+  @override
+  void dispose() {
+    nicController.dispose();
+    lorncontroller.dispose();
+    super.dispose();
+  }
+
+  Future<void> _findCustomerByNic() async {
+    final nicText = nicController.text.trim();
+    if (nicText.isEmpty) {
+      setState(() => _errorMessage = 'Please enter a NIC number first.');
+      return;
+    }
+
+    final nic = int.tryParse(nicText);
+    if (nic == null) {
+      setState(() => _errorMessage = 'NIC must be a valid number.');
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+      _customer = null;
+      _loans = [];
+    });
+
+    try {
+      await loanData.searchByNic(nic);
+
+      final loans = await loanData.getLoansByID();
+
+      setState(() {
+        _customer = loanData.user;
+        _loans = loans;
+        _isLoading = false;
+      });
+
+      if (_customer == null) {
+        setState(() => _errorMessage = 'No customer found for this NIC.');
+      } else if (loans.isEmpty) {
+        setState(() => _errorMessage = 'No loans found for this customer.');
+      } else {
+        
+        if (mounted) {
+          DialogBox(
+            loans: _loans,
+            nicController: nicController,
+            lorncontroller: lorncontroller,
+          ).showLoanDialog(context);
+        }
+      }
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+        _errorMessage = 'Failed to fetch data: ${e.toString()}';
+      });
+    }
+  }
+
+  void _showLoanDialog() {
+    if (_loans.isEmpty) {
+      setState(
+        () => _errorMessage = 'Please search by NIC first to load loans.',
+      );
+      return;
+    }
+    DialogBox(
+      loans: _loans,
+      nicController: nicController,
+      lorncontroller: lorncontroller,
+    ).showLoanDialog(context);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -72,7 +168,7 @@ class CollectionEntryPage extends StatelessWidget {
       backgroundColor: safeAreaC,
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(kCardPadding),
+          padding: EdgeInsets.all(kCardPadding),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -90,29 +186,36 @@ class CollectionEntryPage extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
-                    "April #, 2026 • Session Active",
+                  Text(
+                    "$todayDate  • Session Active",
                     style: TextStyle(color: Colors.grey, fontSize: 12),
                   ),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: kSmallSpacing,
-                      vertical: kExtraSmallSpacing,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.green.shade50,
-                      borderRadius: BorderRadius.circular(
-                        kBorderRadiusExtraLarge,
-                      ),
-                    ),
-                    child: const Text(
-                      "● SYNCED",
-                      style: TextStyle(
-                        color: Colors.green,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
+                  ValueListenableBuilder<bool>(
+                    valueListenable: CheckConnection.isOnline,
+                    builder: (context, isOnline, child) {
+                      return Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: kSmallSpacing,
+                          vertical: kExtraSmallSpacing,
+                        ),
+                        decoration: BoxDecoration(
+                          color: isOnline
+                              ? Colors.green.shade50
+                              : Colors.red.shade50,
+                          borderRadius: BorderRadius.circular(
+                            kBorderRadiusExtraLarge,
+                          ),
+                        ),
+                        child: Text(
+                          isOnline ? "● ONLINE" : "● OFFLINE",
+                          style: TextStyle(
+                            color: isOnline ? Colors.green : Colors.red,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      );
+                    },
                   ),
                 ],
               ),
@@ -126,7 +229,7 @@ class CollectionEntryPage extends StatelessWidget {
                   borderRadius: BorderRadius.circular(kBorderRadiusExtraLarge),
                   boxShadow: [
                     BoxShadow(
-                      // ignore: deprecated_member_use
+                    
                       color: Colors.black.withOpacity(0.05),
                       blurRadius: 10,
                       offset: const Offset(0, 4),
@@ -135,7 +238,114 @@ class CollectionEntryPage extends StatelessWidget {
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
+
                   children: [
+                    const Text(
+                      "# ENTER USER NIC",
+                      style: TextStyle(fontSize: 12, color: Colors.grey),
+                    ),
+                    const SizedBox(height: kXSmallSpacing),
+
+                    Row(
+                      children: [
+                        Expanded(
+                          child: TextField(
+                            controller: nicController,
+                            keyboardType: TextInputType.number,
+                            decoration: InputDecoration(
+                              hintText: "Enter Customer NIC",
+                              filled: true,
+                              fillColor: const Color(0xFFF1F3F6),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(
+                                  kBorderRadiusMedium,
+                                ),
+                                borderSide: BorderSide.none,
+                              ),
+                            ),
+                          ),
+                        ),
+
+                        const SizedBox(width: kSmallSpacing),
+                        InkWell(
+                          onTap: _isLoading ? null : _findCustomerByNic,
+                          borderRadius: BorderRadius.circular(
+                            kBorderRadiusMedium,
+                          ),
+                          child: Container(
+                            padding: const EdgeInsets.all(kIconPadding),
+                            decoration: BoxDecoration(
+                              color: Colors.blue.shade50,
+                              borderRadius: BorderRadius.circular(
+                                kBorderRadiusMedium,
+                              ),
+                            ),
+                            child: _isLoading
+                                ? const SizedBox(
+                                    width: 18,
+                                    height: 18,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                    ),
+                                  )
+                                : const Text(
+                                    "FIND",
+                                    style: TextStyle(color: Colors.blue),
+                                  ),
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    // Customer name display
+                    if (_customer != null) ...[
+                      const SizedBox(height: kXSmallSpacing),
+                      Row(
+                        children: [
+                          const Icon(
+                            Icons.person,
+                            size: 14,
+                            color: Colors.green,
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            _customer!.name,
+                            style: const TextStyle(
+                              fontSize: 13,
+                              color: Colors.green,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+
+                    // Error message display
+                    if (_errorMessage != null) ...[
+                      const SizedBox(height: kXSmallSpacing),
+                      Row(
+                        children: [
+                          const Icon(
+                            Icons.error_outline,
+                            size: 14,
+                            color: Colors.red,
+                          ),
+                          const SizedBox(width: 4),
+                          Expanded(
+                            child: Text(
+                              _errorMessage!,
+                              style: const TextStyle(
+                                fontSize: 12,
+                                color: Colors.red,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+
+                    const SizedBox(height: kSectionSpacing),
+
                     const Text(
                       "# LOAN NUMBER",
                       style: TextStyle(fontSize: 12, color: Colors.grey),
@@ -146,6 +356,7 @@ class CollectionEntryPage extends StatelessWidget {
                       children: [
                         Expanded(
                           child: TextField(
+                            controller: lorncontroller,
                             decoration: InputDecoration(
                               hintText: "Enter Loan #0000",
                               filled: true,
@@ -159,18 +370,25 @@ class CollectionEntryPage extends StatelessWidget {
                             ),
                           ),
                         ),
+
                         const SizedBox(width: kSmallSpacing),
-                        Container(
-                          padding: const EdgeInsets.all(kIconPadding),
-                          decoration: BoxDecoration(
-                            color: Colors.blue.shade50,
-                            borderRadius: BorderRadius.circular(
-                              kBorderRadiusMedium,
-                            ),
+                        InkWell(
+                          onTap: _showLoanDialog,
+                          borderRadius: BorderRadius.circular(
+                            kBorderRadiusMedium,
                           ),
-                          child: const Text(
-                            "FIND",
-                            style: TextStyle(color: Colors.blue),
+                          child: Container(
+                            padding: const EdgeInsets.all(kIconPadding),
+                            decoration: BoxDecoration(
+                              color: Colors.blue.shade50,
+                              borderRadius: BorderRadius.circular(
+                                kBorderRadiusMedium,
+                              ),
+                            ),
+                            child: const Text(
+                              "FIND",
+                              style: TextStyle(color: Colors.blue),
+                            ),
                           ),
                         ),
                       ],
@@ -292,7 +510,7 @@ class CollectionEntryPage extends StatelessWidget {
 
               const SizedBox(height: kSmallSpacing),
 
-              _recentItem("#1 - John Doe", "2 hours ago", "40.00"),
+              // _recentItem("#1 - John Doe", "2 hours ago", "40.00"),
             ],
           ),
         ),
@@ -300,7 +518,7 @@ class CollectionEntryPage extends StatelessWidget {
     );
   }
 
-  // FIXED AMOUNT FIELD (with proper hint text)
+ 
   Widget _amountField(bool highlight) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: kIconPadding),
@@ -333,51 +551,51 @@ class CollectionEntryPage extends StatelessWidget {
     );
   }
 
-  Widget _recentItem(String title, String time, String amount) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: kSmallSpacing),
-      padding: const EdgeInsets.all(kIconPadding),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(kBorderRadiusMedium),
-      ),
-      child: Row(
-        children: [
-          const Icon(Icons.person, color: Colors.grey),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: const TextStyle(fontWeight: FontWeight.w600),
-                ),
-                Text(
-                  time,
-                  style: const TextStyle(fontSize: 12, color: Colors.grey),
-                ),
-              ],
-            ),
-          ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Text(
-                amount,
-                style: const TextStyle(
-                  color: Colors.green,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const Text(
-                "LKR",
-                style: TextStyle(fontSize: 11, color: Colors.grey),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
+  // Widget _recentItem(String title, String time, String amount) {
+  //   return Container(
+  //     margin: const EdgeInsets.only(bottom: kSmallSpacing),
+  //     padding: const EdgeInsets.all(kIconPadding),
+  //     decoration: BoxDecoration(
+  //       color: Colors.white,
+  //       borderRadius: BorderRadius.circular(kBorderRadiusMedium),
+  //     ),
+  //     child: Row(
+  //       children: [
+  //         const Icon(Icons.person, color: Colors.grey),
+  //         const SizedBox(width: 10),
+  //         Expanded(
+  //           child: Column(
+  //             crossAxisAlignment: CrossAxisAlignment.start,
+  //             children: [
+  //               Text(
+  //                 title,
+  //                 style: const TextStyle(fontWeight: FontWeight.w600),
+  //               ),
+  //               Text(
+  //                 time,
+  //                 style: const TextStyle(fontSize: 12, color: Colors.grey),
+  //               ),
+  //             ],
+  //           ),
+  //         ),
+  //         Column(
+  //           crossAxisAlignment: CrossAxisAlignment.end,
+  //           children: [
+  //             Text(
+  //               amount,
+  //               style: const TextStyle(
+  //                 color: Colors.green,
+  //                 fontWeight: FontWeight.bold,
+  //               ),
+  //             ),
+  //             const Text(
+  //               "LKR",
+  //               style: TextStyle(fontSize: 11, color: Colors.grey),
+  //             ),
+  //           ],
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
 }

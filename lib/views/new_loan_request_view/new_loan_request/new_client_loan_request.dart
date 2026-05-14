@@ -83,6 +83,8 @@ class _NewClientLoanRequestState extends State<NewClientLoanRequest> {
             _customBuild(address, "No: 123, Street Name", TextInputType.text, (
               value,
             ) {
+              return null;
+            
               // if (value == null || value.isEmpty) {
               //   return "Please enter your address";
               // } else if (value.length < 5) {
@@ -99,6 +101,8 @@ class _NewClientLoanRequestState extends State<NewClientLoanRequest> {
               "Example@email.com",
               TextInputType.emailAddress,
               (value) {
+                return null;
+              
                 // if (value == null || value.isEmpty) {
                 //   return "Please enter your email";
                 // } else if (!RegExp(
@@ -114,6 +118,8 @@ class _NewClientLoanRequestState extends State<NewClientLoanRequest> {
             customText("NIC Number"),
             SizedBox(height: _customSize_1),
             _customBuild(nic, "Enter NIC Number", TextInputType.text, (value) {
+              return null;
+            
               // if (value == null || value.isEmpty) {
               //   return "Please enter your NIC number";
               // } else if (value.length < 8 && value.length > 15) {
@@ -128,6 +134,8 @@ class _NewClientLoanRequestState extends State<NewClientLoanRequest> {
             _customBuild(phoneNumber, "0712345678", TextInputType.phone, (
               value,
             ) {
+              return null;
+            
               // if (value == null || value.isEmpty) {
               //   return "Please enter your phone number";
               // } else if (value.length != 10 || !value.startsWith('07')) {
@@ -178,6 +186,8 @@ class _NewClientLoanRequestState extends State<NewClientLoanRequest> {
                 _customBuild(loanAmount, "XXXXX.XX", TextInputType.number, (
                   value,
                 ) {
+                  return null;
+                
                   // if (value == null || value.isEmpty) {
                   //   return "Please enter the loan amount";
                   // } else if (value as double == 0) {
@@ -192,6 +202,8 @@ class _NewClientLoanRequestState extends State<NewClientLoanRequest> {
                 _customBuild(interestRate, "XX.XX%", TextInputType.number, (
                   value,
                 ) {
+                  return null;
+                
                   // if (value == null || value.isEmpty) {
                   //   return "Please enter the interest rate";
                   // } else if (value as int < 0) {
@@ -215,6 +227,8 @@ class _NewClientLoanRequestState extends State<NewClientLoanRequest> {
                         "No of Installments",
                         TextInputType.number,
                         (value) {
+                          return null;
+                        
                           // if (value == null || value.isEmpty) {
                           //   return "Please enter the number of installments";
                           // } else if (value as int < 0) {
@@ -336,7 +350,7 @@ class _NewClientLoanRequestState extends State<NewClientLoanRequest> {
               ],
             ),
             SizedBox(height: 20),
-            Container(
+            SizedBox(
               width: double.infinity,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,

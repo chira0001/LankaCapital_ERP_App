@@ -45,5 +45,7 @@ class Loan {
     };
   }
 
-  static Object? fromMap(Map<String, dynamic> loan) {}
+  static Object? fromMap(Map<String, dynamic> loan) {
+    return null;
+  }
 }

@@ -1,7 +1,7 @@
 import 'package:nkrs_app/models/onbording_model.dart';
 
 class OnboardingData {
-  static final List<OnboardingModel> onboarding_data_list = [
+  static final List<OnboardingModel> onboardingDataList = [
     OnboardingModel(
       title: "FIELD OFFICER OPTIMIZATION",
       imagePath: "assets/screen1.png",

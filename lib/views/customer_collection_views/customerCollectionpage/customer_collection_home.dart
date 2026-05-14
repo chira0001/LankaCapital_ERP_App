@@ -5,6 +5,7 @@ import 'package:nkrs_app/views/customer_collection_views/customerCollectionpage/
 import 'package:nkrs_app/views/customer_collection_views/profile/profile.dart';
 import 'package:nkrs_app/views/customer_collection_views/utility/main_card.dart';
 import 'package:nkrs_app/views/new_loan_request_view/loan_request_section_view.dart';
+import 'package:nkrs_app/data/services/auth_service.dart';
 
 class CustomerCollectionHome extends StatefulWidget {
   const CustomerCollectionHome({super.key});
@@ -14,6 +15,24 @@ class CustomerCollectionHome extends StatefulWidget {
 }
 
 class _CustomerCollectionHomeState extends State<CustomerCollectionHome> {
+  final AuthService _authService = AuthService();
+  String _userName = "Loading...";
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchUserName();
+  }
+
+  void _fetchUserName() async {
+    final name = await _authService.getUserName();
+    if (mounted) {
+      setState(() {
+        _userName = name ?? "User";
+      });
+    }
+  }
+
   // int _selectedIndex = 0;
   // double logoSize = 32;
   @override
@@ -77,9 +96,9 @@ class _CustomerCollectionHomeState extends State<CustomerCollectionHome> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Greeting
-                const Text(
-                  "Hello, Alex",
-                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                Text(
+                  "Hello, $_userName",
+                  style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
                 ),
                 SizedBox(height: kTinySpacing),
                 const Text(

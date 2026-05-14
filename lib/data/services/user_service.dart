@@ -28,7 +28,7 @@ class UserService {
         throw Exception('Server error: ${response.statusCode}');
       }
     } catch (e) {
-      print("Failt to get a user data ${e}");
+      print("Failt to get a user data $e");
       throw Exception('Request failed: $e');
     }
   }

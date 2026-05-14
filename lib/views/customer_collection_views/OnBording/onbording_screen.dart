@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:nkrs_app/utility/colors.dart';
-import 'package:nkrs_app/views/customer_collection_views/utility/cusomButton.dart';
-import 'package:nkrs_app/views/customer_collection_views/OnBording/front_page.dart';
+import 'package:nkrs_app/utility/colors.dart';import 'package:nkrs_app/views/customer_collection_views/OnBording/front_page.dart';
 import 'package:nkrs_app/views/customer_collection_views/OnBording/onbording_data.dart';
 import 'package:nkrs_app/views/customer_collection_views/OnBording/shered_onbording.dart';
 import 'package:nkrs_app/views/customer_collection_views/loginpage/login_page.dart';
+import 'package:nkrs_app/views/customer_collection_views/utility/custom_button.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 class Onbordingscreen extends StatefulWidget {
-  Onbordingscreen({super.key});
+  const Onbordingscreen({super.key});
 
   @override
   State<Onbordingscreen> createState() => _OnbordingscreenState();
@@ -37,27 +36,27 @@ class _OnbordingscreenState extends State<Onbordingscreen> {
                   children: [
                     FrontPage(),
                     SheredOnbording(
-                      title: OnboardingData.onboarding_data_list[0].title,
+                      title: OnboardingData.onboardingDataList[0].title,
                       imageParth:
-                          OnboardingData.onboarding_data_list[0].imagePath,
+                          OnboardingData.onboardingDataList[0].imagePath,
                       description:
-                          OnboardingData.onboarding_data_list[0].description,
+                          OnboardingData.onboardingDataList[0].description,
                     ),
 
                     SheredOnbording(
-                      title: OnboardingData.onboarding_data_list[1].title,
+                      title: OnboardingData.onboardingDataList[1].title,
                       imageParth:
-                          OnboardingData.onboarding_data_list[1].imagePath,
+                          OnboardingData.onboardingDataList[1].imagePath,
                       description:
-                          OnboardingData.onboarding_data_list[1].description,
+                          OnboardingData.onboardingDataList[1].description,
                     ),
 
                     SheredOnbording(
-                      title: OnboardingData.onboarding_data_list[2].title,
+                      title: OnboardingData.onboardingDataList[2].title,
                       imageParth:
-                          OnboardingData.onboarding_data_list[2].imagePath,
+                          OnboardingData.onboardingDataList[2].imagePath,
                       description:
-                          OnboardingData.onboarding_data_list[2].description,
+                          OnboardingData.onboardingDataList[2].description,
                     ),
                   ],
                 ),

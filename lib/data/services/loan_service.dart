@@ -85,7 +85,7 @@ class LoanService {
         body: json.encode(loan.toJson()),
       );
       if (response.statusCode == 200 || response.statusCode == 201) {
-        print("Response ${response}");
+        print("Response $response");
         // Product newProduct = Product.formJson(json.decode(response.body));
         // return newProduct;
         return true;
@@ -95,8 +95,8 @@ class LoanService {
         throw Exception("Failed");
       }
     } catch (e) {
-      print("Failed ${e}");
-      throw Exception("Failed to add loan ${e}");
+      print("Failed $e");
+      throw Exception("Failed to add loan $e");
     }
   }
 }
