@@ -21,9 +21,9 @@ class _ExistingCustomerLoanRequestState
     extends State<ExistingCustomerLoanRequest> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController loanAmount = TextEditingController();
-  // final TextEditingController interestRate = TextEditingController();
-  // final TextEditingController installment = TextEditingController();
-  // final TextEditingController nic = TextEditingController();
+  final TextEditingController interestRate = TextEditingController();
+  final TextEditingController installment = TextEditingController();
+  final TextEditingController nic = TextEditingController();
   AddLoanView addLoanView = AddLoanView();
   final double _customSize_1 = 10;
   final double _customSize_2 = 25;
@@ -33,7 +33,7 @@ class _ExistingCustomerLoanRequestState
   // double interestRates = 0.0;
   // int customerId = 0; //customer NIC
   // int employeeId = 0;
-  // int noOfInstallments = 0;
+  int noOfInstallments = 0;
   String message = '';
 
   @override
@@ -117,6 +117,99 @@ class _ExistingCustomerLoanRequestState
                               fontSize: cardHeaderFS,
                               color: cardHeaderFC,
                               fontWeight: FontWeight(700),
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 30),
+                      customText("Loan Amount"),
+                      SizedBox(height: _customSize_1),
+                      _customBuild(
+                        loanAmount,
+                        "XXXXX.XX",
+                        TextInputType.number,
+                        (value) {
+                          if (value == null || value.isEmpty) {
+                            return "Please enter the loan amount";
+                          } else if (double.tryParse(value) == null ||
+                              double.parse(value) <= 0) {
+                            return "Please enter a valid loan amount";
+                          } else {
+                            return null;
+                          }
+                        },
+                        (value) {
+                          if (value != null && value.isNotEmpty) {
+                            amount = double.parse(value);
+                          }
+                        },
+                      ),
+                      SizedBox(height: _customSize_2),
+                      customText("Interest Rate"),
+                      SizedBox(height: _customSize_1),
+                      _customBuild(
+                        interestRate,
+                        "XX.XX%",
+                        TextInputType.number,
+                        (value) {
+                          if (value == null || value.isEmpty) {
+                            return "Please enter the interest rate";
+                          } else {
+                            double? parsedValue = double.tryParse(value);
+                            if (parsedValue == null || parsedValue < 0) {
+                              return "Please enter a valid interest rate";
+                            } else if (parsedValue < 0 || parsedValue >= 100) {
+                              return "Please enter an interest rate between 0 and 100";
+                            } else {
+                              return null;
+                            }
+                          }
+                        },
+                        (value) {
+                          if (value != null && value.isNotEmpty) {
+                            interestRates = double.parse(value);
+                          }
+                        },
+                      ),
+                      SizedBox(height: _customSize_2),
+                      customText("Loan Duration"),
+                      SizedBox(height: _customSize_1),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          SizedBox(
+                            width: MediaQuery.of(context).size.width * 0.4,
+                            child: _customBuild(
+                              installment,
+                              "No of Installments",
+                              TextInputType.number,
+                              (value) {
+                                if (value == null || value.isEmpty) {
+                                  return "Please enter the number of installments";
+                                } else {
+                                  int? parsedValue = int.tryParse(value);
+                                  if (parsedValue == null || parsedValue <= 0) {
+                                    return "Please enter a valid number of installments";
+                                  } else {
+                                    return null;
+                                  }
+                                }
+                              },
+                              (value) {
+                                if (value != null && value.isNotEmpty) {
+                                  noOfInstallments = int.parse(value);
+                                }
+                              },
+                            ),
+                          ),
+                          SizedBox(
+                            width: MediaQuery.of(context).size.width * 0.35,
+                            child: DropdownButtonFormField<String>(
+                              hint: Text("Choose"),
+                              icon: const Icon(
+                                Icons.keyboard_arrow_down,
+                                color: Color(0xFF1A3D81),
+                              ),
                             ),
                           ),
                         ],
