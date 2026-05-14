@@ -102,20 +102,6 @@ class _CollectionEntryPageState extends State<CollectionEntryPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: IconButton(
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => CustomerCollectionHome()),
-            );
-          },
-          icon: const Icon(
-            Icons.arrow_back_ios,
-            color: Color.fromARGB(255, 0, 0, 0),
-            size: 20,
-          ),
-        ),
-        leadingWidth: 17,
         title: Row(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
@@ -136,7 +122,20 @@ class _CollectionEntryPageState extends State<CollectionEntryPage> {
         backgroundColor: appBarC,
         elevation: 2.0,
         shadowColor: appBarShadow,
-
+        leading: IconButton(
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => CustomerCollectionHome()),
+            );
+          },
+          icon: Icon(
+            Icons.arrow_back_ios,
+            color: const Color.fromARGB(255, 0, 0, 0),
+            size: 20,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
         titleTextStyle: TextStyle(
           color: btnC,
           fontSize: appBarFontS,
@@ -181,8 +180,8 @@ class _CollectionEntryPageState extends State<CollectionEntryPage> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    "$_todayDate • Session Active",
+                  const Text(
+                    "April #, 2026 • Session Active",
                     style: TextStyle(color: Colors.grey, fontSize: 12),
                   ),
                   Container(
@@ -196,9 +195,8 @@ class _CollectionEntryPageState extends State<CollectionEntryPage> {
                         kBorderRadiusExtraLarge,
                       ),
                     ),
-                    child: Text(
-                      "scsss",
-
+                    child: const Text(
+                      "● SYNCED",
                       style: TextStyle(
                         color: Colors.green,
                         fontSize: 12,

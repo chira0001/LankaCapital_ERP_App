@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
+import 'package:nkrs_app/data/view_model/add_loan_view.dart';
 import 'package:nkrs_app/models/add_loan_model.dart';
 import 'package:nkrs_app/utility/constanst.dart';
 import 'package:nkrs_app/views/new_loan_request_view/utility/main_card.dart';
 import 'package:nkrs_app/views/new_loan_request_view/loan_request_section_view.dart';
 import 'package:nkrs_app/views/new_loan_request_view/utility/navigator_back.dart';
+import 'package:nkrs_app/views/new_loan_request_view/utility/successfull_message_view.dart';
 
 class ExistingCustomerLoanRequest extends StatefulWidget {
   final int nicNumber;
@@ -22,6 +24,7 @@ class _ExistingCustomerLoanRequestState
   final TextEditingController interestRate = TextEditingController();
   final TextEditingController installment = TextEditingController();
   final TextEditingController nic = TextEditingController();
+  AddLoanView addLoanView = AddLoanView();
   final double _customSize_1 = 10;
   final double _customSize_2 = 25;
 
@@ -31,6 +34,7 @@ class _ExistingCustomerLoanRequestState
   // int customerId = 0; //customer NIC
   // int employeeId = 0;
   int noOfInstallments = 0;
+  String message = '';
 
   @override
   Widget build(BuildContext context) {
@@ -74,256 +78,352 @@ class _ExistingCustomerLoanRequestState
         ],
       ),
       backgroundColor: safeAreaC,
-      body: SingleChildScrollView(
-        child: SafeArea(
-          child: Padding(
-            padding: EdgeInsetsGeometry.symmetric(
-              horizontal: safeAreaHorizontalPD,
-              vertical: safeAreaVerticalPD,
-            ),
-            child: Container(
-              margin: EdgeInsets.only(bottom: 30),
-              padding: EdgeInsets.all(20),
-              width: double.infinity,
-              decoration: BoxDecoration(
-                color: appBarC,
-                borderRadius: BorderRadius.all(
-                  Radius.circular(cardBorderRadius),
-                ),
-                boxShadow: [MainCard.customShadow()],
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: SafeArea(
+            child: Padding(
+              padding: EdgeInsetsGeometry.symmetric(
+                horizontal: safeAreaHorizontalPD,
+                vertical: safeAreaVerticalPD,
               ),
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        Icon(
-                          Iconsax.user,
-                          size: 25,
-                          color: Color.fromARGB(255, 126, 146, 185),
-                        ),
-                        SizedBox(width: 10),
-                        Text(
-                          "Loan Details",
-                          style: TextStyle(
-                            fontSize: cardHeaderFS,
-                            color: cardHeaderFC,
-                            fontWeight: FontWeight(700),
+              child: Container(
+                margin: EdgeInsets.only(bottom: 30),
+                padding: EdgeInsets.all(20),
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  color: appBarC,
+                  borderRadius: BorderRadius.all(
+                    Radius.circular(cardBorderRadius),
+                  ),
+                  boxShadow: [MainCard.customShadow()],
+                ),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Icon(
+                            Iconsax.user,
+                            size: 25,
+                            color: Color.fromARGB(255, 126, 146, 185),
                           ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 30),
-                    customText("Loan Amount"),
-                    SizedBox(height: _customSize_1),
-                    _customBuild(
-                      loanAmount,
-                      "XXXXX.XX",
-                      TextInputType.number,
-                      (value) {
-                        if (value == null || value.isEmpty) {
-                          return "Please enter the loan amount";
-                        } else if (double.tryParse(value) == null || double.parse(value) <= 0) {
-                          return "Please enter a valid loan amount";
-                        } else {
-                          return null;
-                        }
-                      },
-                      (value) {
-                        if (value != null && value.isNotEmpty) {
-                          amount = double.parse(value);
-                        }
-                      },
-                    ),
-                    SizedBox(height: _customSize_2),
-                    customText("Interest Rate"),
-                    SizedBox(height: _customSize_1),
-                    _customBuild(
-                      interestRate,
-                      "XX.XX%",
-                      TextInputType.number,
-                      (value) {
-                        if (value == null || value.isEmpty) {
-                          return "Please enter the interest rate";
-                        } else {
-                          double? parsedValue = double.tryParse(value);
-                          if (parsedValue == null || parsedValue < 0) {
-                            return "Please enter a valid interest rate";
-                          } else if (parsedValue < 0 || parsedValue >= 100) {
-                            return "Please enter an interest rate between 0 and 100";
+                          SizedBox(width: 10),
+                          Text(
+                            "Loan Details",
+                            style: TextStyle(
+                              fontSize: cardHeaderFS,
+                              color: cardHeaderFC,
+                              fontWeight: FontWeight(700),
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 30),
+                      customText("Loan Amount"),
+                      SizedBox(height: _customSize_1),
+                      _customBuild(
+                        loanAmount,
+                        "XXXXX.XX",
+                        TextInputType.number,
+                        (value) {
+                          if (value == null || value.isEmpty) {
+                            return "Please enter the loan amount";
+                          } else if (double.tryParse(value) == null ||
+                              double.parse(value) <= 0) {
+                            return "Please enter a valid loan amount";
                           } else {
                             return null;
                           }
-                        }
-                      },
-                      (value) {
-                        if (value != null && value.isNotEmpty) {
-                          interestRates = double.parse(value);
-                        }
-                      },
-                    ),
-                    SizedBox(height: _customSize_2),
-                    customText("Loan Duration"),
-                    SizedBox(height: _customSize_1),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        SizedBox(
-                          width: MediaQuery.of(context).size.width * 0.4,
-                          child: _customBuild(
-                            installment,
-                            "No of Installments",
-                            TextInputType.number,
-                            (value) {
-                              if (value == null || value.isEmpty) {
-                                return "Please enter the number of installments";
-                              } else {
-                                int? parsedValue = int.tryParse(value);
-                                if (parsedValue == null || parsedValue <= 0) {
-                                  return "Please enter a valid number of installments";
+                        },
+                        (value) {
+                          if (value != null && value.isNotEmpty) {
+                            amount = double.parse(value);
+                          }
+                        },
+                      ),
+                      SizedBox(height: _customSize_2),
+                      customText("Interest Rate"),
+                      SizedBox(height: _customSize_1),
+                      _customBuild(
+                        interestRate,
+                        "XX.XX%",
+                        TextInputType.number,
+                        (value) {
+                          if (value == null || value.isEmpty) {
+                            return "Please enter the interest rate";
+                          } else {
+                            double? parsedValue = double.tryParse(value);
+                            if (parsedValue == null || parsedValue < 0) {
+                              return "Please enter a valid interest rate";
+                            } else if (parsedValue < 0 || parsedValue >= 100) {
+                              return "Please enter an interest rate between 0 and 100";
+                            } else {
+                              return null;
+                            }
+                          }
+                        },
+                        (value) {
+                          if (value != null && value.isNotEmpty) {
+                            interestRates = double.parse(value);
+                          }
+                        },
+                      ),
+                      SizedBox(height: _customSize_2),
+                      customText("Loan Duration"),
+                      SizedBox(height: _customSize_1),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          SizedBox(
+                            width: MediaQuery.of(context).size.width * 0.4,
+                            child: _customBuild(
+                              installment,
+                              "No of Installments",
+                              TextInputType.number,
+                              (value) {
+                                if (value == null || value.isEmpty) {
+                                  return "Please enter the number of installments";
                                 } else {
-                                  return null;
+                                  int? parsedValue = int.tryParse(value);
+                                  if (parsedValue == null || parsedValue <= 0) {
+                                    return "Please enter a valid number of installments";
+                                  } else {
+                                    return null;
+                                  }
                                 }
-                              }
-                            },
-                            (value) {
-                              if (value != null && value.isNotEmpty) {
-                                noOfInstallments = int.parse(value);
-                              }
-                            },
-                          ),
-                        ),
-                        SizedBox(
-                          width: MediaQuery.of(context).size.width * 0.35,
-                          child: DropdownButtonFormField<String>(
-                            hint: Text("Choose"),
-                            icon: const Icon(
-                              Icons.keyboard_arrow_down,
-                              color: Color(0xFF1A3D81),
+                              },
+                              (value) {
+                                if (value != null && value.isNotEmpty) {
+                                  noOfInstallments = int.parse(value);
+                                }
+                              },
                             ),
-                            decoration: InputDecoration(
-                              floatingLabelStyle: TextStyle(fontSize: 1),
-                              errorMaxLines: 2,
-                              contentPadding: const EdgeInsets.symmetric(
-                                vertical: 0,
-                                horizontal: 12,
-                              ),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.all(
-                                  Radius.circular(btnBorderRadius),
-                                ),
-                              ),
-                              enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.all(
-                                  Radius.circular(btnBorderRadius),
-                                ),
-                                borderSide: BorderSide(
-                                  color: Color.fromARGB(58, 23, 23, 23),
-                                  width: 1.5,
-                                ),
-                              ),
-                              errorBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.all(
-                                  Radius.circular(btnBorderRadius),
-                                ),
-                                borderSide: BorderSide(
-                                  color: Color.fromARGB(89, 181, 0, 0),
-                                  width: 2,
-                                ),
-                              ),
-                              errorStyle: TextStyle(
-                                color: Color.fromARGB(255, 233, 1, 1),
-                                fontSize: 15,
-                                fontWeight: FontWeight(700),
-                              ),
-                              fillColor: safeAreaC,
-                              filled: true,
-                              labelText: "labelText",
-                              labelStyle: TextStyle(
-                                color: Color.fromARGB(105, 21, 21, 21),
-                                fontSize: 17,
-                                fontWeight: FontWeight(500),
-                              ),
-                            ),
-                            items: ["Days", "Weeks"].map((String value) {
-                              return DropdownMenuItem<String>(
-                                value: value,
-                                child: Text(
-                                  value,
-                                  style: TextStyle(color: Color(0xFF1A3D81)),
-                                ),
-                              );
-                            }).toList(),
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return "Please select a duration type";
-                              } else {
-                                return null;
-                              }
-                            },
-                            onChanged: (newValue) {},
                           ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 30),
-                    GestureDetector(
-                      onTap: () {
-                        if (_formKey.currentState!.validate()) {
-                          _formKey.currentState!.save();
-                          AddLoanModel addLoanModel = AddLoanModel(
-                            amount: amount,
-                            customerId: 12,
-                            employeeId: 1,
-                            // interestRate: interestRates,
-                            // noOfInstallments: noOfInstallments
-                          );
-                        }
-                        // Navigator.pop(context);
-                        // Navigator.push(
-                        //   context,
-                        //   MaterialPageRoute(
-                        //     builder: (context) => LoanSuccessScreen(),
-                        //   ),
-                        // );
-                      },
-                      child: Container(
+                          SizedBox(
+                            width: MediaQuery.of(context).size.width * 0.35,
+                            child: DropdownButtonFormField<String>(
+                              hint: Text("Choose"),
+                              icon: const Icon(
+                                Icons.keyboard_arrow_down,
+                                color: Color(0xFF1A3D81),
+                              ), items: [], onChanged: (String? value) {  },
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 30),
+                      customText("Loan Amount"),
+                      SizedBox(height: _customSize_1),
+                      _customBuild(
+                        loanAmount,
+                        "XXXXX.XX",
+                        TextInputType.number,
+                        (value) {
+                          if (value == null || value.isEmpty) {
+                            return "Please enter the loan amount";
+                          } else if (double.tryParse(value) == null) {
+                            return "Please enter a valid numeric amount";
+                          } else {
+                            return null;
+                          }
+                        },
+                        (value) {
+                          amount = double.tryParse(value ?? '') ?? 0.0;
+                        },
+                      ),
+                      // SizedBox(height: _customSize_2),
+                      // customText("Interest Rate"),
+                      // SizedBox(height: _customSize_1),
+                      // _customBuild(
+                      //   interestRate,
+                      //   "XX.XX%",
+                      //   TextInputType.number,
+                      //   (value) {
+                      //     if (value == null || value.isEmpty) {
+                      //       return "Please enter the interest rate";
+                      //     } else if (value as int < 0) {
+                      //       return "Please enter a valid interest rate";
+                      //     } else if (value as int < 0 || value as int >= 100) {
+                      //       return "Please enter an interest rate between 0 and 100";
+                      //     } else {
+                      //       return null;
+                      //     }
+                      //   },
+                      //   (value) {
+                      //     interestRates = value as double;
+                      //   },
+                      // ),
+                      // SizedBox(height: _customSize_2),
+                      // customText("Loan Duration"),
+                      // SizedBox(height: _customSize_1),
+                      // Row(
+                      //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      //   children: [
+                      //     SizedBox(
+                      //       width: MediaQuery.of(context).size.width * 0.4,
+                      //       child: _customBuild(
+                      //         installment,
+                      //         "No of Installments",
+                      //         TextInputType.number,
+                      //         (value) {
+                      //           if (value == null || value.isEmpty) {
+                      //             return "Please enter the number of installments";
+                      //           } else if (value as int < 0) {
+                      //             return "Please enter a valid number of installments";
+                      //           } else {
+                      //             return null;
+                      //           }
+                      //         },
+                      //         (value) {
+                      //           noOfInstallments = value as int;
+                      //         },
+                      //       ),
+                      //     ),
+                      //     SizedBox(
+                      //       width: MediaQuery.of(context).size.width * 0.35,
+                      //       child: DropdownButtonFormField<String>(
+                      //         hint: Text("Choose"),
+                      //         icon: const Icon(
+                      //           Icons.keyboard_arrow_down,
+                      //           color: Color(0xFF1A3D81),
+                      //         ),
+                      //         decoration: InputDecoration(
+                      //           floatingLabelStyle: TextStyle(fontSize: 1),
+                      //           errorMaxLines: 2,
+                      //           contentPadding: const EdgeInsets.symmetric(
+                      //             vertical: 0,
+                      //             horizontal: 12,
+                      //           ),
+                      //           border: OutlineInputBorder(
+                      //             borderRadius: BorderRadius.all(
+                      //               Radius.circular(btnBorderRadius),
+                      //             ),
+                      //           ),
+                      //           enabledBorder: OutlineInputBorder(
+                      //             borderRadius: BorderRadius.all(
+                      //               Radius.circular(btnBorderRadius),
+                      //             ),
+                      //             borderSide: BorderSide(
+                      //               color: Color.fromARGB(58, 23, 23, 23),
+                      //               width: 1.5,
+                      //             ),
+                      //           ),
+                      //           errorBorder: OutlineInputBorder(
+                      //             borderRadius: BorderRadius.all(
+                      //               Radius.circular(btnBorderRadius),
+                      //             ),
+                      //             borderSide: BorderSide(
+                      //               color: Color.fromARGB(89, 181, 0, 0),
+                      //               width: 2,
+                      //             ),
+                      //           ),
+                      //           errorStyle: TextStyle(
+                      //             color: Color.fromARGB(255, 233, 1, 1),
+                      //             fontSize: 15,
+                      //             fontWeight: FontWeight(700),
+                      //           ),
+                      //           fillColor: safeAreaC,
+                      //           filled: true,
+                      //           labelText: "labelText",
+                      //           labelStyle: TextStyle(
+                      //             color: Color.fromARGB(105, 21, 21, 21),
+                      //             fontSize: 17,
+                      //             fontWeight: FontWeight(500),
+                      //           ),
+                      //         ),
+                      //         items: ["Days", "Weeks"].map((String value) {
+                      //           return DropdownMenuItem<String>(
+                      //             value: value,
+                      //             child: Text(
+                      //               value,
+                      //               style: TextStyle(color: Color(0xFF1A3D81)),
+                      //             ),
+                      //           );
+                      //         }).toList(),
+                      //         validator: (value) {
+                      //           if (value == null || value.isEmpty) {
+                      //             return "Please select a duration type";
+                      //           } else {
+                      //             return null;
+                      //           }
+                      //         },
+                      //         onChanged: (newValue) {},
+                      //       ),
+                      //     ),
+                      //   ],
+                      // ),
+                      SizedBox(height: 30),
+                      SizedBox(
                         width: double.infinity,
-                        margin: const EdgeInsets.only(top: 20),
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                          vertical: 13,
-                        ),
-                        decoration: BoxDecoration(
-                          color: btnC,
-                          borderRadius: BorderRadius.circular(btnBorderRadius),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              "Apply for Loan",
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: btnFontSize,
-                                fontWeight: FontWeight(700),
+                        child: ElevatedButton(
+                          onPressed: () async {
+                            FocusScope.of(context).unfocus();
+                            if (_formKey.currentState!.validate()) {
+                              _formKey.currentState!.save();
+                              AddLoanModel addLoanModel = AddLoanModel(
+                                amount: amount,
+                                customerId: widget.nicNumber,
+                                employeeId: 1,
+                              );
+                              bool success = await addLoanView.addLoan(
+                                addLoanModel,
+                              );
+                              if (success) {
+                                Navigator.push(
+                                  // ignore: use_build_context_synchronously
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        const LoanSuccessScreen(),
+                                  ),
+                                );
+                              } else {
+                                setState(() {
+                                  message =
+                                      "Failed to submit loan. Please try again.";
+                                });
+                              }
+                            }
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: btnC,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                              vertical: 15,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(
+                                btnBorderRadius,
                               ),
                             ),
-                            SizedBox(width: 10),
-                            Icon(
-                              Icons.arrow_forward_ios,
-                              color: Colors.white,
-                              size: 16,
-                            ),
-                          ],
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                "Apply for Loan",
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: btnFontSize,
+                                  fontWeight: FontWeight(700),
+                                ),
+                              ),
+                              const SizedBox(width: 10),
+                              const Icon(
+                                Icons.arrow_forward_ios,
+                                color: Colors.white,
+                                size: 16,
+                              ),
+                            ],
+                          ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),
