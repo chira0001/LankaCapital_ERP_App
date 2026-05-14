@@ -30,7 +30,7 @@ class _ExistingCustomerLoanRequestState
 
   // loan variable
   double amount = 0.0;
-  // double interestRates = 0.0;
+  double interestRates = 0.0;
   // int customerId = 0; //customer NIC
   // int employeeId = 0;
   int noOfInstallments = 0;
@@ -209,7 +209,7 @@ class _ExistingCustomerLoanRequestState
                               icon: const Icon(
                                 Icons.keyboard_arrow_down,
                                 color: Color(0xFF1A3D81),
-                              ),
+                              ), items: [], onChanged: (String? value) {  },
                             ),
                           ),
                         ],
