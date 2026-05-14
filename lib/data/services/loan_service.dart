@@ -1,11 +1,16 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:nkrs_app/models/add_loan_model.dart';
 import 'package:nkrs_app/models/loan_model.dart';
 import 'package:http/http.dart' as http;
 import 'package:nkrs_app/models/user_model.dart';
+// import 'package:nkrs_app/views/new_loan_request_view/utility/check_connection.dart';
 
 class LoanService {
-    static const String jwtToken = "he;fsf";
+  late final String _message;
+  String? get message => _message;
+
+  static const String jwtToken = "he;fsf";
   // Future<List<Loan>> fetchAllLoans(String jwtToken) async {
   //   final Uri url = Uri.parse('https://fakestoreapi.com/products');
 
@@ -39,39 +44,41 @@ class LoanService {
   // }
 
   Future<(User, List<Loan>)> fetchUserAndLoans(int nic) async {
-      final Uri url = Uri.parse('http://10.0.2.2:8080/api/v1/recep/customers/${nic}');
+    final Uri url = Uri.parse(
+      'http://10.0.2.2:8080/api/v1/recep/customers/loans/$nic',
+    );
 
     try {
-      final response = await http.post(
-        url,
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $jwtToken',
-        },
-        body: json.encode({'id': nic}),
-      );
+      final response = await http.get(url);
       if (response.statusCode == 200) {
+        _message = '';
         final Map<String, dynamic> data = json.decode(response.body);
-        final user = User.fromJson(data['user']);
+        final user = User.fromJson(data);
         final loans = (data['loans'] as List)
             .map((json) => Loan.fromJson(json))
             .toList();
 
         return (user, loans);
+      } else if (response.statusCode == 404) {
+        // final Map<String, dynamic> error = json.decode(response.body);
+        _message = "Invalid user ID : $nic";
+        throw Exception("Error");
       } else {
-        // ignore: avoid_print
-        print("Error null data in user & loans");
+        _message = "Database or Server error";
         throw Exception("Server Error: ${response.statusCode}");
       }
     } catch (e) {
+      _message = 'Failed to fetch data : $e';
       throw Exception("Failed to fetch data: $e");
     }
   }
 
-  Future<void> addLoan(AddLoanModel loan) async{
-      final Uri url = Uri.parse('https://your-api.com/user-summary');
-      
-      try {
+  Future<bool> addLoan(AddLoanModel loan) async {
+    final Uri url = Uri.parse(
+      'http://192.168.56.1/api/v1/field/customers/loans',
+    );
+
+    try {
       final response = await http.post(
         url,
         headers: {"Content-Type": "application/json"},
@@ -81,8 +88,10 @@ class LoanService {
         print("Response ${response}");
         // Product newProduct = Product.formJson(json.decode(response.body));
         // return newProduct;
+        return true;
       } else {
         print("Failed to loan product");
+        return false;
         throw Exception("Failed");
       }
     } catch (e) {

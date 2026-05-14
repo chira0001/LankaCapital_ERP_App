@@ -4,7 +4,7 @@ import 'package:nkrs_app/models/add_loan_model.dart';
 class AddLoanView {
   final LoanService _service = LoanService();
 
-  void addLoan(AddLoanModel addLoan) {
-    _service.addLoan(addLoan);
+  Future<bool> addLoan(AddLoanModel addLoan) async {
+    return _service.addLoan(addLoan);
   }
 }

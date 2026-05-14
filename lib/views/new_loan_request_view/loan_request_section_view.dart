@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
+import 'package:nkrs_app/data/view_model/check_connection.dart';
 import 'package:nkrs_app/utility/constanst.dart';
 import 'package:nkrs_app/views/customer_collection_views/customerCollectionpage/customer_collection_home.dart';
 import 'package:nkrs_app/views/new_loan_request_view/loan_request/existing_customer_loan.dart';
 import 'package:nkrs_app/views/new_loan_request_view/new_loan_request/new_client_loan_request.dart';
 import 'package:nkrs_app/views/new_loan_request_view/utility/main_card.dart';
+import 'package:nkrs_app/views/new_loan_request_view/utility/popup_box_message.dart';
 
 class LoanRequestSection extends StatefulWidget {
   const LoanRequestSection({super.key});
@@ -14,8 +16,13 @@ class LoanRequestSection extends StatefulWidget {
 }
 
 class _LoanRequestSectionState extends State<LoanRequestSection> {
-  // late final TextEditingController name;
   double logoSize = 32;
+
+  @override
+  void initState() {
+    super.initState();
+    CheckConnection.initialize();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -67,17 +74,41 @@ class _LoanRequestSectionState extends State<LoanRequestSection> {
           letterSpacing: 1.3,
         ),
         actions: [
-          IconButton(
-            onPressed: () {
-              MaterialPageRoute(builder: (context) => CustomerCollectionHome());
-            },
-            icon: Icon(
-              Iconsax.notification_bing_copy,
-              color: const Color.fromARGB(255, 0, 0, 0),
-              size: appBarIconS,
+          Padding(
+            padding: const EdgeInsets.only(right: 10),
+            // ValueListenableBuilder automatically rebuilds ONLY when the connection state updates
+            child: ValueListenableBuilder<bool>(
+              valueListenable: CheckConnection.isOnline,
+              builder: (context, online, child) {
+                return IconButton(
+                  onPressed: () {
+                    CheckConnection.initialize();
+                    showTopNotification(
+                      context,
+                      online ? "Device is Online" : "Device is Offline",
+                    );
+                  },
+                  icon: Icon(
+                    online ? Icons.wifi_rounded : Icons.wifi_off_rounded,
+                    color: online
+                        ? const Color.fromARGB(
+                            255,
+                            9,
+                            172,
+                            58,
+                          ) // Green when online
+                        : const Color.fromARGB(
+                            255,
+                            172,
+                            9,
+                            9,
+                          ), // Red when offline
+                    size: 28,
+                  ),
+                );
+              },
             ),
           ),
-          const SizedBox(width: 12),
         ],
       ),
       backgroundColor: safeAreaC,

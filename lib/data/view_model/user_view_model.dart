@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
-// import 'package:nkrs_app/data/repositories/user_repository.dart';
 import 'package:nkrs_app/data/services/user_service.dart';
 import 'package:nkrs_app/models/user_model.dart';
 
 class UserViewModel extends ChangeNotifier {
   final UserService _service = UserService();
 
-  
-  User? _foundUser; 
+  User? _foundUser;
   String? _errorMessage;
 
   User? get foundUser => _foundUser;
@@ -23,7 +21,7 @@ class UserViewModel extends ChangeNotifier {
   //   }
 
   //   try {
-  //     final User? user = _userRepository.user; 
+  //     final User? user = _userRepository.user;
 
   //     if (user != null && user.id == nic) {
   //       _foundUser = user;
@@ -40,9 +38,10 @@ class UserViewModel extends ChangeNotifier {
   // }
   Future<void> fetchLoans() async {
     try {
-      _foundUser = await _service.fetchAllUsers("faf","15"); // add jwt token
+      _foundUser = await _service.fetchAllUsers("faf", "15"); // add jwt token
     } catch (e) {
       print("Failed to user loans.");
+      throw Exception("Can't upload data $e");
     }
   }
 }
