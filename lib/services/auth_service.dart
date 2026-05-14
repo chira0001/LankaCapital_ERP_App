@@ -1,6 +1,8 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
+import 'package:nkrs_app/models/loan_model.dart';
+import 'package:nkrs_app/models/user_model.dart';
 
 class AuthService {
   final FlutterSecureStorage _storage = const FlutterSecureStorage(
@@ -226,4 +228,34 @@ class AuthService {
 
   // Expose dio so we can use it in other places if needed
   Dio get dio => _dio;
+
+  /// Fetches the customer profile and their loans by NIC number.
+  /// The API returns a flat JSON object with customer fields + a `loans` array.
+  /// Uses the authenticated Dio instance so JWT is auto-attached.
+  Future<(User, List<Loan>)> fetchCustomerAndLoans(int nic) async {
+    try {
+      final response = await _dio.get('/recep/customers/$nic');
+
+      if (response.statusCode == 200) {
+        final data = response.data as Map<String, dynamic>;
+
+        // The customer fields (nic, name, email, etc.) are at the root level.
+        final user = User.fromJson(data);
+
+        // The loans array is also at root level.
+        final rawLoans = data['loans'] as List<dynamic>? ?? [];
+        final loans = rawLoans
+            .map((json) => Loan.fromJson(json as Map<String, dynamic>))
+            .toList();
+
+        return (user, loans);
+      } else {
+        throw Exception('Server error: ${response.statusCode}');
+      }
+    } on DioException catch (e) {
+      throw Exception(
+        'Failed to fetch customer data: ${e.response?.statusCode} - ${e.message}',
+      );
+    }
+  }
 }

@@ -1,13 +1,102 @@
 import 'package:flutter/material.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
+import 'package:nkrs_app/models/loan_model.dart';
+import 'package:nkrs_app/models/user_model.dart';
+import 'package:nkrs_app/services/auth_service.dart';
 import 'package:nkrs_app/utility/constanst.dart';
 import 'package:nkrs_app/views/customer_collection_views/customerCollectionpage/ReceiptPreviewPage.dart';
 import 'package:nkrs_app/views/customer_collection_views/customerCollectionpage/customer_collection_home.dart';
 import 'package:nkrs_app/views/customer_collection_views/profile/profile.dart';
+import 'package:nkrs_app/views/customer_collection_views/utility/dialog_box.dart';
 
-class CollectionEntryPage extends StatelessWidget {
-  CollectionEntryPage({super.key});
+class CollectionEntryPage extends StatefulWidget {
+  const CollectionEntryPage({super.key});
+
+  @override
+  State<CollectionEntryPage> createState() => _CollectionEntryPageState();
+}
+
+class _CollectionEntryPageState extends State<CollectionEntryPage> {
   final String _todayDate = DateTime.now().toString().split(' ')[0];
+  final TextEditingController NICcontroller = TextEditingController();
+  final TextEditingController lorncontroller = TextEditingController();
+  final AuthService _authService = AuthService();
+
+
+  bool _isLoading = false;
+  String? _errorMessage;
+  User? _customer;
+  List<Loan> _loans = [];
+
+  @override
+  void dispose() {
+    NICcontroller.dispose();
+    lorncontroller.dispose();
+    super.dispose();
+  }
+
+ 
+  Future<void> _findCustomerByNic() async {
+    final nicText = NICcontroller.text.trim();
+    if (nicText.isEmpty) {
+      setState(() => _errorMessage = 'Please enter a NIC number first.');
+      return;
+    }
+
+    final nic = int.tryParse(nicText);
+    if (nic == null) {
+      setState(() => _errorMessage = 'NIC must be a valid number.');
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+      _customer = null;
+      _loans = [];
+    });
+
+    try {
+      final (user, loans) = await _authService.fetchCustomerAndLoans(nic);
+      setState(() {
+        _customer = user;
+        _loans = loans;
+        _isLoading = false;
+      });
+
+      if (loans.isEmpty) {
+        setState(() => _errorMessage = 'No loans found for this customer.');
+      } else {
+        // Show the loan selection dialog
+        if (mounted) {
+          DialogBox(
+            loans: _loans,
+            NICcontroller: NICcontroller,
+            lorncontroller: lorncontroller,
+          ).showLoanDialog(context);
+        }
+      }
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+        _errorMessage = 'Failed to fetch data: ${e.toString()}';
+      });
+    }
+  }
+
+  /// Called when the user taps FIND next to the Loan Number field.
+  /// Opens the dialog directly if loans are already loaded.
+  void _showLoanDialog() {
+    if (_loans.isEmpty) {
+      setState(() => _errorMessage = 'Please search by NIC first to load loans.');
+      return;
+    }
+    DialogBox(
+      loans: _loans,
+      NICcontroller: NICcontroller,
+      lorncontroller: lorncontroller,
+    ).showLoanDialog(context);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -74,7 +163,7 @@ class CollectionEntryPage extends StatelessWidget {
       backgroundColor: safeAreaC,
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(kCardPadding),
+          padding: EdgeInsets.all(kCardPadding),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -138,7 +227,106 @@ class CollectionEntryPage extends StatelessWidget {
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
+
                   children: [
+                    const Text(
+                      "# ENTER USER NIC",
+                      style: TextStyle(fontSize: 12, color: Colors.grey),
+                    ),
+                    const SizedBox(height: kXSmallSpacing),
+
+                    Row(
+                      children: [
+                        Expanded(
+                          child: TextField(
+                            controller: NICcontroller,
+                            keyboardType: TextInputType.number,
+                            decoration: InputDecoration(
+                              hintText: "Enter Customer NIC",
+                              filled: true,
+                              fillColor: const Color(0xFFF1F3F6),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(
+                                  kBorderRadiusMedium,
+                                ),
+                                borderSide: BorderSide.none,
+                              ),
+                            ),
+                          ),
+                        ),
+
+                        const SizedBox(width: kSmallSpacing),
+                        InkWell(
+                          onTap: _isLoading ? null : _findCustomerByNic,
+                          borderRadius: BorderRadius.circular(
+                            kBorderRadiusMedium,
+                          ),
+                          child: Container(
+                            padding: const EdgeInsets.all(kIconPadding),
+                            decoration: BoxDecoration(
+                              color: Colors.blue.shade50,
+                              borderRadius: BorderRadius.circular(
+                                kBorderRadiusMedium,
+                              ),
+                            ),
+                            child: _isLoading
+                                ? const SizedBox(
+                                    width: 18,
+                                    height: 18,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                    ),
+                                  )
+                                : const Text(
+                                    "FIND",
+                                    style: TextStyle(color: Colors.blue),
+                                  ),
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    // Customer name display
+                    if (_customer != null) ...[
+                      const SizedBox(height: kXSmallSpacing),
+                      Row(
+                        children: [
+                          const Icon(Icons.person, size: 14, color: Colors.green),
+                          const SizedBox(width: 4),
+                          Text(
+                            _customer!.name,
+                            style: const TextStyle(
+                              fontSize: 13,
+                              color: Colors.green,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+
+                    // Error message display
+                    if (_errorMessage != null) ...[
+                      const SizedBox(height: kXSmallSpacing),
+                      Row(
+                        children: [
+                          const Icon(Icons.error_outline, size: 14, color: Colors.red),
+                          const SizedBox(width: 4),
+                          Expanded(
+                            child: Text(
+                              _errorMessage!,
+                              style: const TextStyle(
+                                fontSize: 12,
+                                color: Colors.red,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+
+                    const SizedBox(height: kSectionSpacing),
+
                     const Text(
                       "# LOAN NUMBER",
                       style: TextStyle(fontSize: 12, color: Colors.grey),
@@ -149,6 +337,7 @@ class CollectionEntryPage extends StatelessWidget {
                       children: [
                         Expanded(
                           child: TextField(
+                            controller: lorncontroller,
                             decoration: InputDecoration(
                               hintText: "Enter Loan #0000",
                               filled: true,
@@ -162,18 +351,25 @@ class CollectionEntryPage extends StatelessWidget {
                             ),
                           ),
                         ),
+
                         const SizedBox(width: kSmallSpacing),
-                        Container(
-                          padding: const EdgeInsets.all(kIconPadding),
-                          decoration: BoxDecoration(
-                            color: Colors.blue.shade50,
-                            borderRadius: BorderRadius.circular(
-                              kBorderRadiusMedium,
-                            ),
+                        InkWell(
+                          onTap: _showLoanDialog,
+                          borderRadius: BorderRadius.circular(
+                            kBorderRadiusMedium,
                           ),
-                          child: const Text(
-                            "FIND",
-                            style: TextStyle(color: Colors.blue),
+                          child: Container(
+                            padding: const EdgeInsets.all(kIconPadding),
+                            decoration: BoxDecoration(
+                              color: Colors.blue.shade50,
+                              borderRadius: BorderRadius.circular(
+                                kBorderRadiusMedium,
+                              ),
+                            ),
+                            child: const Text(
+                              "FIND",
+                              style: TextStyle(color: Colors.blue),
+                            ),
                           ),
                         ),
                       ],
