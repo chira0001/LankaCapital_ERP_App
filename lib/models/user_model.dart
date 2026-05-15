@@ -25,26 +25,21 @@ class User {
 
   factory User.fromJson(Map<String, dynamic> json) {
     return User(
-      id: json['customerNIC'] as int,
-      name:
-          json['businessName'] != null &&
-              (json['businessName'] as String).isNotEmpty
-          ? "${json['businessName'][0].toUpperCase()}${json['businessName'].substring(1).toLowerCase()}"
-          : "N/A",
-      // name: json['businessName'] ?? "N/A",
-      email: json['businessEmail'] ?? "N/A",
-      phoneNumber: json['contactNumber'] ?? "N/A",
-      address: json['businessAddress'] ?? "N/A",
+      id: (json['nic'] as num?)?.toInt(),
+      name: json['name'] ?? "N/A",
+      email: json['email'] ?? "N/A",
+      phoneNumber: json['phoneNumber'] ?? "N/A",
+      address: json['address'] ?? "N/A",
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
-      'customerNIC': id,
-      'businessEmail': email,
-      'businessName': name,
-      'contactNumber': phoneNumber,
-      'businessAddress': address,
+      'nic': id,
+      'email': email,
+      'name': name,
+      'phoneNumber': phoneNumber,
+      'address': address,
     };
   }
 }

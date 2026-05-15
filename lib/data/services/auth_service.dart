@@ -210,6 +210,20 @@ class AuthService {
     return null;
   }
 
+  Future<Map<String, dynamic>?> getDailyTarget(dynamic employeeId) async {
+    try {
+      final response = await _dio.get('/recep/employees/$employeeId/target');
+      if (response.statusCode == 200) {
+        return response.data as Map<String, dynamic>;
+      }
+    } on DioException catch (e) {
+      debugPrint("Dio Error fetching daily target: ${e.response?.statusCode}");
+    } catch (e) {
+      debugPrint("Error fetching daily target: $e");
+    }
+    return null;
+  }
+
   Future<bool> updateCustomerProfile(
     String userId,
     Map<String, dynamic> data,

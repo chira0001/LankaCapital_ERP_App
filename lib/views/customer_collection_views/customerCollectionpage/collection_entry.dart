@@ -40,7 +40,10 @@ class _CollectionEntryPageState extends State<CollectionEntryPage> {
   int _todayEntries = 0;
   double _todayTotal = 0.0;
 
+  // Daily task tracking
   String _currentUserName = "";
+  String _officerRegion = "";
+  double _dailyTarget = 0.0;
 
   @override
   void initState() {
@@ -51,13 +54,44 @@ class _CollectionEntryPageState extends State<CollectionEntryPage> {
   }
 
   Future<void> _fetchUserName() async {
-    String? name = await _authService.getUserName();
-    if (name != null && name.isNotEmpty) {
-      if (mounted) {
+    try {
+      final profile = await _authService.getCustomerProfile();
+      if (profile != null && mounted) {
+        final firstName = profile['firstName'] ?? '';
+        final lastName = profile['lastName'] ?? '';
+        final fullName = "$firstName $lastName".trim();
+        final email = profile['email'] ?? '';
+        final empId = profile['id'];
+
         setState(() {
-          _currentUserName = name;
+          _currentUserName = fullName.isNotEmpty ? fullName : email;
         });
+
+        // Fetch daily target using employee ID
+        if (empId != null) {
+          final targetData = await _authService.getDailyTarget(empId);
+          if (targetData != null && mounted) {
+            final rawTarget = targetData['amount'] ?? 0;
+            final parsedTarget = (rawTarget is num)
+                ? rawTarget.toDouble()
+                : double.tryParse(rawTarget.toString()) ?? 0.0;
+            final region = (targetData['region'] as String? ?? '').trim();
+
+            setState(() {
+              _dailyTarget = parsedTarget;
+              if (region.isNotEmpty) {
+                _officerRegion = region;
+              } else {
+                // Fallback to profile address if region in target is empty
+                final profileAddress = (profile['address'] as String? ?? '').trim();
+                _officerRegion = profileAddress.isNotEmpty ? profileAddress : 'All Regions';
+              }
+            });
+          }
+        }
       }
+    } catch (e) {
+      debugPrint('Error fetching user profile for task: $e');
     }
   }
 
@@ -591,26 +625,26 @@ class _CollectionEntryPageState extends State<CollectionEntryPage> {
 
                             if (!context.mounted) return;
                             Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => ReceiptPreviewPage(
-                                    receiptId: receiptId,
-                                    fileNumber: fileNumber,
-                                    premiumAmount: _calculatedPremium,
-                                    paidAmount: paidAmount,
-                                    dueAmount: _dueAmount,
-                                    collectedBy: collectedBy,
-                                    collectionDate: DateTime.now(),
-                                  ),
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => ReceiptPreviewPage(
+                                  receiptId: receiptId,
+                                  fileNumber: fileNumber,
+                                  premiumAmount: _calculatedPremium,
+                                  paidAmount: paidAmount,
+                                  dueAmount: _dueAmount,
+                                  collectedBy: collectedBy,
+                                  collectionDate: DateTime.now(),
                                 ),
-                              );
+                              ),
+                            );
                           } catch (e) {
                             if (!context.mounted) return;
                             ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text('Failed to save data: $e'),
-                                ),
-                              );
+                              SnackBar(
+                                content: Text('Failed to save data: $e'),
+                              ),
+                            );
                           }
                         },
                         child: const Text(
@@ -625,6 +659,7 @@ class _CollectionEntryPageState extends State<CollectionEntryPage> {
 
               const SizedBox(height: kMediumSpacing),
 
+              // ── Summary row ────────────────────────────────────────────
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -641,6 +676,9 @@ class _CollectionEntryPageState extends State<CollectionEntryPage> {
 
               const SizedBox(height: kMediumSpacing),
 
+              // ── Daily Task Dashboard ───────────────────────────────────
+              _buildDailyTaskCard(),
+              const SizedBox(height: kMediumSpacing),
               const Text(
                 "RECENT COLLECTIONS",
                 style: TextStyle(
@@ -788,6 +826,251 @@ class _CollectionEntryPageState extends State<CollectionEntryPage> {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildDailyTaskCard() {
+    final bool hasTarget = _dailyTarget > 0;
+    final double collected = _todayTotal;
+    final double remaining = hasTarget
+        ? (_dailyTarget - collected).clamp(0, _dailyTarget)
+        : 0;
+    final double percentage = hasTarget
+        ? (collected / _dailyTarget).clamp(0.0, 1.0)
+        : 0.0;
+    final int percentInt = (percentage * 100).round();
+
+    // Colour logic: red < 30%, amber < 60%, green >= 60% (task accomplished)
+    final Color progressColor = percentInt >= 100
+        ? Colors.green.shade800
+        : percentInt >= 60
+            ? Colors.green.shade500
+            : percentInt >= 30
+                ? Colors.amber.shade700
+                : Colors.red.shade500;
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            const Color.fromARGB(255, 44, 72, 116),
+            const Color.fromARGB(255, 61, 63, 65),
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            // ignore: deprecated_member_use
+            color: Colors.blue.shade900.withOpacity(0.35),
+            blurRadius: 12,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header row
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                "DAILY TASK",
+                style: TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white70,
+                  letterSpacing: 1.5,
+                ),
+              ),
+              // Region badge
+              if (_officerRegion.isNotEmpty)
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 3,
+                  ),
+                  decoration: BoxDecoration(
+                    // ignore: deprecated_member_use
+                    color: Colors.white.withOpacity(0.18),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(
+                        Icons.location_on,
+                        size: 11,
+                        color: Colors.white70,
+                      ),
+                      const SizedBox(width: 3),
+                      Text(
+                        _officerRegion,
+                        style: const TextStyle(
+                          fontSize: 10,
+                          color: Colors.white70,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+            ],
+          ),
+
+          const SizedBox(height: 12),
+
+          // Percentage + ring
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              // Circular progress indicator
+              SizedBox(
+                width: 64,
+                height: 64,
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    CircularProgressIndicator(
+                      value: 1.0,
+                      strokeWidth: 6,
+                      // ignore: deprecated_member_use
+                      color: Colors.white.withOpacity(0.15),
+                    ),
+                    CircularProgressIndicator(
+                      value: percentage,
+                      strokeWidth: 6,
+                      color: progressColor,
+                      backgroundColor: Colors.transparent,
+                    ),
+                    Text(
+                      "$percentInt%",
+                      style: const TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              const SizedBox(width: 16),
+
+              // Amounts column
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _taskAmountRow(
+                      label: "TARGET",
+                      value: hasTarget
+                          ? "${_dailyTarget.toStringAsFixed(2)} LKR"
+                          : "Not set",
+                      color: Colors.white,
+                      bold: true,
+                    ),
+                    const SizedBox(height: 6),
+                    _taskAmountRow(
+                      label: "COLLECTED",
+                      value: "${collected.toStringAsFixed(2)} LKR",
+                      color: Colors.greenAccent.shade200,
+                      bold: false,
+                    ),
+                    const SizedBox(height: 6),
+                    _taskAmountRow(
+                      label: "REMAINING",
+                      value: hasTarget
+                          ? "${remaining.toStringAsFixed(2)} LKR"
+                          : "—",
+                      color: remaining > 0
+                          ? Colors.orangeAccent.shade100
+                          : Colors.greenAccent,
+                      bold: false,
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 14),
+
+          // Linear progress bar
+          ClipRRect(
+            borderRadius: BorderRadius.circular(8),
+            child: LinearProgressIndicator(
+              value: percentage,
+              minHeight: 8,
+              // ignore: deprecated_member_use
+              backgroundColor: Colors.white.withOpacity(0.2),
+              valueColor: AlwaysStoppedAnimation<Color>(progressColor),
+            ),
+          ),
+
+          const SizedBox(height: 6),
+
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                "$_todayEntries collection${_todayEntries == 1 ? '' : 's'} today",
+                style: const TextStyle(fontSize: 10, color: Colors.white54),
+              ),
+              Text(
+                hasTarget
+                    ? (percentage >= 1.0
+                        ? "🏆 Target reached!"
+                        : percentage >= 0.6
+                            ? "⭐ Task Accomplished!"
+                            : "${(percentage * 100).toStringAsFixed(1)}% done")
+                    : "No target assigned",
+                style: TextStyle(
+                  fontSize: 10,
+                  color: percentage >= 1.0
+                      ? Colors.greenAccent
+                      : percentage >= 0.6
+                          ? Colors.greenAccent.shade200
+                          : Colors.white54,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _taskAmountRow({
+    required String label,
+    required String value,
+    required Color color,
+    required bool bold,
+  }) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          label,
+          style: const TextStyle(
+            fontSize: 10,
+            color: Colors.white54,
+            letterSpacing: 1.2,
+          ),
+        ),
+        Text(
+          value,
+          style: TextStyle(
+            fontSize: 12,
+            color: color,
+            fontWeight: bold ? FontWeight.bold : FontWeight.w500,
+          ),
+        ),
+      ],
     );
   }
 }
