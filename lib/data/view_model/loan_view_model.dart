@@ -45,7 +45,7 @@ class LoanViewModel extends ChangeNotifier {
       }
 
       final userData = result['customer'] as Map<String, dynamic>;
-      final loanData = result['loans'] as List<Map<String, dynamic>>;
+
       // print(userData['name']);
 
       _user = User(

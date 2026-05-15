@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:nkrs_app/models/add_loan_model.dart';
 import 'package:nkrs_app/models/loan_model.dart';
 import 'package:http/http.dart' as http;
@@ -45,7 +46,7 @@ class LoanService {
 
   Future<(User, List<Loan>)> fetchUserAndLoans(int nic) async {
     final Uri url = Uri.parse(
-      'http://10.0.2.2:8080/api/v1/recep/customers/loans/$nic',
+      'http://10.230.135.234:8080/api/v1/recep/customers/loans/$nic',
     );
 
     try {
@@ -75,7 +76,7 @@ class LoanService {
 
   Future<bool> addLoan(AddLoanModel loan) async {
     final Uri url = Uri.parse(
-      'http://192.168.56.1/api/v1/field/customers/loans',
+      'http://10.230.135.234/api/v1/field/customers/loans',
     );
 
     try {
@@ -85,17 +86,16 @@ class LoanService {
         body: json.encode(loan.toJson()),
       );
       if (response.statusCode == 200 || response.statusCode == 201) {
-        print("Response $response");
+        debugPrint("Response $response");
         // Product newProduct = Product.formJson(json.decode(response.body));
         // return newProduct;
         return true;
       } else {
-        print("Failed to loan product");
+        debugPrint("Failed to loan product");
         return false;
-        throw Exception("Failed");
       }
     } catch (e) {
-      print("Failed $e");
+      debugPrint("Failed $e");
       throw Exception("Failed to add loan $e");
     }
   }

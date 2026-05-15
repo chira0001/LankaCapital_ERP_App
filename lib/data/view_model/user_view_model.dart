@@ -40,7 +40,7 @@ class UserViewModel extends ChangeNotifier {
     try {
       _foundUser = await _service.fetchAllUsers("faf", "15"); // add jwt token
     } catch (e) {
-      print("Failed to user loans.");
+      debugPrint("Failed to user loans.");
       throw Exception("Can't upload data $e");
     }
   }

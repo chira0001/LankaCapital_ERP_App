@@ -67,5 +67,19 @@ class DatabaseInitializerService {
         FOREIGN KEY (employee_id) REFERENCES employees(id) ON DELETE SET NULL
       )
     ''');
+
+    // create collections table
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS collections (
+        receipt_id VARCHAR(255) PRIMARY KEY,
+        file_number VARCHAR(255),
+        collection_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        premium_amount DECIMAL(12,2),
+        paid_amount DECIMAL(12,2),
+        due_amount DECIMAL(12,2),
+        collected_by VARCHAR(255),
+        FOREIGN KEY (file_number) REFERENCES loans(file_number) ON DELETE CASCADE
+      )
+    ''');
   }
 }

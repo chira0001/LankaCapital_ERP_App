@@ -3,6 +3,9 @@ import 'package:nkrs_app/views/customer_collection_views/customerCollectionpage/
 import 'package:nkrs_app/views/customer_collection_views/loginpage/register_page.dart';
 import 'package:nkrs_app/data/services/auth_service.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:local_auth/local_auth.dart';
+import 'package:flutter/services.dart';
+import 'package:nkrs_app/views/customer_collection_views/utility/app_lock_wrapper.dart';
 
 
 class LoginPage extends StatefulWidget {
@@ -19,12 +22,64 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController _passwordController = TextEditingController();
   final AuthService _authService = AuthService();
   final FlutterSecureStorage _storage = const FlutterSecureStorage();
+  final LocalAuthentication auth = LocalAuthentication();
   bool _isLoading = false;
+  bool _canCheckBiometrics = false;
 
   @override
   void initState() {
     super.initState();
+    _checkBiometrics();
     _loadSavedCredentials();
+  }
+
+  Future<void> _checkBiometrics() async {
+    late bool canCheckBiometrics;
+    try {
+      canCheckBiometrics = await auth.canCheckBiometrics;
+    } on PlatformException catch (e) {
+      canCheckBiometrics = false;
+      debugPrint(e.toString());
+    }
+    if (!mounted) return;
+    setState(() {
+      _canCheckBiometrics = canCheckBiometrics;
+    });
+  }
+
+  Future<void> _authenticateWithBiometrics() async {
+    bool authenticated = false;
+    try {
+      authenticated = await auth.authenticate(
+        localizedReason: 'Scan your fingerprint or face to authenticate',
+        biometricOnly: true,
+        persistAcrossBackgrounding: true,
+      );
+    } on PlatformException catch (e) {
+      debugPrint(e.toString());
+      return;
+    }
+    if (!mounted) return;
+
+    if (authenticated) {
+      final isLoggedIn = await _authService.isLoggedIn();
+      if (!mounted) return;
+      if (isLoggedIn) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const AppLockWrapper(
+              initialAuthenticated: true,
+              child: CustomerCollectionHome(),
+            ),
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Please login with password first.')),
+        );
+      }
+    }
   }
 
   Future<void> _loadSavedCredentials() async {
@@ -34,6 +89,11 @@ class _LoginPageState extends State<LoginPage> {
         _emailController.text = savedEmail;
         rememberMe = true;
       });
+      
+      final isLoggedIn = await _authService.isLoggedIn();
+      if (isLoggedIn && _canCheckBiometrics) {
+        _authenticateWithBiometrics();
+      }
     }
   }
 
@@ -70,23 +130,25 @@ class _LoginPageState extends State<LoginPage> {
 
     final success = await _authService.login(email, password);
 
-    if (mounted) {
-      setState(() {
-        _isLoading = false;
-      });
+    if (!mounted) return;
+    setState(() {
+      _isLoading = false;
+    });
 
-      if (success) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) => const CustomerCollectionHome(),
+    if (success) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const AppLockWrapper(
+            initialAuthenticated: true,
+            child: CustomerCollectionHome(),
           ),
-        );
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Login failed. Please check your credentials.')),
-        );
-      }
+        ),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Login failed. Please check your credentials.')),
+      );
     }
   }
 
@@ -283,9 +345,9 @@ class _LoginPageState extends State<LoginPage> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    socialButton(Icons.fingerprint),
+                    socialButton(Icons.fingerprint, _authenticateWithBiometrics),
                     const SizedBox(width: 15),
-                    socialButton(Icons.face),
+                    socialButton(Icons.face, _authenticateWithBiometrics),
                   ],
                 ),
 
@@ -323,16 +385,20 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  Widget socialButton(IconData icon) {
-    return Container(
-      height: 55,
-      width: 55,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey.shade300),
+  Widget socialButton(IconData icon, VoidCallback onTap) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        height: 55,
+        width: 55,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: Colors.grey.shade300),
+        ),
+        child: Icon(icon),
       ),
-      child: Icon(icon),
     );
   }
 }

@@ -3,7 +3,26 @@ import 'package:nkrs_app/views/customer_collection_views/customerCollectionpage/
 import 'package:nkrs_app/views/customer_collection_views/customerCollectionpage/payment_complete_screen.dart' show PaymentCompleteScreen;
 
 class ReceiptPreviewPage extends StatelessWidget {
-  const ReceiptPreviewPage({super.key});
+  final String receiptId;
+  final String fileNumber;
+  final double premiumAmount;
+  final double paidAmount;
+  final double dueAmount;
+  final String collectedBy;
+  final DateTime collectionDate;
+  final bool isViewOnly;
+
+  const ReceiptPreviewPage({
+    super.key,
+    required this.receiptId,
+    required this.fileNumber,
+    required this.premiumAmount,
+    required this.paidAmount,
+    required this.dueAmount,
+    required this.collectedBy,
+    required this.collectionDate,
+    this.isViewOnly = false,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -57,23 +76,23 @@ class ReceiptPreviewPage extends StatelessWidget {
 
                     const SizedBox(height: 20),
 
-                    _row("Receipt ID:", "1771753187222"),
-                    _row("Collection Date:", "February 22, 2026"),
-                    _row("Print Date & Time:", "2/22/2026, 3:09:47 PM"),
+                    _row("Receipt ID:", receiptId),
+                    _row("Collection Date:", "${collectionDate.year}-${collectionDate.month.toString().padLeft(2, '0')}-${collectionDate.day.toString().padLeft(2, '0')}"),
+                    _row("Print Date & Time:", "${DateTime.now().year}-${DateTime.now().month.toString().padLeft(2, '0')}-${DateTime.now().day.toString().padLeft(2, '0')} ${DateTime.now().hour.toString().padLeft(2, '0')}:${DateTime.now().minute.toString().padLeft(2, '0')}"),
 
                     const Divider(height: 25),
 
-                    _row("Loan Number:", "1121"),
+                    _row("Loan Number:", fileNumber),
 
                     const Divider(height: 25),
 
-                    _row("Premium Amount:", "LKR 10,000.00"),
-                    _rowBold("Paid Amount:", "LKR 1,238.99"),
-                    _row("Due Amount:", "LKR 8,761.01"),
+                    _row("Premium Amount:", "LKR ${premiumAmount.toStringAsFixed(2)}"),
+                    _rowBold("Paid Amount:", "LKR ${paidAmount.toStringAsFixed(2)}"),
+                    _row("Due Amount:", "LKR ${dueAmount.toStringAsFixed(2)}"),
 
                     const Divider(height: 25),
 
-                    _row("Collected By:", "Admin User"),
+                    _row("Collected By:", collectedBy),
 
                     const Spacer(),
 
@@ -90,61 +109,62 @@ class ReceiptPreviewPage extends StatelessWidget {
             const SizedBox(height: 20),
 
             /// BUTTONS
-            Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton.icon(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => CollectionEntryPage(),
+            if (!isViewOnly)
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => CollectionEntryPage(),
+                          ),
+                        );
+                      },
+                      icon: const Icon(Icons.print, color: Colors.red),
+                      label: const Text(
+                        "Re-print",
+                        style: TextStyle(color: Colors.red),
+                      ),
+                      style: OutlinedButton.styleFrom(
+                        side: const BorderSide(color: Colors.red),
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
                         ),
-                      );
-                    },
-                    icon: const Icon(Icons.print, color: Colors.red),
-                    label: const Text(
-                      "Re-print",
-                      style: TextStyle(color: Colors.red),
-                    ),
-                    style: OutlinedButton.styleFrom(
-                      side: const BorderSide(color: Colors.red),
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
                       ),
                     ),
                   ),
-                ),
 
-                const SizedBox(width: 12),
+                  const SizedBox(width: 12),
 
-                Expanded(
-                  child: ElevatedButton.icon(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => PaymentCompleteScreen(),
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => PaymentCompleteScreen(),
+                          ),
+                        );
+                      },
+                      icon: const Icon(Icons.print, color: Colors.white),
+                      label: const Text(
+                        "Print Receipt",
+                        style: TextStyle(color: Colors.white),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blue.shade700,
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
                         ),
-                      );
-                    },
-                    icon: const Icon(Icons.print, color: Colors.white),
-                    label: const Text(
-                      "Print Receipt",
-                      style: TextStyle(color: Colors.white),
-                    ),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue.shade700,
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
                       ),
                     ),
                   ),
-                ),
-              ],
-            ),
+                ],
+              ),
           ],
         ),
       ),
