@@ -5,11 +5,13 @@ class DialogBox {
   final List<Loan> loans;
   final TextEditingController nicController;
   final TextEditingController lorncontroller;
+  final Function(Loan)? onLoanSelected;
 
   DialogBox({
     required this.loans,
     required this.nicController,
     required this.lorncontroller,
+    this.onLoanSelected,
   });
 
   void showLoanDialog(BuildContext context) {
@@ -46,6 +48,10 @@ class DialogBox {
                   // Fill loan number field with the file number (e.g. D001)
                   lorncontroller.text = selectedLoan.fileNumber;
                   // NICcontroller already has the NIC — keep it as-is
+
+                  if (onLoanSelected != null) {
+                    onLoanSelected!(selectedLoan);
+                  }
 
                   Navigator.pop(context);
                 },

@@ -3,15 +3,16 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:nkrs_app/models/loan_model.dart';
 import 'package:nkrs_app/models/user_model.dart';
+import 'package:flutter/foundation.dart';
 
 class AuthService {
   final FlutterSecureStorage _storage = const FlutterSecureStorage(
-    aOptions: AndroidOptions(encryptedSharedPreferences: true),
+    aOptions: AndroidOptions(),
   );
   late final Dio _dio;
   final String _tokenKey = 'jwt_token';
   final String _refreshTokenKey = 'refresh_token';
-  final String _baseUrl = 'http://10.16.54.234:8080/api/v1';
+  final String _baseUrl = 'http://10.230.135.234:8080/api/v1';
 
   AuthService() {
     // 1. Initialize Dio with base configurations
@@ -64,9 +65,7 @@ class AuthService {
       );
 
       String? tokenToRefresh = await _storage.read(key: _refreshTokenKey);
-      if (tokenToRefresh == null) {
-        tokenToRefresh = currentToken;
-      }
+      tokenToRefresh ??= currentToken;
 
       if (tokenToRefresh == null) return null;
 
@@ -88,7 +87,7 @@ class AuthService {
         }
       }
     } catch (e) {
-      print("Failed to refresh token: $e");
+      debugPrint("Failed to refresh token: $e");
       await logout();
     }
     return null;
@@ -111,13 +110,13 @@ class AuthService {
               await _storage.write(key: _refreshTokenKey, value: refreshToken);
             }
           } catch (e) {
-            print("Error writing token: $e");
+            debugPrint("Error writing token: $e");
           }
           return true;
         }
       }
     } on DioException catch (e) {
-      print("Login failed: ${e.response?.statusCode} - ${e.message}");
+      debugPrint("Login failed: ${e.response?.statusCode} - ${e.message}");
     }
     return false;
   }
@@ -126,7 +125,7 @@ class AuthService {
     try {
       return await _storage.read(key: _tokenKey);
     } catch (e) {
-      print("Error reading token: $e");
+      debugPrint("Error reading token: $e");
       return null;
     }
   }
@@ -136,7 +135,7 @@ class AuthService {
       await _storage.delete(key: _tokenKey);
       await _storage.delete(key: _refreshTokenKey);
     } catch (e) {
-      print("Error deleting token: $e");
+      debugPrint("Error deleting token: $e");
     }
   }
 
@@ -144,7 +143,7 @@ class AuthService {
     try {
       await _storage.write(key: _tokenKey, value: token);
     } catch (e) {
-      print("Error setting token: $e");
+      debugPrint("Error setting token: $e");
     }
   }
 
@@ -171,7 +170,7 @@ class AuthService {
         return fullName.isNotEmpty ? fullName : null;
       }
     } catch (e) {
-      print("Error fetching username: $e");
+      debugPrint("Error fetching username: $e");
     }
     return null;
   }
@@ -180,33 +179,33 @@ class AuthService {
     try {
       final token = await getToken();
       if (token != null) {
-        print("Decoded JWT: ${JwtDecoder.decode(token)}");
+        debugPrint("Decoded JWT: ${JwtDecoder.decode(token)}");
       }
 
       final userId = await getUserIdFromToken();
-      print("Extracted userId from token: $userId");
+      debugPrint("Extracted userId from token: $userId");
       if (userId == null) return null;
 
-      print("Fetching all employees from: /recep/employees");
+      debugPrint("Fetching all employees from: /recep/employees");
       final response = await _dio.get('/recep/employees');
-      print("Profile response status: ${response.statusCode}");
+      debugPrint("Profile response status: ${response.statusCode}");
 
       if (response.statusCode == 200) {
         final List<dynamic> employees = response.data;
         for (var emp in employees) {
           if (emp['email'] == userId) {
-            print("Found matching employee profile: $emp");
+            debugPrint("Found matching employee profile: $emp");
             return emp;
           }
         }
-        print("Employee with email $userId not found in the list.");
+        debugPrint("Employee with email $userId not found in the list.");
       }
     } on DioException catch (e) {
-      print(
+      debugPrint(
         "Dio Error fetching profile: ${e.response?.statusCode} - ${e.response?.data}",
       );
     } catch (e) {
-      print("Error fetching profile: $e");
+      debugPrint("Error fetching profile: $e");
     }
     return null;
   }
@@ -220,14 +219,14 @@ class AuthService {
       final response = await _dio.put('/recep/employees/$userId', data: data);
       return response.statusCode == 200 || response.statusCode == 204;
     } catch (e) {
-      print("Error updating profile: $e");
+      debugPrint("Error updating profile: $e");
       return false;
     }
   }
 
   Dio get dio => _dio;
 
-  get currentUser => null;
+  dynamic get currentUser => null;
 
   Future<(User, List<Loan>)> fetchCustomerAndLoans(int nic) async {
     try {

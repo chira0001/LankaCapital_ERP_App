@@ -10,6 +10,7 @@ import 'package:nkrs_app/views/customer_collection_views/customerCollectionpage/
 import 'package:nkrs_app/views/customer_collection_views/profile/profile.dart';
 import 'package:nkrs_app/views/customer_collection_views/utility/dialog_box.dart';
 import 'package:nkrs_app/data/view_model/check_connection.dart';
+import 'package:nkrs_app/data/services/database_service.dart';
 
 class CollectionEntryPage extends StatefulWidget {
   const CollectionEntryPage({super.key});
@@ -22,6 +23,8 @@ class _CollectionEntryPageState extends State<CollectionEntryPage> {
   String todayDate = DateTime.now().toString().split(' ')[0];
   final TextEditingController nicController = TextEditingController();
   final TextEditingController lorncontroller = TextEditingController();
+  final TextEditingController loanAmountController = TextEditingController();
+  final TextEditingController paidAmountController = TextEditingController();
   final AuthService _authService = AuthService();
   LoanViewModel loanData = LoanViewModel();
 
@@ -29,11 +32,83 @@ class _CollectionEntryPageState extends State<CollectionEntryPage> {
   String? _errorMessage;
   User? _customer;
   List<Loan> _loans = [];
+  Loan? _selectedLoan;
+  double _calculatedPremium = 0.0;
+  double _dueAmount = 0.0;
+
+  List<Map<String, dynamic>> _todayCollections = [];
+  int _todayEntries = 0;
+  double _todayTotal = 0.0;
+
+  String _currentUserName = "";
+
+  @override
+  void initState() {
+    super.initState();
+    paidAmountController.addListener(_calculateDueAmount);
+    _loadTodayCollections();
+    _fetchUserName();
+  }
+
+  Future<void> _fetchUserName() async {
+    String? name = await _authService.getUserName();
+    if (name != null && name.isNotEmpty) {
+      if (mounted) {
+        setState(() {
+          _currentUserName = name;
+        });
+      }
+    }
+  }
+
+  Future<void> _loadTodayCollections() async {
+    final collections = await DatabaseService().getTodayCollections();
+    double total = 0.0;
+    for (var col in collections) {
+      total += (col['paid_amount'] as num).toDouble();
+    }
+    setState(() {
+      _todayCollections = collections;
+      _todayEntries = collections.length;
+      _todayTotal = total;
+    });
+  }
+
+  void _calculateDueAmount() {
+    if (_selectedLoan == null) return;
+
+    double paidAmount = double.tryParse(paidAmountController.text) ?? 0.0;
+    setState(() {
+      _dueAmount = _calculatedPremium - paidAmount;
+    });
+  }
+
+  void _handleLoanSelected(Loan loan) {
+    setState(() {
+      _selectedLoan = loan;
+      double amount = loan.amount;
+      double interest = amount * (loan.interestRate / 100);
+      double docCharge = loan.documentCharge;
+      int installments = loan.noOfInstallments;
+
+      double totalPayable = amount + interest + docCharge;
+      if (installments > 0) {
+        _calculatedPremium = totalPayable / installments;
+      } else {
+        _calculatedPremium = totalPayable;
+      }
+
+      loanAmountController.text = _calculatedPremium.toStringAsFixed(2);
+      _calculateDueAmount();
+    });
+  }
 
   @override
   void dispose() {
     nicController.dispose();
     lorncontroller.dispose();
+    loanAmountController.dispose();
+    paidAmountController.dispose();
     super.dispose();
   }
 
@@ -73,12 +148,12 @@ class _CollectionEntryPageState extends State<CollectionEntryPage> {
       } else if (loans.isEmpty) {
         setState(() => _errorMessage = 'No loans found for this customer.');
       } else {
-        
         if (mounted) {
           DialogBox(
             loans: _loans,
             nicController: nicController,
             lorncontroller: lorncontroller,
+            onLoanSelected: _handleLoanSelected,
           ).showLoanDialog(context);
         }
       }
@@ -101,6 +176,7 @@ class _CollectionEntryPageState extends State<CollectionEntryPage> {
       loans: _loans,
       nicController: nicController,
       lorncontroller: lorncontroller,
+      onLoanSelected: _handleLoanSelected,
     ).showLoanDialog(context);
   }
 
@@ -229,7 +305,7 @@ class _CollectionEntryPageState extends State<CollectionEntryPage> {
                   borderRadius: BorderRadius.circular(kBorderRadiusExtraLarge),
                   boxShadow: [
                     BoxShadow(
-                    
+                      // ignore: deprecated_member_use
                       color: Colors.black.withOpacity(0.05),
                       blurRadius: 10,
                       offset: const Offset(0, 4),
@@ -397,11 +473,16 @@ class _CollectionEntryPageState extends State<CollectionEntryPage> {
                     const SizedBox(height: kSectionSpacing),
 
                     const Text(
-                      "PREMIUM AMOUNT",
+                      "LORN AMOUNT",
                       style: TextStyle(fontSize: 12, color: Colors.grey),
                     ),
                     const SizedBox(height: kTinySpacing),
-                    _amountField(false),
+                    _amountField(
+                      highlight: false,
+                      controller: loanAmountController,
+                      readOnly: true,
+                      hint: "Calculated Premium Amount",
+                    ),
 
                     const SizedBox(height: kSectionSpacing),
 
@@ -410,7 +491,12 @@ class _CollectionEntryPageState extends State<CollectionEntryPage> {
                       style: TextStyle(fontSize: 12, color: Colors.green),
                     ),
                     const SizedBox(height: kTinySpacing),
-                    _amountField(true),
+                    _amountField(
+                      highlight: true,
+                      controller: paidAmountController,
+                      readOnly: false,
+                      hint: "Enter Paid Amount",
+                    ),
 
                     const SizedBox(height: kSectionSpacing),
 
@@ -424,17 +510,17 @@ class _CollectionEntryPageState extends State<CollectionEntryPage> {
                         ),
                         border: Border.all(color: Colors.grey.shade300),
                       ),
-                      child: const Column(
+                      child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
+                          const Text(
                             "BALANCE DUE",
                             style: TextStyle(fontSize: 11, color: Colors.grey),
                           ),
-                          SizedBox(height: kXSmallSpacing),
+                          const SizedBox(height: kXSmallSpacing),
                           Text(
-                            "0 LKR",
-                            style: TextStyle(
+                            "${_dueAmount.toStringAsFixed(2)} LKR",
+                            style: const TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
                             ),
@@ -463,13 +549,69 @@ class _CollectionEntryPageState extends State<CollectionEntryPage> {
                           ),
                         ),
 
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => ReceiptPreviewPage(),
-                            ),
-                          );
+                        onPressed: () async {
+                          if (_selectedLoan == null) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Please select a loan first.'),
+                              ),
+                            );
+                            return;
+                          }
+
+                          final paidAmountText = paidAmountController.text;
+                          if (paidAmountText.isEmpty) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Please enter the paid amount.'),
+                              ),
+                            );
+                            return;
+                          }
+
+                          double paidAmount =
+                              double.tryParse(paidAmountText) ?? 0.0;
+                          String receiptId = DateTime.now()
+                              .millisecondsSinceEpoch
+                              .toString();
+                          String fileNumber = _selectedLoan!.fileNumber;
+                          String collectedBy = _currentUserName;
+
+                          try {
+                            await DatabaseService().insertCollection(
+                              receiptId: receiptId,
+                              fileNumber: fileNumber,
+                              premiumAmount: _calculatedPremium,
+                              paidAmount: paidAmount,
+                              dueAmount: _dueAmount,
+                              collectedBy: collectedBy,
+                            );
+
+                            await _loadTodayCollections();
+
+                            if (!context.mounted) return;
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => ReceiptPreviewPage(
+                                    receiptId: receiptId,
+                                    fileNumber: fileNumber,
+                                    premiumAmount: _calculatedPremium,
+                                    paidAmount: paidAmount,
+                                    dueAmount: _dueAmount,
+                                    collectedBy: collectedBy,
+                                    collectionDate: DateTime.now(),
+                                  ),
+                                ),
+                              );
+                          } catch (e) {
+                            if (!context.mounted) return;
+                            ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text('Failed to save data: $e'),
+                                ),
+                              );
+                          }
                         },
                         child: const Text(
                           "SUBMIT & PRINT",
@@ -485,14 +627,14 @@ class _CollectionEntryPageState extends State<CollectionEntryPage> {
 
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: const [
+                children: [
                   Text(
-                    "TODAY: 0 ENTRIES",
-                    style: TextStyle(fontSize: 12, color: Colors.grey),
+                    "TODAY: $_todayEntries ENTRIES",
+                    style: const TextStyle(fontSize: 12, color: Colors.grey),
                   ),
                   Text(
-                    "TOTAL: 0.00 LKR",
-                    style: TextStyle(fontSize: 12, color: Colors.blue),
+                    "TOTAL: ${_todayTotal.toStringAsFixed(2)} LKR",
+                    style: const TextStyle(fontSize: 12, color: Colors.blue),
                   ),
                 ],
               ),
@@ -510,7 +652,26 @@ class _CollectionEntryPageState extends State<CollectionEntryPage> {
 
               const SizedBox(height: kSmallSpacing),
 
-              // _recentItem("#1 - John Doe", "2 hours ago", "40.00"),
+              if (_todayCollections.isEmpty)
+                const Padding(
+                  padding: EdgeInsets.symmetric(vertical: kMediumSpacing),
+                  child: Center(
+                    child: Text(
+                      "No collections today",
+                      style: TextStyle(color: Colors.grey, fontSize: 13),
+                    ),
+                  ),
+                ),
+
+              ..._todayCollections.map((col) {
+                final timeStr = col['collection_date'].toString();
+                DateTime time = DateTime.tryParse(timeStr) ?? DateTime.now();
+                String formattedTime =
+                    "${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}";
+                String title = "Loan #${col['file_number']}";
+                String amount = (col['paid_amount'] as num).toStringAsFixed(2);
+                return _recentItem(col, title, formattedTime, amount);
+              }),
             ],
           ),
         ),
@@ -518,8 +679,12 @@ class _CollectionEntryPageState extends State<CollectionEntryPage> {
     );
   }
 
- 
-  Widget _amountField(bool highlight) {
+  Widget _amountField({
+    required bool highlight,
+    required TextEditingController controller,
+    required bool readOnly,
+    required String hint,
+  }) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: kIconPadding),
       decoration: BoxDecoration(
@@ -533,12 +698,12 @@ class _CollectionEntryPageState extends State<CollectionEntryPage> {
         children: [
           Expanded(
             child: TextField(
+              controller: controller,
+              readOnly: readOnly,
               keyboardType: TextInputType.number,
               decoration: InputDecoration(
                 border: InputBorder.none,
-                hintText: highlight
-                    ? "Enter Paid Amount"
-                    : "Enter Premium Amount",
+                hintText: hint,
               ),
             ),
           ),
@@ -551,51 +716,78 @@ class _CollectionEntryPageState extends State<CollectionEntryPage> {
     );
   }
 
-  // Widget _recentItem(String title, String time, String amount) {
-  //   return Container(
-  //     margin: const EdgeInsets.only(bottom: kSmallSpacing),
-  //     padding: const EdgeInsets.all(kIconPadding),
-  //     decoration: BoxDecoration(
-  //       color: Colors.white,
-  //       borderRadius: BorderRadius.circular(kBorderRadiusMedium),
-  //     ),
-  //     child: Row(
-  //       children: [
-  //         const Icon(Icons.person, color: Colors.grey),
-  //         const SizedBox(width: 10),
-  //         Expanded(
-  //           child: Column(
-  //             crossAxisAlignment: CrossAxisAlignment.start,
-  //             children: [
-  //               Text(
-  //                 title,
-  //                 style: const TextStyle(fontWeight: FontWeight.w600),
-  //               ),
-  //               Text(
-  //                 time,
-  //                 style: const TextStyle(fontSize: 12, color: Colors.grey),
-  //               ),
-  //             ],
-  //           ),
-  //         ),
-  //         Column(
-  //           crossAxisAlignment: CrossAxisAlignment.end,
-  //           children: [
-  //             Text(
-  //               amount,
-  //               style: const TextStyle(
-  //                 color: Colors.green,
-  //                 fontWeight: FontWeight.bold,
-  //               ),
-  //             ),
-  //             const Text(
-  //               "LKR",
-  //               style: TextStyle(fontSize: 11, color: Colors.grey),
-  //             ),
-  //           ],
-  //         ),
-  //       ],
-  //     ),
-  //   );
-  // }
+  Widget _recentItem(
+    Map<String, dynamic> col,
+    String title,
+    String time,
+    String amount,
+  ) {
+    return InkWell(
+      onTap: () {
+        final timeStr = col['collection_date'].toString();
+        DateTime collectionTime = DateTime.tryParse(timeStr) ?? DateTime.now();
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ReceiptPreviewPage(
+              receiptId: col['receipt_id'] ?? "",
+              fileNumber: col['file_number'] ?? "",
+              premiumAmount: (col['premium_amount'] as num?)?.toDouble() ?? 0.0,
+              paidAmount: (col['paid_amount'] as num?)?.toDouble() ?? 0.0,
+              dueAmount: (col['due_amount'] as num?)?.toDouble() ?? 0.0,
+              collectedBy: col['collected_by'] ?? "Unknown",
+              collectionDate: collectionTime,
+              isViewOnly: true,
+            ),
+          ),
+        );
+      },
+      borderRadius: BorderRadius.circular(kBorderRadiusMedium),
+      child: Container(
+        margin: const EdgeInsets.only(bottom: kSmallSpacing),
+        padding: const EdgeInsets.all(kIconPadding),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(kBorderRadiusMedium),
+        ),
+        child: Row(
+          children: [
+            const Icon(Icons.person, color: Colors.grey),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: const TextStyle(fontWeight: FontWeight.w600),
+                  ),
+                  Text(
+                    time,
+                    style: const TextStyle(fontSize: 12, color: Colors.grey),
+                  ),
+                ],
+              ),
+            ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Text(
+                  amount,
+                  style: const TextStyle(
+                    color: Colors.green,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const Text(
+                  "LKR",
+                  style: TextStyle(fontSize: 11, color: Colors.grey),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }

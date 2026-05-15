@@ -25,12 +25,28 @@ dependencies:
   internet_connection_checker: ^1.0.0+1
   sqflite_sqlcipher: ^3.4.0
   path: ^1.9.0
+  local_auth: ^3.0.1
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
 
   flutter_lints: ^6.0.0
+  flutter_launcher_icons: ^0.14.3
+  flutter_native_splash: ^2.4.1
+
+flutter_native_splash:
+  color: "#ffffff"
+  image: "assets/logo_2.png"
+  android_13:
+    image: "assets/logo_2.png"
+    icon_background_color: "#ffffff"
+    color: "#ffffff"
+
+flutter_launcher_icons:
+  android: true
+  ios: false
+  image_path: "assets/logo_2.png"
 
 flutter:
   uses-material-design: true

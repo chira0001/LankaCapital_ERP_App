@@ -1,4 +1,5 @@
 import 'package:nkrs_app/data/services/database_initializer_service.dart';
+import 'package:flutter/foundation.dart';
 import 'package:path/path.dart';
 import 'package:sqflite_sqlcipher/sqflite.dart';
 
@@ -21,7 +22,7 @@ class DatabaseService {
       "SELECT name FROM sqlite_master WHERE type='table'",
     );
     for (var table in tables!) {
-      print("Table: ${table['name']}");
+      debugPrint("Table: ${table['name']}");
     }
   }
 
@@ -33,9 +34,9 @@ class DatabaseService {
       await db?.execute('DROP TABLE IF EXISTS employees');
       await db?.execute('DROP TABLE IF EXISTS customers');
 
-      print("Tables dropped successfully.");
+      debugPrint("Tables dropped successfully.");
     } catch (e) {
-      print("Error dropping tables: $e");
+      debugPrint("Error dropping tables: $e");
     } finally {
       // Re-enable foreign keys
       await db?.execute('PRAGMA foreign_keys = ON');
@@ -46,7 +47,7 @@ class DatabaseService {
     final dbPath = await getDatabasesPath();
     final path = join(dbPath, _databaseService.filePath);
     await deleteDatabase(path);
-    print("Database deleted");
+    debugPrint("Database deleted");
   }
 
   Future close() async {
@@ -78,9 +79,9 @@ class DatabaseService {
         conflictAlgorithm: ConflictAlgorithm.replace,
       );
 
-      print('Customer $name inserted successfully.');
+      debugPrint('Customer $name inserted successfully.');
     } catch (e) {
-      print('Error inserting customer: $e');
+      debugPrint('Error inserting customer: $e');
       rethrow;
     }
   }
@@ -89,19 +90,19 @@ class DatabaseService {
     try {
       final db = await _databaseService.database;
       final List<Map<String, dynamic>> maps = await db!.query('customers');
-      print(maps);
+      debugPrint(maps.toString());
       for (var data in maps) {
-        print('-----------------------------------');
-        print('  NIC:          ${data['nic']}');
-        print('  Name:         ${data['name']}');
-        print('  Email:        ${data['email']}');
-        print('  Address:      ${data['address']}');
-        print('  Phone Number: ${data['phone_number']}');
-        print('-----------------------------------');
+        debugPrint('-----------------------------------');
+        debugPrint('  NIC:          ${data['nic']}');
+        debugPrint('  Name:         ${data['name']}');
+        debugPrint('  Email:        ${data['email']}');
+        debugPrint('  Address:      ${data['address']}');
+        debugPrint('  Phone Number: ${data['phone_number']}');
+        debugPrint('-----------------------------------');
       }
       // return maps;
     } catch (e) {
-      print('Error retrieving customers: $e');
+      debugPrint('Error retrieving customers: $e');
       // return [];
     }
   }
@@ -115,13 +116,13 @@ class DatabaseService {
         whereArgs: [nic],
       );
       if (rowsDeleted > 0) {
-        print('Successfully deleted customer with NIC: $nic');
+        debugPrint('Successfully deleted customer with NIC: $nic');
       } else {
-        print('No customer found with NIC: $nic');
+        debugPrint('No customer found with NIC: $nic');
       }
       // return rowsDeleted;
     } catch (e) {
-      print('Error deleting customer: $e');
+      debugPrint('Error deleting customer: $e');
       // return 0;
     }
   }
@@ -130,10 +131,10 @@ class DatabaseService {
     try {
       final db = await _databaseService.database;
       final rowsDeleted = await db!.delete(tableName);
-      // print('Successfully cleared table. Deleted $rowsDeleted customers.');
+      // debugPrint('Successfully cleared table. Deleted $rowsDeleted customers.');
       return rowsDeleted;
     } catch (e) {
-      // print('Error clearing customers table: $e');
+      // debugPrint('Error clearing customers table: $e');
       return 0;
     }
   }
@@ -145,7 +146,7 @@ class DatabaseService {
       where: 'nic = ?',
       whereArgs: [nic],
     );
-    print(customerResult);
+    debugPrint(customerResult.toString());
     if (customerResult.isEmpty) {
       return null;
     }else{
@@ -160,5 +161,54 @@ class DatabaseService {
     );
 
     return {'customer': customerResult.first, 'loans': loansResult};
+  }
+
+  Future<void> insertCollection({
+    required String receiptId,
+    required String fileNumber,
+    required double premiumAmount,
+    required double paidAmount,
+    required double dueAmount,
+    required String collectedBy,
+  }) async {
+    try {
+      final db = await _databaseService.database;
+      final Map<String, dynamic> collectionData = {
+        'receipt_id': receiptId,
+        'file_number': fileNumber,
+        'premium_amount': premiumAmount,
+        'paid_amount': paidAmount,
+        'due_amount': dueAmount,
+        'collected_by': collectedBy,
+        'collection_date': DateTime.now().toIso8601String(),
+      };
+
+      await db?.insert(
+        'collections',
+        collectionData,
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
+      debugPrint('Collection $receiptId inserted successfully.');
+    } catch (e) {
+      debugPrint('Error inserting collection: $e');
+      rethrow;
+    }
+  }
+
+  Future<List<Map<String, dynamic>>> getTodayCollections() async {
+    try {
+      final db = await _databaseService.database;
+      final today = DateTime.now().toIso8601String().split('T')[0];
+      final List<Map<String, dynamic>> maps = await db!.query(
+        'collections',
+        where: 'collection_date LIKE ?',
+        whereArgs: ['$today%'],
+        orderBy: 'collection_date DESC',
+      );
+      return maps;
+    } catch (e) {
+      debugPrint('Error retrieving today\'s collections: $e');
+      return [];
+    }
   }
 }

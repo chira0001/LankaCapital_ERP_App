@@ -39,8 +39,6 @@ class _ExistingCustomerLoanState extends State<ExistingCustomerLoan> {
 
   @override
   Widget build(BuildContext context) {
-    late int? customerID;
-
     return Scaffold(
       appBar: AppBar(
         backgroundColor: appBarC,
@@ -223,9 +221,6 @@ class _ExistingCustomerLoanState extends State<ExistingCustomerLoan> {
                                   } else {
                                     return null;
                                   }
-                                },
-                                onSaved: (newValue) {
-                                  customerID = int.tryParse(nicNumber.text);
                                 },
                               ),
                             ),

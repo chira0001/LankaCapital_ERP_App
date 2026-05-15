@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:flutter/foundation.dart';
 import 'package:nkrs_app/models/user_model.dart';
 
 class UserService {
@@ -19,7 +20,7 @@ class UserService {
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         final Map<String, dynamic> responseData = json.decode(response.body);
-        print("fetch the user");
+        debugPrint("fetch the user");
 
         return User.fromJson(responseData);
       } else if (response.statusCode == 401) {
@@ -28,7 +29,7 @@ class UserService {
         throw Exception('Server error: ${response.statusCode}');
       }
     } catch (e) {
-      print("Failt to get a user data $e");
+      debugPrint("Failt to get a user data $e");
       throw Exception('Request failed: $e');
     }
   }

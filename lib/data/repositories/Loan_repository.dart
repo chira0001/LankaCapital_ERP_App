@@ -1,8 +1,9 @@
-import 'package:nkrs_app/data/services/loan_service.dart';
+
 import 'package:nkrs_app/models/loan_model.dart';
+import 'package:flutter/foundation.dart';
 
 class LoanRepository {
-  final LoanService _service = LoanService();
+  // Removed unused _service
   late List<Loan> _loans;
 
   List<Loan> get loans => _loans;
@@ -11,7 +12,7 @@ class LoanRepository {
     try {
       // _loans = await _service.fetchAllLoans("faf");
     } catch (e) {
-      print("Failed to load loans.");
+      debugPrint("Failed to load loans.");
     }
   }
 }
