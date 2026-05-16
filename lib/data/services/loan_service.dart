@@ -46,7 +46,7 @@ class LoanService {
 
   Future<(User, List<Loan>)> fetchUserAndLoans(int nic) async {
     final Uri url = Uri.parse(
-      'http://10.230.135.234:8080/api/v1/recep/customers/loans/$nic',
+      'http://192.168.43.90:8080/api/v1/recep/customers/loans/$nic',
     );
 
     try {
@@ -76,7 +76,7 @@ class LoanService {
 
   Future<bool> addLoan(AddLoanModel loan) async {
     final Uri url = Uri.parse(
-      'http://10.230.135.234/api/v1/field/customers/loans',
+      'http://192.168.43.90/api/v1/field/customers/loans',
     );
 
     try {
