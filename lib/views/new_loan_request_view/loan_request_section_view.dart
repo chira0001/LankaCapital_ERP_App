@@ -128,7 +128,7 @@ class _LoanRequestSectionState extends State<LoanRequestSection> {
                     "New Loan Request",
                     style: TextStyle(
                       fontWeight: FontWeight(HeaderFW),
-                      fontSize: headerFontSize,
+                      fontSize: headerFontSize - 1,
                       color: headerTextC,
                     ),
                   ),

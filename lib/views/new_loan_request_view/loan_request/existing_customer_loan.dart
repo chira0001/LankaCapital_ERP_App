@@ -8,6 +8,8 @@ import 'package:nkrs_app/models/user_model.dart';
 import 'package:nkrs_app/utility/constanst.dart';
 import 'package:nkrs_app/views/new_loan_request_view/loan_request/existing_customer_loan_details.dart';
 import 'package:nkrs_app/views/new_loan_request_view/loan_request/existing_customer_loan_request.dart';
+import 'package:nkrs_app/views/new_loan_request_view/utility/custom_row.dart';
+import 'package:nkrs_app/views/new_loan_request_view/utility/custom_text_field.dart';
 import 'package:nkrs_app/views/new_loan_request_view/utility/main_card.dart';
 import 'package:nkrs_app/views/new_loan_request_view/utility/popup_box_message.dart';
 
@@ -63,34 +65,47 @@ class _ExistingCustomerLoanState extends State<ExistingCustomerLoan> {
         ),
         actions: [
           Padding(
-            padding: const EdgeInsets.only(right: 10),
+            padding: const EdgeInsets.only(right: 15),
             child: ValueListenableBuilder<bool>(
               valueListenable: CheckConnection.isOnline,
               builder: (context, online, child) {
-                return IconButton(
-                  onPressed: () {
+                return GestureDetector(
+                  onTap: () {
                     CheckConnection.initialize();
+
                     showTopNotification(
                       context,
                       online ? "Device is Online" : "Device is Offline",
                     );
                   },
-                  icon: Icon(
-                    online ? Icons.wifi_rounded : Icons.wifi_off_rounded,
-                    color: online
-                        ? const Color.fromARGB(
-                            255,
-                            9,
-                            172,
-                            58,
-                          ) // Green when online
-                        : const Color.fromARGB(
-                            255,
-                            172,
-                            9,
-                            9,
-                          ), // Red when offline
-                    size: 28,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 5,
+                    ),
+                    decoration: BoxDecoration(
+                      color: online
+                          ? const Color.fromARGB(40, 9, 172, 58)
+                          : const Color.fromARGB(40, 172, 9, 9),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: online
+                            ? const Color.fromARGB(255, 9, 172, 58)
+                            : const Color.fromARGB(255, 172, 9, 9),
+                        width: 0.5,
+                      ),
+                    ),
+                    child: Text(
+                      online ? "ONLINE" : "OFFLINE",
+                      style: TextStyle(
+                        color: online
+                            ? const Color.fromARGB(255, 9, 172, 58)
+                            : const Color.fromARGB(255, 172, 9, 9),
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 1,
+                        fontSize: 10,
+                      ),
+                    ),
                   ),
                 );
               },
@@ -100,12 +115,12 @@ class _ExistingCustomerLoanState extends State<ExistingCustomerLoan> {
       ),
       backgroundColor: safeAreaC,
       body: SafeArea(
-        child: Padding(
-          padding: EdgeInsetsGeometry.symmetric(
-            horizontal: safeAreaHorizontalPD,
-            vertical: safeAreaVerticalPD,
-          ),
-          child: SingleChildScrollView(
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: EdgeInsetsGeometry.symmetric(
+              horizontal: safeAreaHorizontalPD,
+              vertical: safeAreaVerticalPD,
+            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -142,11 +157,11 @@ class _ExistingCustomerLoanState extends State<ExistingCustomerLoan> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "Search for Customer",
+                        "Search for Customer".toUpperCase(),
                         style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight(800),
-                          color: const Color.fromARGB(156, 26, 26, 26),
+                          fontSize: 12.5,
+                          fontWeight: FontWeight(500),
+                          color: const Color.fromARGB(138, 26, 26, 26),
                         ),
                       ),
                       SizedBox(height: 10),
@@ -158,62 +173,11 @@ class _ExistingCustomerLoanState extends State<ExistingCustomerLoan> {
                           children: [
                             SizedBox(
                               width: 240,
-                              height: 100,
-                              child: TextFormField(
-                                controller: nicNumber,
-                                keyboardType: TextInputType.number,
-                                autocorrect: false,
-                                cursorColor: const Color.fromARGB(
-                                  255,
-                                  0,
-                                  55,
-                                  255,
-                                ),
-                                decoration: InputDecoration(
-                                  floatingLabelStyle: TextStyle(fontSize: 1),
-                                  errorMaxLines: 2,
-                                  contentPadding: const EdgeInsets.symmetric(
-                                    vertical: 0,
-                                    horizontal: 12,
-                                  ),
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.all(
-                                      Radius.circular(btnBorderRadius),
-                                    ),
-                                  ),
-                                  enabledBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.all(
-                                      Radius.circular(btnBorderRadius),
-                                    ),
-                                    borderSide: BorderSide(
-                                      color: Color.fromARGB(58, 23, 23, 23),
-                                      width: 1.5,
-                                    ),
-                                  ),
-                                  errorBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.all(
-                                      Radius.circular(btnBorderRadius),
-                                    ),
-                                    borderSide: BorderSide(
-                                      color: Color.fromARGB(89, 181, 0, 0),
-                                      width: 2,
-                                    ),
-                                  ),
-                                  errorStyle: TextStyle(
-                                    color: Color.fromARGB(255, 233, 1, 1),
-                                    fontSize: 15,
-                                    fontWeight: FontWeight(700),
-                                  ),
-                                  fillColor: safeAreaC,
-                                  filled: true,
-                                  labelText: "Enter Customer ID",
-                                  labelStyle: TextStyle(
-                                    color: Color.fromARGB(105, 21, 21, 21),
-                                    fontSize: 17,
-                                    fontWeight: FontWeight(500),
-                                  ),
-                                ),
-                                validator: (value) {
+                              child: CustomTextField(
+                                controllerNames: nicNumber,
+                                labelText_: "Enter Customer ID",
+                                type: TextInputType.number,
+                                validatorCallback: (value) {
                                   if (value == null || value.trim().isEmpty) {
                                     return "Please fill this field";
                                   } else if (value.isEmpty) {
@@ -278,19 +242,30 @@ class _ExistingCustomerLoanState extends State<ExistingCustomerLoan> {
                                 }
                               },
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: btnC,
+                                // ignore: deprecated_member_use
+                                backgroundColor: const Color.fromARGB(
+                                  96,
+                                  0,
+                                  102,
+                                  255,
+                                ),
                                 padding: const EdgeInsets.symmetric(
                                   horizontal: 20,
-                                  vertical: 12,
+                                  vertical: 14,
                                 ),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(
                                     btnBorderRadius,
                                   ),
+                                  side: BorderSide(
+                                    width: 2,
+                                    // ignore: deprecated_member_use
+                                    color: btnC.withOpacity(0.3),
+                                  ),
                                 ),
                               ),
                               child: loanData.isLoading
-                                  ? const SizedBox(
+                                  ? SizedBox(
                                       height: 20,
                                       width: 20,
                                       child: CircularProgressIndicator(
@@ -351,10 +326,9 @@ class _ExistingCustomerLoanState extends State<ExistingCustomerLoan> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Text(_user!.name),
-                _buildDetailRow("Full Name", _user!.name),
-                _buildDetailRow("Address", _user!.address),
-                // _buildDetailRow("Email", "_user.email"),
-                _buildDetailRow("Phone Number", _user!.phoneNumber),
+                CustomRow(label: "Full Name", value: _user!.name),
+                CustomRow(label: "Address", value: _user!.address),
+                CustomRow(label: "Phone Number", value: _user!.phoneNumber),
                 GestureDetector(
                   onTap: () {
                     // Navigate to new loan request page
@@ -545,103 +519,70 @@ class _ExistingCustomerLoanState extends State<ExistingCustomerLoan> {
     }
   }
 
-  void showCustomMessageBox(
-    BuildContext context,
-    String message, {
-    bool isError = false,
-  }) {
-    // 1. Clear any existing snackbars instantly
-    ScaffoldMessenger.of(context).clearSnackBars();
+  // void showCustomMessageBox(
+  //   BuildContext context,
+  //   String message, {
+  //   bool isError = false,
+  // }) {
+  //   // 1. Clear any existing snackbars instantly
+  //   ScaffoldMessenger.of(context).clearSnackBars();
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        behavior: SnackBarBehavior.floating, // Floats above bottom navigation
-        backgroundColor: Colors.white,
-        elevation: 6,
+  //   ScaffoldMessenger.of(context).showSnackBar(
+  //     SnackBar(
+  //       behavior: SnackBarBehavior.floating, // Floats above bottom navigation
+  //       backgroundColor: Colors.white,
+  //       elevation: 6,
 
-        // 2. Set the automatic close time to 10 seconds
-        duration: const Duration(seconds: 10),
+  //       // 2. Set the automatic close time to 10 seconds
+  //       duration: const Duration(seconds: 10),
 
-        // 3. Custom Physics/Animation Settings
-        dismissDirection:
-            DismissDirection.horizontal, // Allows swiping away to close
+  //       // 3. Custom Physics/Animation Settings
+  //       dismissDirection:
+  //           DismissDirection.horizontal, // Allows swiping away to close
 
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-          side: BorderSide(
-            color: isError
-                ? Colors.black
-                : Colors.black12, // Bold border for errors
-            width: isError ? 2.0 : 1.0,
-          ),
-        ),
-        content: Row(
-          children: [
-            // Animated Icon swap based on state
-            AnimatedSwitcher(
-              duration: const Duration(milliseconds: 300),
-              child: Icon(
-                isError ? Icons.error_outline : Icons.check_circle_outline,
-                key: ValueKey<bool>(isError),
-                color: Colors.black,
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Text(
-                message,
-                style: const TextStyle(
-                  color: Colors.black,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-          ],
-        ),
-        action: SnackBarAction(
-          label: "DISMISS",
-          textColor: Colors.black87,
-          onPressed: () {
-            ScaffoldMessenger.of(context).hideCurrentSnackBar();
-          },
-        ),
-      ),
-    );
-  }
-
-  Widget _buildDetailRow(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4.0),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        mainAxisSize: MainAxisSize.max,
-        children: [
-          Text(
-            label.toUpperCase(),
-            style: const TextStyle(
-              color: Colors.grey,
-              fontSize: 12,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Text(
-              value,
-              textAlign: TextAlign.end,
-              style: const TextStyle(
-                color: Color(0xFF1A3D81),
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+  //       shape: RoundedRectangleBorder(
+  //         borderRadius: BorderRadius.circular(8),
+  //         side: BorderSide(
+  //           color: isError
+  //               ? Colors.black
+  //               : Colors.black12, // Bold border for errors
+  //           width: isError ? 2.0 : 1.0,
+  //         ),
+  //       ),
+  //       content: Row(
+  //         children: [
+  //           // Animated Icon swap based on state
+  //           AnimatedSwitcher(
+  //             duration: const Duration(milliseconds: 300),
+  //             child: Icon(
+  //               isError ? Icons.error_outline : Icons.check_circle_outline,
+  //               key: ValueKey<bool>(isError),
+  //               color: Colors.black,
+  //             ),
+  //           ),
+  //           const SizedBox(width: 12),
+  //           Expanded(
+  //             child: Text(
+  //               message,
+  //               style: const TextStyle(
+  //                 color: Colors.black,
+  //                 fontSize: 14,
+  //                 fontWeight: FontWeight.w600,
+  //               ),
+  //             ),
+  //           ),
+  //         ],
+  //       ),
+  //       action: SnackBarAction(
+  //         label: "DISMISS",
+  //         textColor: Colors.black87,
+  //         onPressed: () {
+  //           ScaffoldMessenger.of(context).hideCurrentSnackBar();
+  //         },
+  //       ),
+  //     ),
+  //   );
+  // }
 
   void database() async {
     // await DatabaseService().insertCustomer(

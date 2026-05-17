@@ -23,11 +23,21 @@ class CustomTextField extends StatelessWidget {
       controller: controllerNames,
       keyboardType: type,
       autocorrect: false,
-      cursorColor: const Color.fromARGB(255, 0, 55, 255),
+      cursorColor: btnC,
       decoration: InputDecoration(
         floatingLabelStyle: TextStyle(fontSize: 1),
         errorMaxLines: 2,
-        contentPadding: const EdgeInsets.symmetric(vertical: 0, horizontal: 12),
+        contentPadding: const EdgeInsets.symmetric(
+          vertical: 14,
+          horizontal: 12,
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.all(Radius.circular(btnBorderRadius)),
+          borderSide: BorderSide(
+            color: Color.fromARGB(255, 220, 220, 220),
+            width: 1.5,
+          ),
+        ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.all(Radius.circular(btnBorderRadius)),
         ),
@@ -35,14 +45,14 @@ class CustomTextField extends StatelessWidget {
           borderRadius: BorderRadius.all(Radius.circular(btnBorderRadius)),
           borderSide: BorderSide(
             color: Color.fromARGB(58, 23, 23, 23),
-            width: 1.5,
+            width: 0,
           ),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.all(Radius.circular(btnBorderRadius)),
           borderSide: BorderSide(
             color: Color.fromARGB(89, 181, 0, 0),
-            width: 2,
+            width: 1,
           ),
         ),
         errorStyle: TextStyle(
@@ -56,7 +66,7 @@ class CustomTextField extends StatelessWidget {
         labelStyle: TextStyle(
           color: Color.fromARGB(105, 21, 21, 21),
           fontSize: 17,
-          fontWeight: FontWeight(500),
+          fontWeight: FontWeight(400),
         ),
       ),
       validator: validatorCallback,
@@ -64,3 +74,35 @@ class CustomTextField extends StatelessWidget {
     );
   }
 }
+
+// Expanded(
+//                   child: TextField(
+//                     controller: nicNumber,
+//                     decoration: InputDecoration(
+//                       hintText: "Enter Loan #0000",
+//                       filled: true,
+//                       fillColor: const Color(0xFFF1F3F6),
+//                       border: OutlineInputBorder(
+//                         borderRadius: BorderRadius.circular(
+//                           kBorderRadiusMedium,
+//                         ),
+//                         borderSide: BorderSide.none,
+//                       ),
+//                     ),
+//                   ),
+//                 ),
+
+
+// child: Container(
+//                             padding: const EdgeInsets.all(kIconPadding),
+//                             decoration: BoxDecoration(
+//                               color: Colors.blue.shade50,
+//                               borderRadius: BorderRadius.circular(
+//                                 kBorderRadiusMedium,
+//                               ),
+//                             ),
+//                             child: const Text(
+//                               "FIND",
+//                               style: TextStyle(color: Colors.blue),
+//                             ),
+//                           ),

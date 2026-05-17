@@ -3,6 +3,8 @@ import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:nkrs_app/utility/constanst.dart';
 import 'package:nkrs_app/views/new_loan_request_view/loan_request_section_view.dart';
 import 'package:nkrs_app/views/new_loan_request_view/new_loan_request/new_client_loan_request_status.dart';
+import 'package:nkrs_app/views/new_loan_request_view/utility/custom_row.dart';
+import 'package:nkrs_app/views/new_loan_request_view/utility/custom_text_field.dart';
 import 'package:nkrs_app/views/new_loan_request_view/utility/main_card.dart';
 import 'package:nkrs_app/views/new_loan_request_view/utility/navigator_back.dart';
 
@@ -30,8 +32,8 @@ class _NewClientLoanRequestState extends State<NewClientLoanRequest> {
   final TextEditingController installment = TextEditingController();
   // for step 2
   int _currentStep = 0;
-  final double _customSize_1 = 10;
-  final double _customSize_2 = 20;
+  final double _customSize_1 = 4;
+  final double _customSize_2 = 25;
   bool isCompeleted = false;
 
   List<Step> get getSt => [
@@ -68,41 +70,48 @@ class _NewClientLoanRequestState extends State<NewClientLoanRequest> {
             SizedBox(height: 30),
             customText("Full Name"),
             SizedBox(height: _customSize_1),
-            _customBuild(name, "John Doe", TextInputType.text, (value) {
-              if (value == null || value.isEmpty) {
-                return "Please enter your name";
-              } else if (!RegExp(r'^[a-zA-Z\s]+$').hasMatch(value)) {
-                return "Name cannot contain only numbers or special characters";
-              } else {
-                return null;
-              }
-            }),
+            CustomTextField(
+              controllerNames: name,
+              labelText_: "John Doe",
+              validatorCallback: (value) {
+                if (value == null || value.isEmpty) {
+                  return "Please enter your name";
+                } else if (!RegExp(r'^[a-zA-Z\s]+$').hasMatch(value)) {
+                  return "Name cannot contain only numbers or special characters";
+                } else {
+                  return null;
+                }
+              },
+              type: TextInputType.text,
+            ),
             SizedBox(height: _customSize_2),
             customText("Address"),
             SizedBox(height: _customSize_1),
-            _customBuild(address, "No: 123, Street Name", TextInputType.text, (
-              value,
-            ) {
-              return null;
-            
-              // if (value == null || value.isEmpty) {
-              //   return "Please enter your address";
-              // } else if (value.length < 5) {
-              //   return "Please enter a valid address";
-              // } else {
-              //   return null;
-              // }
-            }),
+            CustomTextField(
+              controllerNames: address,
+              labelText_: "No: 123, Street Name",
+              type: TextInputType.text,
+              validatorCallback: (value) {
+                return null;
+
+                // if (value == null || value.isEmpty) {
+                //   return "Please enter your address";
+                // } else if (value.length < 5) {
+                //   return "Please enter a valid address";
+                // } else {
+                //   return null;
+                // }
+              },
+            ),
             SizedBox(height: _customSize_2),
             customText("E-mail"),
             SizedBox(height: _customSize_1),
-            _customBuild(
-              email,
-              "Example@email.com",
-              TextInputType.emailAddress,
-              (value) {
+            CustomTextField(
+              controllerNames: email,
+              labelText_: "Example@email.com",
+              type: TextInputType.emailAddress,
+              validatorCallback: (value) {
                 return null;
-              
                 // if (value == null || value.isEmpty) {
                 //   return "Please enter your email";
                 // } else if (!RegExp(
@@ -117,33 +126,41 @@ class _NewClientLoanRequestState extends State<NewClientLoanRequest> {
             SizedBox(height: _customSize_2),
             customText("NIC Number"),
             SizedBox(height: _customSize_1),
-            _customBuild(nic, "Enter NIC Number", TextInputType.text, (value) {
-              return null;
-            
-              // if (value == null || value.isEmpty) {
-              //   return "Please enter your NIC number";
-              // } else if (value.length < 8 && value.length > 15) {
-              //   return "Please enter a valid NIC number";
-              // } else {
-              //   return null;
-              // }
-            }),
+            CustomTextField(
+              controllerNames: nic,
+              labelText_: "Enter NIC Number",
+              type: TextInputType.number,
+              validatorCallback: (value) {
+                return null;
+
+                // if (value == null || value.isEmpty) {
+                //   return "Please enter your NIC number";
+                // } else if (value.length < 8 && value.length > 15) {
+                //   return "Please enter a valid NIC number";
+                // } else {
+                //   return null;
+                // }
+              },
+            ),
             SizedBox(height: _customSize_2),
             customText("Phone Number"),
             SizedBox(height: _customSize_1),
-            _customBuild(phoneNumber, "0712345678", TextInputType.phone, (
-              value,
-            ) {
-              return null;
-            
-              // if (value == null || value.isEmpty) {
-              //   return "Please enter your phone number";
-              // } else if (value.length != 10 || !value.startsWith('07')) {
-              //   return "Please enter a valid phone number";
-              // } else {
-              //   return null;
-              // }
-            }),
+            CustomTextField(
+              controllerNames: phoneNumber,
+              labelText_: "0712345678",
+              type: TextInputType.phone,
+              validatorCallback: (value) {
+                return null;
+
+                // if (value == null || value.isEmpty) {
+                //   return "Please enter your phone number";
+                // } else if (value.length != 10 || !value.startsWith('07')) {
+                //   return "Please enter a valid phone number";
+                // } else {
+                //   return null;
+                // }
+              },
+            ),
           ],
         ),
       ),
@@ -187,7 +204,7 @@ class _NewClientLoanRequestState extends State<NewClientLoanRequest> {
                   value,
                 ) {
                   return null;
-                
+
                   // if (value == null || value.isEmpty) {
                   //   return "Please enter the loan amount";
                   // } else if (value as double == 0) {
@@ -203,7 +220,7 @@ class _NewClientLoanRequestState extends State<NewClientLoanRequest> {
                   value,
                 ) {
                   return null;
-                
+
                   // if (value == null || value.isEmpty) {
                   //   return "Please enter the interest rate";
                   // } else if (value as int < 0) {
@@ -228,7 +245,7 @@ class _NewClientLoanRequestState extends State<NewClientLoanRequest> {
                         TextInputType.number,
                         (value) {
                           return null;
-                        
+
                           // if (value == null || value.isEmpty) {
                           //   return "Please enter the number of installments";
                           // } else if (value as int < 0) {
@@ -355,17 +372,22 @@ class _NewClientLoanRequestState extends State<NewClientLoanRequest> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildDetailRow("Full Name", name.text),
+                  CustomRow(label: "Full Name", value: name.text),
                   Row(
                     children: [
-                      Expanded(child: _buildDetailRow("NIC Number", nic.text)),
                       Expanded(
-                        child: _buildDetailRow("Phone", phoneNumber.text),
+                        child: CustomRow(label: "NIC Number", value: nic.text),
+                      ),
+                      Expanded(
+                        child: CustomRow(
+                          label: "Phone",
+                          value: phoneNumber.text,
+                        ),
                       ),
                     ],
                   ),
-                  _buildDetailRow("Email", email.text),
-                  _buildDetailRow("Permanent Address", address.text),
+                  CustomRow(label: "Email", value: email.text),
+                  CustomRow(label: "Permanent Address", value: address.text),
                 ],
               ),
             ),
@@ -499,7 +521,7 @@ class _NewClientLoanRequestState extends State<NewClientLoanRequest> {
                       ),
                       onPressed: details.onStepContinue,
                       child: Text(
-                        _currentStep == getSt.length - 1 ? "Finish" : "Next",
+                        _currentStep == getSt.length - 1 ? "Submit" : "Next",
                         style: TextStyle(
                           color: appBarC,
                           fontSize: btnFontSize,
@@ -600,11 +622,11 @@ class _NewClientLoanRequestState extends State<NewClientLoanRequest> {
 
   Text customText(String lable_) {
     return Text(
-      lable_,
+      lable_.toUpperCase(),
       style: TextStyle(
-        fontSize: 16,
-        fontWeight: FontWeight(800),
-        color: const Color.fromARGB(156, 26, 26, 26),
+        fontSize: 12.5,
+        fontWeight: FontWeight.bold,
+        color: const Color.fromARGB(138, 26, 26, 26),
       ),
     );
   }
@@ -646,33 +668,6 @@ class _NewClientLoanRequestState extends State<NewClientLoanRequest> {
               color: Color(0xFF1A3D81),
               fontSize: isBold ? 18 : 16,
               fontWeight: isBold ? FontWeight.bold : FontWeight.w600,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildDetailRow(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            label.toUpperCase(),
-            style: TextStyle(
-              color: Colors.grey,
-              fontSize: 12,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          Text(
-            value,
-            style: TextStyle(
-              color: Color(0xFF1A3D81),
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
             ),
           ),
         ],

@@ -23,6 +23,7 @@ class LoanViewModel extends ChangeNotifier {
       final (user, loans) = await service.fetchUserAndLoans(nic);
       _user = user;
       _loans = loans;
+      _isLoading = false;
     } catch (e) {
       _user = null;
       _loans = [];
