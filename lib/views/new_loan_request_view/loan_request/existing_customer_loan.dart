@@ -23,6 +23,7 @@ class ExistingCustomerLoan extends StatefulWidget {
 class _ExistingCustomerLoanState extends State<ExistingCustomerLoan> {
   bool showDetails = false;
   late bool online;
+  late bool isLoading = false;
 
   LoanViewModel loanData = LoanViewModel();
   TextEditingController nicNumber = TextEditingController();
@@ -201,6 +202,9 @@ class _ExistingCustomerLoanState extends State<ExistingCustomerLoan> {
                                     );
                                     return;
                                   }
+                                  setState(() {
+                                    isLoading = true;
+                                  });
                                   if (CheckConnection.isOnline.value) {
                                     await loanData.searchByNic(customerId);
                                     setState(() {
@@ -230,6 +234,9 @@ class _ExistingCustomerLoanState extends State<ExistingCustomerLoan> {
                                       }
                                     });
                                   }
+                                  setState(() {
+                                    isLoading = false;
+                                  });
                                 } else {
                                   showTopNotification(
                                     context,
@@ -238,8 +245,10 @@ class _ExistingCustomerLoanState extends State<ExistingCustomerLoan> {
                                   setState(() {
                                     showDetails = false;
                                   });
-                                  return;
                                 }
+                                setState(() {
+                                  isLoading = false;
+                                });
                               },
                               style: ElevatedButton.styleFrom(
                                 // ignore: deprecated_member_use
@@ -264,13 +273,18 @@ class _ExistingCustomerLoanState extends State<ExistingCustomerLoan> {
                                   ),
                                 ),
                               ),
-                              child: loanData.isLoading
-                                  ? SizedBox(
-                                      height: 20,
-                                      width: 20,
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2,
-                                        color: Colors.white,
+                              child: isLoading
+                                  ? Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 11,
+                                      ),
+                                      child: SizedBox(
+                                        height: 22,
+                                        width: 21,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                          color: Colors.white,
+                                        ),
                                       ),
                                     )
                                   : Text(

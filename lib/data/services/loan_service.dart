@@ -50,7 +50,7 @@ class LoanService {
     );
 
     try {
-      final response = await http.get(url);
+      final response = await http.get(url).timeout(const Duration(seconds: 10));
       if (response.statusCode == 200) {
         _message = '';
         final Map<String, dynamic> data = json.decode(response.body);
