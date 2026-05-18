@@ -12,6 +12,7 @@ import 'package:nkrs_app/views/new_loan_request_view/utility/custom_row.dart';
 import 'package:nkrs_app/views/new_loan_request_view/utility/custom_text_field.dart';
 import 'package:nkrs_app/views/new_loan_request_view/utility/main_card.dart';
 import 'package:nkrs_app/views/new_loan_request_view/utility/popup_box_message.dart';
+import 'package:nkrs_app/views/new_loan_request_view/utility/popup_box_message_.dart';
 
 class ExistingCustomerLoan extends StatefulWidget {
   const ExistingCustomerLoan({super.key});
@@ -28,7 +29,6 @@ class _ExistingCustomerLoanState extends State<ExistingCustomerLoan> {
   LoanViewModel loanData = LoanViewModel();
   TextEditingController nicNumber = TextEditingController();
   final _formKey = GlobalKey<FormState>();
-  String message = '';
   User? _user;
 
   @override
@@ -205,50 +205,47 @@ class _ExistingCustomerLoanState extends State<ExistingCustomerLoan> {
                                   setState(() {
                                     isLoading = true;
                                   });
-                                  if (CheckConnection.isOnline.value) {
-                                    await loanData.searchByNic(customerId);
+                                  try {
+                                    if (CheckConnection.isOnline.value) {
+                                      await loanData.searchByNic(customerId);
+                                    } else {
+                                      await loanData.searchByNicOffline(
+                                        customerId,
+                                      );
+                                    }
                                     setState(() {
                                       _user = loanData.user;
                                       if (_user != null) {
                                         showDetails = true;
-                                        message = "";
                                       } else {
                                         showDetails = false;
-                                        message =
-                                            "No matching user was found $customerId";
+                                        showCustomTopMessageBox(
+                                          isError: true,
+                                          context,
+                                          "No customer record found for NIC: $customerId",
+                                        );
                                       }
                                     });
-                                  } else {
-                                    await loanData.searchByNicOffline(
-                                      customerId,
-                                    );
+                                  } catch (e) {
                                     setState(() {
-                                      _user = loanData.user;
-                                      if (_user != null) {
-                                        showDetails = true;
-                                        message = "";
-                                      } else {
-                                        showDetails = false;
-                                        message =
-                                            "No matching user was found $customerId";
-                                      }
+                                      showDetails = false;
+                                    });
+                                    showTopNotification(
+                                      // ignore: use_build_context_synchronously
+                                      context,
+                                      "Something went wrong. Please try again.",
+                                    );
+                                  } finally {
+                                    setState(() {
+                                      isLoading = false;
                                     });
                                   }
-                                  setState(() {
-                                    isLoading = false;
-                                  });
                                 } else {
-                                  showTopNotification(
-                                    context,
-                                    "Please fix the validation errors before submitting.",
-                                  );
                                   setState(() {
                                     showDetails = false;
+                                    isLoading = false;
                                   });
                                 }
-                                setState(() {
-                                  isLoading = false;
-                                });
                               },
                               style: ElevatedButton.styleFrom(
                                 // ignore: deprecated_member_use
@@ -315,7 +312,6 @@ class _ExistingCustomerLoanState extends State<ExistingCustomerLoan> {
   }
 
   Widget customBox() {
-    // User? user = loanData.user;
     if (showDetails) {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -516,87 +512,9 @@ class _ExistingCustomerLoanState extends State<ExistingCustomerLoan> {
         ],
       );
     } else {
-      nicNumber.clear();
-      // nicNumber.dispose();
-      return Center(
-        child: Text(
-          message,
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-            color: const Color.fromARGB(255, 205, 8, 8),
-            letterSpacing: 0.5,
-          ),
-          textAlign: TextAlign.center,
-        ),
-      );
+      return Container();
     }
   }
-
-  // void showCustomMessageBox(
-  //   BuildContext context,
-  //   String message, {
-  //   bool isError = false,
-  // }) {
-  //   // 1. Clear any existing snackbars instantly
-  //   ScaffoldMessenger.of(context).clearSnackBars();
-
-  //   ScaffoldMessenger.of(context).showSnackBar(
-  //     SnackBar(
-  //       behavior: SnackBarBehavior.floating, // Floats above bottom navigation
-  //       backgroundColor: Colors.white,
-  //       elevation: 6,
-
-  //       // 2. Set the automatic close time to 10 seconds
-  //       duration: const Duration(seconds: 10),
-
-  //       // 3. Custom Physics/Animation Settings
-  //       dismissDirection:
-  //           DismissDirection.horizontal, // Allows swiping away to close
-
-  //       shape: RoundedRectangleBorder(
-  //         borderRadius: BorderRadius.circular(8),
-  //         side: BorderSide(
-  //           color: isError
-  //               ? Colors.black
-  //               : Colors.black12, // Bold border for errors
-  //           width: isError ? 2.0 : 1.0,
-  //         ),
-  //       ),
-  //       content: Row(
-  //         children: [
-  //           // Animated Icon swap based on state
-  //           AnimatedSwitcher(
-  //             duration: const Duration(milliseconds: 300),
-  //             child: Icon(
-  //               isError ? Icons.error_outline : Icons.check_circle_outline,
-  //               key: ValueKey<bool>(isError),
-  //               color: Colors.black,
-  //             ),
-  //           ),
-  //           const SizedBox(width: 12),
-  //           Expanded(
-  //             child: Text(
-  //               message,
-  //               style: const TextStyle(
-  //                 color: Colors.black,
-  //                 fontSize: 14,
-  //                 fontWeight: FontWeight.w600,
-  //               ),
-  //             ),
-  //           ),
-  //         ],
-  //       ),
-  //       action: SnackBarAction(
-  //         label: "DISMISS",
-  //         textColor: Colors.black87,
-  //         onPressed: () {
-  //           ScaffoldMessenger.of(context).hideCurrentSnackBar();
-  //         },
-  //       ),
-  //     ),
-  //   );
-  // }
 
   void database() async {
     // await DatabaseService().insertCustomer(
