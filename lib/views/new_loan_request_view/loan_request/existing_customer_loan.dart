@@ -72,7 +72,9 @@ class _ExistingCustomerLoanState extends State<ExistingCustomerLoan> {
               builder: (context, online, child) {
                 return GestureDetector(
                   onTap: () {
-                    CheckConnection.initialize();
+                    setState(() {
+                      CheckConnection.initialize();
+                    });
 
                     showTopNotification(
                       context,
