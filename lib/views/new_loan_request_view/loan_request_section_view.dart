@@ -5,6 +5,7 @@ import 'package:nkrs_app/utility/constanst.dart';
 import 'package:nkrs_app/views/customer_collection_views/customerCollectionpage/customer_collection_home.dart';
 import 'package:nkrs_app/views/new_loan_request_view/loan_request/existing_customer_loan.dart';
 import 'package:nkrs_app/views/new_loan_request_view/new_loan_request/new_client_loan_request.dart';
+import 'package:nkrs_app/views/new_loan_request_view/utility/custom_navi_bar.dart';
 import 'package:nkrs_app/views/new_loan_request_view/utility/main_card.dart';
 import 'package:nkrs_app/views/new_loan_request_view/utility/popup_box_message.dart';
 
@@ -17,6 +18,11 @@ class LoanRequestSection extends StatefulWidget {
 
 class _LoanRequestSectionState extends State<LoanRequestSection> {
   double logoSize = 32;
+  int _navIndex = 0;
+
+  void _handleNavTap(int i) {
+    setState(() => _navIndex = i);
+  }
 
   @override
   void initState() {
@@ -188,6 +194,12 @@ class _LoanRequestSectionState extends State<LoanRequestSection> {
             ],
           ),
         ),
+      ),
+
+      bottomNavigationBar: FancyBottomNavBar(
+        currentIndex: _navIndex,
+        onTap: _handleNavTap,
+        // onCenterTap: () center btn
       ),
     );
   }

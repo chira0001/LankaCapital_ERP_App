@@ -7,14 +7,15 @@ class DatabaseService {
   final DatabaseInitializerService _databaseService =
       DatabaseInitializerService();
 
-  Future<bool?> isTableExists(String tableName) async {
-    final db = await _databaseService.database; //risk
-    final result = await db?.rawQuery(
-      "SELECT name FROM sqlite_master WHERE type='table' AND name=?",
-      [tableName],
-    );
-    return result?.isNotEmpty;
-  }
+  // Future<bool?> isTableExists(String tableName) async {
+  //   final db = await _databaseService.database; //risk
+  //   final result = await db?.rawQuery(
+  //     "SELECT name FROM sqlite_master WHERE type='table' AND name=?",
+  //     [tableName],
+  //   );
+  //   return result?.isNotEmpty;
+  // }
+
 
   Future<void> printAllTables() async {
     final db = await _databaseService.database;

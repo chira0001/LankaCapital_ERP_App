@@ -38,6 +38,7 @@ class _ExistingCustomerLoanState extends State<ExistingCustomerLoan> {
     DatabaseInitializerService().database;
     DatabaseService().printAllTables();
     // DatabaseService().isTableExists("");
+    // CheckConnection().initialize();
   }
 
   @override
@@ -193,6 +194,9 @@ class _ExistingCustomerLoanState extends State<ExistingCustomerLoan> {
                             ),
                             ElevatedButton(
                               onPressed: () async {
+                                // DatabaseService().dropTables();
+                                // DatabaseService().deleteDatabaseFile();
+                                // DatabaseService().close();
                                 if (_formKey.currentState!.validate()) {
                                   var customerId = int.tryParse(
                                     nicNumber.text.trim(),

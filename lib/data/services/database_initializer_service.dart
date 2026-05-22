@@ -2,7 +2,8 @@ import 'package:path/path.dart';
 import 'package:sqflite_sqlcipher/sqflite.dart';
 
 class DatabaseInitializerService {
-  static final DatabaseInitializerService _instance = DatabaseInitializerService._internal();
+  static final DatabaseInitializerService _instance =
+      DatabaseInitializerService._internal();
   static Database? _databse;
   factory DatabaseInitializerService() => _instance;
   DatabaseInitializerService._internal();
@@ -31,43 +32,45 @@ class DatabaseInitializerService {
     // create employee table
     await db.execute('''
       CREATE TABLE IF NOT EXISTS employees (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        address VARCHAR(255) NOT NULL,
-        email VARCHAR(255) NOT NULL UNIQUE,
-        first_name VARCHAR(255) NOT NULL,
-        last_name VARCHAR(255) NOT NULL,
-        nic BIGINT NOT NULL,
-        phone_number VARCHAR(255) NOT NULL
+        id INTEGER PRIMARY KEY,
+        address TEXT,
+        email TEXT NOT NULL UNIQUE,
+        first_name TEXT,
+        last_name TEXT,
+        nic INTEGER NOT NULL UNIQUE,
+        phone_number TEXT,
+        sync INTEGER DEFAULT 0
       )
-    ''');
-    // create customer table
+  ''');
     await db.execute('''
-      CREATE TABLE IF NOT EXISTS customers (
-        nic BIGINT PRIMARY KEY,
-        address VARCHAR(255) NOT NULL,
-        email VARCHAR(255) NOT NULL UNIQUE,
-        name VARCHAR(255) NOT NULL,
-        phone_number VARCHAR(255) NOT NULL
-      )
-    ''');
-    // create loan table
+    CREATE TABLE IF NOT EXISTS customers (
+      nic INTEGER PRIMARY KEY,
+      address TEXT,
+      email TEXT,
+      name TEXT,
+      phone_number TEXT,
+      sync INTEGER DEFAULT 0
+    )
+  ''');
     await db.execute('''
-      CREATE TABLE IF NOT EXISTS loans (
-        file_number VARCHAR(255) PRIMARY KEY,
-        amount DECIMAL(12,2),
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        interest_rate DOUBLE,
-        customer_id BIGINT,
-        employee_id BIGINT,
-        no_of_installments DOUBLE,
-        rejection_note VARCHAR(1000),
-        risk TEXT CHECK(risk IN ('HIGH', 'LOW', 'MEDIUM')),
-        status TEXT CHECK(status IN ('APPROVED', 'PENDING', 'REJECTED')),
-        FOREIGN KEY (customer_id) REFERENCES customers(id) ON DELETE CASCADE,
-        FOREIGN KEY (employee_id) REFERENCES employees(id) ON DELETE SET NULL
-      )
-    ''');
-
+    CREATE TABLE IF NOT EXISTS loans (
+      file_number TEXT PRIMARY KEY,
+      amount REAL,
+      created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+      interest_rate REAL,
+      customer_id INTEGER,
+      employee_id INTEGER,
+      no_of_installments REAL,
+      rejection_note TEXT,
+      risk TEXT CHECK(risk IN ('HIGH', 'LOW', 'MEDIUM')),
+      status TEXT CHECK(status IN ('APPROVED', 'PENDING', 'REJECTED'))DEFAULT 'PENDING',
+      sync INTEGER DEFAULT 0,
+      FOREIGN KEY (customer_id)
+        REFERENCES customers(nic),
+      FOREIGN KEY (employee_id)
+        REFERENCES employees(id)
+    )
+  ''');
     // create collections table
     await db.execute('''
       CREATE TABLE IF NOT EXISTS collections (
