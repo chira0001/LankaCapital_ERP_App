@@ -16,16 +16,16 @@ class AsyncDatabaseTable {
       return "'Cus' : Local database error";
       // throw Exception("Can't access to customer table");
     }
+
     _pageNo = 0;
     int? savedId;
-    Map<String, dynamic> jsonCustomerId = {"nic": customerId};
+    Map<String, dynamic> json = {"nic": customerId};
 
     while (true) {
       List<Map<String, dynamic>>? tableData = await asyncService.asyncCustomers(
-        //call the server 'post'
         _pageNo,
-        jsonCustomerId,
-      );
+        json,
+      ); //call the server 'post'
       if (tableData == null) {
         return "'Cus' : Server or Connection or Error";
       }
@@ -37,7 +37,7 @@ class AsyncDatabaseTable {
         return e;
       }).toList();
       for (var item in tableData) {
-        savedId = (await _databasePutService.insertDataToCustomer(item));
+        savedId = (await _databasePutService.insertDataToCustomers(item));
         if (savedId == null) {
           //delete all sync column value is 1 rows
           return "Can't insert data customer";
@@ -57,14 +57,13 @@ class AsyncDatabaseTable {
     }
     _pageNo = 0;
     int? savedId;
-    Map<String, dynamic> jsonEmployeeId = {"id": employeeId};
+    Map<String, dynamic> json = {"id": employeeId};
 
     while (true) {
       List<Map<String, dynamic>>? tableData = await asyncService.asyncEmployees(
-        //call the server 'post'
         _pageNo,
-        jsonEmployeeId,
-      );
+        json,
+      ); //call the server 'post'
       if (tableData == null) {
         return "'Emp' : Server or Connection or Error";
       }
@@ -76,7 +75,7 @@ class AsyncDatabaseTable {
         return e;
       }).toList();
       for (var item in tableData) {
-        savedId = (await _databasePutService.insertDataToEmployee(item));
+        savedId = (await _databasePutService.insertDataToEmployees(item));
         if (savedId == null) {
           //delete all sync column value is 1 rows
           return "Can't insert data to employee";
@@ -95,15 +94,14 @@ class AsyncDatabaseTable {
       return "'Loans' : Local database error";
     }
     _pageNo = 0;
-    String? savedId;
-    Map<String, dynamic> jsonLoanId = {"file_number": loansId};
+    int? savedId;
+    Map<String, dynamic> json = {"file_number": loansId};
 
     while (true) {
       List<Map<String, dynamic>>? tableData = await asyncService.asyncLoans(
-        //call the server 'post'
         _pageNo,
-        jsonLoanId,
-      );
+        json,
+      ); //call the server 'post'
       if (tableData == null) {
         return "'Loans' : Server or Connection or Error";
       }
@@ -114,13 +112,49 @@ class AsyncDatabaseTable {
         e["sync"] = 1;
         return e;
       }).toList();
-      // for (var item in tableData) {
-      //   savedId = (await _databasePutService.insertDataToEmployee(item));
-      //   if (savedId == null) {
-      //     //delete all sync column value is 1 rows
-      //     return "Can't insert data to loans";
-      //   }
-      // }
+      for (var item in tableData) {
+        savedId = (await _databasePutService.insertDataToLoans(item));
+        if (savedId == null) {
+          //delete all sync column value is 1 rows
+          return "Can't insert data to loans";
+        }
+      }
+      ++_pageNo;
+      // ignore: avoid_print
+      print("Saved ${tableData.length} rows");
+    }
+  }
+
+  Future<String> installmentsTable() async {
+    List<String>? installmentsId = await _databaseGetService
+        .getinstallmentsId(); //customer ID
+    if (installmentsId == null) {
+      return "'instal' : Local database error";
+    }
+    _pageNo = 0;
+    int? savedId;
+    Map<String, dynamic> json = {"id": installmentsId};
+
+    while (true) {
+      List<Map<String, dynamic>>? tableData = await asyncService
+          .asyncInstallments(_pageNo, json); //call the server 'post'
+      if (tableData == null) {
+        return "'instal' : Server or Connection or Error";
+      }
+      if (tableData.isEmpty) {
+        return "installments Sync Completed";
+      }
+      tableData = tableData.map((e) {
+        e["sync"] = 1;
+        return e;
+      }).toList();
+      for (var item in tableData) {
+        savedId = (await _databasePutService.insertDataToinstallments(item));
+        if (savedId == null) {
+          //delete all sync column value is 1 rows
+          return "Can't insert data to installments";
+        }
+      }
       ++_pageNo;
       // ignore: avoid_print
       print("Saved ${tableData.length} rows");

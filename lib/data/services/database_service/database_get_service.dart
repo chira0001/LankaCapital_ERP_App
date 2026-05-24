@@ -38,6 +38,23 @@ class DatabaseGetService {
     }
   }
 
+  Future<List<String>?> getinstallmentsId() async {
+    try {
+      final db = await _databaseService.database;
+      final List<Map<String, dynamic>> maps = await db!.query(
+        'loans',
+        columns: ['id'],
+        where: 'sync = ?',
+        whereArgs: [1],
+      );
+      return maps.map((e) => e['id'].toString()).toList();
+    } catch (e) {
+      // ignore: avoid_print
+      print("Database Error: $e");
+      throw Exception(e);
+    }
+  }
+
   Future<List<String>?> getLoansId() async {
     try {
       final db = await _databaseService.database;

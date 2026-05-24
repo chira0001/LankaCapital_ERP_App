@@ -8,7 +8,7 @@ class DatabaseInitializerService {
   factory DatabaseInitializerService() => _instance;
   DatabaseInitializerService._internal();
 
-  String get filePath => "lankacapitals.db";
+  String get filePath => "lankacapital.db";
   final String password = "1234";
 
   Future<Database?> get database async {
@@ -42,35 +42,45 @@ class DatabaseInitializerService {
         sync INTEGER DEFAULT 0
       )
   ''');
+    // create customers table
     await db.execute('''
     CREATE TABLE IF NOT EXISTS customers (
       nic INTEGER PRIMARY KEY,
-      address TEXT,
+      address TEXT NOT NULL,
       email TEXT,
-      name TEXT,
-      phone_number TEXT,
+      name TEXT NOT NULL,
+      phone_number TEXT NOT NULL,
       sync INTEGER DEFAULT 0
     )
   ''');
+    // create installments table
     await db.execute('''
-    CREATE TABLE IF NOT EXISTS loans (
-      file_number TEXT PRIMARY KEY,
-      amount REAL,
-      created_at TEXT DEFAULT CURRENT_TIMESTAMP,
-      interest_rate REAL,
-      customer_id INTEGER,
-      employee_id INTEGER,
-      no_of_installments REAL,
-      rejection_note TEXT,
-      risk TEXT CHECK(risk IN ('HIGH', 'LOW', 'MEDIUM')),
-      status TEXT CHECK(status IN ('APPROVED', 'PENDING', 'REJECTED'))DEFAULT 'PENDING',
-      sync INTEGER DEFAULT 0,
-      FOREIGN KEY (customer_id)
-        REFERENCES customers(nic),
-      FOREIGN KEY (employee_id)
-        REFERENCES employees(id)
-    )
-  ''');
+      CREATE TABLE IF NOT EXISTS installments (
+        id INTEGER PRIMARY KEY,
+        value INTEGER NOT NULL UNIQUE,
+        sync INTEGER DEFAULT 0
+      )
+    ''');
+    // create loans table
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS loans (
+        file_number TEXT PRIMARY KEY,
+        amount REAL,
+        created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+        document_charge REAL DEFAULT 100.00,
+        interest_rate REAL DEFAULT 15,
+        customer_id INTEGER,
+        employee_id INTEGER,
+        no_of_installments REAL DEFAULT 1,
+        rejection_note TEXT,
+        risk TEXT CHECK(risk IN ('HIGH', 'LOW', 'MEDIUM')),
+        status TEXT CHECK(status IN ('APPROVED', 'PENDING', 'REJECTED'))DEFAULT 'PENDING',
+        sync INTEGER DEFAULT 0,
+        FOREIGN KEY (customer_id) REFERENCES customers(nic),
+        FOREIGN KEY (employee_id) REFERENCES employees(id),
+        FOREIGN KEY (no_of_installments) REFERENCES installments(id)
+      )
+    ''');
     // create collections table
     await db.execute('''
       CREATE TABLE IF NOT EXISTS collections (

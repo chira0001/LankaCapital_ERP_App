@@ -16,7 +16,6 @@ class DatabaseService {
   //   return result?.isNotEmpty;
   // }
 
-
   Future<void> printAllTables() async {
     final db = await _databaseService.database;
     final tables = await db?.rawQuery(
@@ -99,6 +98,7 @@ class DatabaseService {
         debugPrint('  Email:        ${data['email']}');
         debugPrint('  Address:      ${data['address']}');
         debugPrint('  Phone Number: ${data['phone_number']}');
+        debugPrint('  Sync:         ${data['sync']}');
         debugPrint('-----------------------------------');
       }
       // return maps;
@@ -150,9 +150,7 @@ class DatabaseService {
     debugPrint(customerResult.toString());
     if (customerResult.isEmpty) {
       return null;
-    }else{
-      
-    }
+    } else {}
 
     final loansResult = await db.query(
       'loans',
