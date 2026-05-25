@@ -2,12 +2,14 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:nkrs_app/models/add_loan_model.dart';
+import 'package:nkrs_app/models/installments_model.dart';
 import 'package:nkrs_app/models/loan_model.dart';
 import 'package:http/http.dart' as http;
 import 'package:nkrs_app/models/user_model.dart';
 // import 'package:nkrs_app/views/new_loan_request_view/utility/check_connection.dart';
 
 class LoanService {
+  static const String _baseUrl = 'http://192.168.43.90:8080/api/v1/field';
   late final String _message;
   String? get message => _message;
 
@@ -74,29 +76,44 @@ class LoanService {
     }
   }
 
-  Future<bool> addLoan(AddLoanModel loan) async {
-    final Uri url = Uri.parse(
-      'http://192.168.43.90/api/v1/field/customers/loans',
-    );
+  Future<String?> addLoan(AddLoanModel loan) async {
+    final Uri url = Uri.parse('$_baseUrl/customers/loans');
 
     try {
       final response = await http.post(
         url,
         headers: {"Content-Type": "application/json"},
-        body: json.encode(loan.toJson()),
+        body: jsonEncode(loan.toJsonServer()),
       );
       if (response.statusCode == 200 || response.statusCode == 201) {
-        debugPrint("Response $response");
-        // Product newProduct = Product.formJson(json.decode(response.body));
-        // return newProduct;
-        return true;
+        return '';
       } else {
-        debugPrint("Failed to loan product");
-        return false;
+        final Map<String, dynamic> data = jsonDecode(response.body);
+        return data["message"].toString();
       }
     } catch (e) {
       debugPrint("Failed $e");
-      throw Exception("Failed to add loan $e");
+      return null;
     }
+  }
+
+  Future<List<InstallmentsModel>?> getInstallments() async {
+    final Uri url = Uri.parse(
+      'http://192.168.43.90:8080/api/v1/recep/installments',
+    );
+    try {
+      final response = await http.get(url).timeout(const Duration(seconds: 10));
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final data = jsonDecode(response.body);
+        print("$data : debug data");
+
+        return (data as List)
+            .map((e) => InstallmentsModel.fromJson(e))
+            .toList();
+      }
+    } catch (e) {
+      return null;
+    }
+    return null;
   }
 }

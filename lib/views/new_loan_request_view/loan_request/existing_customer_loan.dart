@@ -1,8 +1,13 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 import 'package:nkrs_app/data/services/database_initializer_service.dart';
 import 'package:nkrs_app/data/services/database_service.dart';
+import 'package:nkrs_app/data/services/database_service/database_get_service.dart';
 import 'package:nkrs_app/data/view_model/check_connection.dart';
+import 'package:nkrs_app/data/view_model/get_loan_view_model.dart';
 import 'package:nkrs_app/data/view_model/loan_view_model.dart';
+import 'package:nkrs_app/models/installments_model.dart';
 import 'package:nkrs_app/models/loan_model.dart';
 import 'package:nkrs_app/models/user_model.dart';
 import 'package:nkrs_app/utility/constanst.dart';
@@ -10,9 +15,11 @@ import 'package:nkrs_app/views/new_loan_request_view/loan_request/existing_custo
 import 'package:nkrs_app/views/new_loan_request_view/loan_request/existing_customer_loan_request.dart';
 import 'package:nkrs_app/views/new_loan_request_view/utility/custom_row.dart';
 import 'package:nkrs_app/views/new_loan_request_view/utility/custom_text_field.dart';
+import 'package:nkrs_app/views/new_loan_request_view/utility/loading_dialog.dart';
 import 'package:nkrs_app/views/new_loan_request_view/utility/main_card.dart';
 import 'package:nkrs_app/views/new_loan_request_view/utility/popup_box_message.dart';
 import 'package:nkrs_app/views/new_loan_request_view/utility/popup_box_message_.dart';
+import 'package:nkrs_app/views/new_loan_request_view/utility/scaffold_message.dart';
 
 class ExistingCustomerLoan extends StatefulWidget {
   const ExistingCustomerLoan({super.key});
@@ -76,11 +83,21 @@ class _ExistingCustomerLoanState extends State<ExistingCustomerLoan> {
                     setState(() {
                       CheckConnection.initialize();
                     });
-
-                    showTopNotification(
-                      context,
-                      online ? "Device is Online" : "Device is Offline",
-                    );
+                    if (online) {
+                      AppTopSnackBar.success(
+                        context,
+                        "Device is Online.",
+                        showClose: false,
+                        duration: Duration(seconds: 2),
+                      );
+                    } else {
+                      AppTopSnackBar.error(
+                        context,
+                        "Device is Offline.",
+                        showClose: false,
+                        duration: Duration(seconds: 2),
+                      );
+                    }
                   },
                   child: Container(
                     padding: const EdgeInsets.symmetric(
@@ -197,6 +214,7 @@ class _ExistingCustomerLoanState extends State<ExistingCustomerLoan> {
                                 // DatabaseService().dropTables();
                                 // DatabaseService().deleteDatabaseFile();
                                 // DatabaseService().close();
+                                database();
                                 if (_formKey.currentState!.validate()) {
                                   var customerId = int.tryParse(
                                     nicNumber.text.trim(),
@@ -237,7 +255,6 @@ class _ExistingCustomerLoanState extends State<ExistingCustomerLoan> {
                                       showDetails = false;
                                     });
                                     showTopNotification(
-                                      // ignore: use_build_context_synchronously
                                       context,
                                       "Something went wrong. Please try again.",
                                     );
@@ -346,15 +363,43 @@ class _ExistingCustomerLoanState extends State<ExistingCustomerLoan> {
                 CustomRow(label: "Address", value: _user!.address),
                 CustomRow(label: "Phone Number", value: _user!.phoneNumber),
                 GestureDetector(
-                  onTap: () {
-                    // Navigate to new loan request page
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) =>
-                            ExistingCustomerLoanRequest(nicNumber: 1255654),
-                      ),
-                    );
+                  onTap: () async {
+                    List<InstallmentsModel>? installments;
+                    LoadingDialog.show(context, message: 'Please Wait...');
+                    try {
+                      final bool isOnline = CheckConnection.isOnline.value;
+                      if (isOnline) {
+                        installments = await GetLoanViewModel()
+                            .getLoanDataByOnline(context);
+                      } else {
+                        installments = await DatabaseGetService()
+                            .getInstallments();
+                      }
+                    } catch (e) {
+                      // handle/log error if you want
+                    } finally {
+                      if (context.mounted) {
+                        LoadingDialog.hide(context);
+                      }
+                    }
+                    if (!context.mounted) return;
+                    if (installments != null) {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => ExistingCustomerLoanRequest(
+                            installments: installments!,
+                            interestRates: null,
+                            nicNumber: 1234,
+                          ),
+                        ),
+                      );
+                    } else {
+                      AppTopSnackBar.error(
+                        context,
+                        "Failed to load installments. Cannot proceed.",
+                      );
+                    }
                   },
                   child: Container(
                     width: double.infinity,
@@ -523,20 +568,20 @@ class _ExistingCustomerLoanState extends State<ExistingCustomerLoan> {
   }
 
   void database() async {
-    // await DatabaseService().insertCustomer(
-    //   address: "116/3",
-    //   email: "example@gmail.com",
-    //   name: "vihaga",
-    //   nic: 200210801480,
-    //   phoneNumber: "07766303438",
-    // );
-    // await DatabaseService().insertCustomer(
-    //   address: "116/3",
-    //   email: "example2@gmail.com",
-    //   name: "vihaga",
-    //   nic: 200210801481,
-    //   phoneNumber: "07766303438",
-    // );
+    await DatabaseService().insertCustomer(
+      address: "116/3",
+      email: "example@gmail.com",
+      name: "vihaga",
+      nic: 200210801480,
+      phoneNumber: "07766303438",
+    );
+    await DatabaseService().insertCustomer(
+      address: "116/3",
+      email: "example2@gmail.com",
+      name: "vihaga",
+      nic: 200210801481,
+      phoneNumber: "07766303438",
+    );
     // await DatabaseService().deleteCustomerByNic(200210801481);
     await DatabaseService().getAllCustomers();
     // await DatabaseService().printAllTables();

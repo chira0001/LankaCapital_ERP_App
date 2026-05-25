@@ -61,6 +61,14 @@ class DatabaseInitializerService {
         sync INTEGER DEFAULT 0
       )
     ''');
+    // create interest_rates table
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS interest_rates (
+        id INTEGER PRIMARY KEY,
+        rate REAL NOT NULL UNIQUE,
+        sync INTEGER DEFAULT 0
+      )
+    ''');
     // create loans table
     await db.execute('''
       CREATE TABLE IF NOT EXISTS loans (
@@ -68,17 +76,18 @@ class DatabaseInitializerService {
         amount REAL,
         created_at TEXT DEFAULT CURRENT_TIMESTAMP,
         document_charge REAL DEFAULT 100.00,
-        interest_rate REAL DEFAULT 15,
+        interest_rate_id REAL DEFAULT 1,
         customer_id INTEGER,
         employee_id INTEGER,
-        no_of_installments REAL DEFAULT 1,
+        installment_id REAL DEFAULT 1,
         rejection_note TEXT,
         risk TEXT CHECK(risk IN ('HIGH', 'LOW', 'MEDIUM')),
         status TEXT CHECK(status IN ('APPROVED', 'PENDING', 'REJECTED'))DEFAULT 'PENDING',
         sync INTEGER DEFAULT 0,
         FOREIGN KEY (customer_id) REFERENCES customers(nic),
         FOREIGN KEY (employee_id) REFERENCES employees(id),
-        FOREIGN KEY (no_of_installments) REFERENCES installments(id)
+        FOREIGN KEY (installment_id) REFERENCES installments(id),
+        FOREIGN KEY (interest_rate_id) REFERENCES interest_rates(id)
       )
     ''');
     // create collections table

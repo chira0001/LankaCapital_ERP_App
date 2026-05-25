@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
+import 'package:nkrs_app/data/services/database_service/database_get_service.dart';
 import 'package:nkrs_app/data/view_model/check_connection.dart';
+import 'package:nkrs_app/data/view_model/get_loan_view_model.dart';
+import 'package:nkrs_app/models/installments_model.dart';
 import 'package:nkrs_app/utility/constanst.dart';
 import 'package:nkrs_app/views/customer_collection_views/customerCollectionpage/customer_collection_home.dart';
 import 'package:nkrs_app/views/new_loan_request_view/loan_request/existing_customer_loan.dart';
 import 'package:nkrs_app/views/new_loan_request_view/new_loan_request/new_client_loan_request.dart';
 import 'package:nkrs_app/views/new_loan_request_view/utility/custom_navi_bar.dart';
+import 'package:nkrs_app/views/new_loan_request_view/utility/loading_dialog.dart';
 import 'package:nkrs_app/views/new_loan_request_view/utility/main_card.dart';
-import 'package:nkrs_app/views/new_loan_request_view/utility/popup_box_message.dart';
+import 'package:nkrs_app/views/new_loan_request_view/utility/scaffold_message.dart';
 
 class LoanRequestSection extends StatefulWidget {
   const LoanRequestSection({super.key});
@@ -81,35 +85,59 @@ class _LoanRequestSectionState extends State<LoanRequestSection> {
         ),
         actions: [
           Padding(
-            padding: const EdgeInsets.only(right: 10),
-            // ValueListenableBuilder automatically rebuilds ONLY when the connection state updates
+            padding: const EdgeInsets.only(right: 15),
             child: ValueListenableBuilder<bool>(
               valueListenable: CheckConnection.isOnline,
               builder: (context, online, child) {
-                return IconButton(
-                  onPressed: () {
-                    CheckConnection.initialize();
-                    showTopNotification(
-                      context,
-                      online ? "Device is Online" : "Device is Offline",
-                    );
+                return GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      CheckConnection.initialize();
+                    });
+                    if (online) {
+                      AppTopSnackBar.success(
+                        context,
+                        "Device is Online.",
+                        showClose: false,
+                        duration: Duration(seconds: 2),
+                      );
+                    } else {
+                      AppTopSnackBar.error(
+                        context,
+                        "Device is Offline.",
+                        showClose: false,
+                        duration: Duration(seconds: 2),
+                      );
+                    }
                   },
-                  icon: Icon(
-                    online ? Icons.wifi_rounded : Icons.wifi_off_rounded,
-                    color: online
-                        ? const Color.fromARGB(
-                            255,
-                            9,
-                            172,
-                            58,
-                          ) // Green when online
-                        : const Color.fromARGB(
-                            255,
-                            172,
-                            9,
-                            9,
-                          ), // Red when offline
-                    size: 28,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 5,
+                    ),
+                    decoration: BoxDecoration(
+                      color: online
+                          ? const Color.fromARGB(40, 9, 172, 58)
+                          : const Color.fromARGB(40, 172, 9, 9),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: online
+                            ? const Color.fromARGB(255, 9, 172, 58)
+                            : const Color.fromARGB(255, 172, 9, 9),
+                        width: 0.5,
+                      ),
+                    ),
+                    child: Text(
+                      online ? "ONLINE" : "OFFLINE",
+                      style: TextStyle(
+                        color: online
+                            ? const Color.fromARGB(255, 9, 172, 58)
+                            : const Color.fromARGB(255, 172, 9, 9),
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 1,
+                        fontSize: 10,
+                      ),
+                    ),
                   ),
                 );
               },
@@ -118,80 +146,135 @@ class _LoanRequestSectionState extends State<LoanRequestSection> {
         ],
       ),
       backgroundColor: safeAreaC,
-      body: Padding(
-        padding: EdgeInsetsGeometry.symmetric(
-          horizontal: safeAreaHorizontalPD,
-          vertical: safeAreaVerticalPD,
-        ),
+      body: SafeArea(
         child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "New Loan Request",
-                    style: TextStyle(
-                      fontWeight: FontWeight(HeaderFW),
-                      fontSize: headerFontSize - 1,
-                      color: headerTextC,
+          child: Padding(
+            padding: EdgeInsetsGeometry.symmetric(
+              horizontal: safeAreaHorizontalPD,
+              vertical: safeAreaVerticalPD,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "New Loan Request",
+                      style: TextStyle(
+                        fontWeight: FontWeight(HeaderFW),
+                        fontSize: headerFontSize,
+                        color: headerTextC,
+                      ),
                     ),
-                  ),
-                  SizedBox(height: 5),
-                  Text(
-                    "Select the customer type to continue.",
-                    textAlign: TextAlign.start,
-                    style: TextStyle(
-                      fontSize: descriptionFontSize,
-                      fontWeight: FontWeight(descriptionFw),
-                      color: descriptionC,
+                    SizedBox(height: 5),
+                    Text(
+                      "Select the customer type to continue.",
+                      textAlign: TextAlign.start,
+                      style: TextStyle(
+                        fontSize: descriptionFontSize,
+                        fontWeight: FontWeight(descriptionFw),
+                        color: descriptionC,
+                      ),
                     ),
-                  ),
-                ],
-              ),
-              SizedBox(height: 30),
-              InkWell(
-                borderRadius: BorderRadius.circular(cardBorderRadius),
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => ExistingCustomerLoan(),
-                    ),
-                  );
-                },
-                child: MainCard(
-                  header: "Existing Customer",
-                  description:
-                      "Process a new loan for a returning client with existing records in our system.",
-                  cusIconRight: Iconsax.user_search_copy,
-                  iconColor: const Color.fromARGB(255, 0, 55, 255),
-                  iconBackgrouundColor: Color.fromARGB(40, 0, 55, 254),
+                  ],
                 ),
-              ),
-              SizedBox(height: 20),
-              InkWell(
-                borderRadius: BorderRadius.circular(30),
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => NewClientLoanRequest(),
-                      // builder: (context)=> LoanSuccessScreen(),
-                    ),
-                  );
-                },
-                child: MainCard(
-                  header: "New Customer",
-                  description:
-                      "Register and create a loan application   for a first-time borrower.",
-                  cusIconRight: Iconsax.user_add_copy,
-                  iconColor: const Color.fromARGB(255, 153, 0, 255),
-                  iconBackgrouundColor: Color.fromARGB(40, 153, 0, 255),
+                SizedBox(height: 30),
+                InkWell(
+                  borderRadius: BorderRadius.circular(cardBorderRadius),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ExistingCustomerLoan(),
+                      ),
+                    );
+                  },
+                  child: MainCard(
+                    header: "Existing Customer",
+                    description:
+                        "Process a new loan for a returning client with existing records in our system.",
+                    cusIconRight: Iconsax.user_search_copy,
+                    iconColor: const Color.fromARGB(255, 0, 55, 255),
+                    iconBackgrouundColor: Color.fromARGB(40, 0, 55, 254),
+                  ),
                 ),
-              ),
-            ],
+                SizedBox(height: 20),
+                InkWell(
+                  borderRadius: BorderRadius.circular(30),
+                  onTap: () async {
+                    List<InstallmentsModel>? installments;
+                    LoadingDialog.show(context, message: 'Please Wait...');
+                    try {
+                      final bool isOnline = CheckConnection.isOnline.value;
+                      if (isOnline) {
+                        installments = await GetLoanViewModel()
+                            .getLoanDataByOnline(context);
+                      } else {
+                        installments = await DatabaseGetService()
+                            .getInstallments();
+                      }
+                    } catch (e) {
+                      // handle/log error if you want
+                    } finally {
+                      if (context.mounted) {
+                        LoadingDialog.hide(
+                          context,
+                        ); // closes the loading dialog
+                      }
+                    }
+                    if (!context.mounted) return;
+                    // REMOVE this unless you really want to close the current page:
+                    // Navigator.pop(context);
+                    if (installments != null && installments.isNotEmpty) {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => NewClientLoanRequest(
+                            installments: installments!,
+                            interestRates: null,
+                          ),
+                        ),
+                      );
+                    } else {
+                      AppTopSnackBar.error(
+                        context,
+                        "Failed to load installments. Cannot proceed.",
+                      );
+                    }
+                  },
+                  child: MainCard(
+                    header: "New Customer",
+                    description:
+                        "Register and create a loan application for a first-time borrower.",
+                    cusIconRight: Iconsax.user_add_copy,
+                    iconColor: const Color.fromARGB(255, 153, 0, 255),
+                    iconBackgrouundColor: Color.fromARGB(40, 153, 0, 255),
+                  ),
+                ),
+                //debug function for test database
+                // InkWell(
+                //   borderRadius: BorderRadius.circular(30),
+                //   onTap: () {
+                //     Navigator.push(
+                //       context,
+                //       MaterialPageRoute(
+                //         builder: (context) => DebugView(),
+                //         // builder: (context)=> LoanSuccessScreen(),
+                //       ),
+                //     );
+                //   },
+                //   child: MainCard(
+                //     header: "Debug Section",
+                //     description:
+                //         "Register and create a loan application   for a first-time borrower.",
+                //     cusIconRight: Iconsax.user_add_copy,
+                //     iconColor: const Color.fromARGB(255, 153, 0, 255),
+                //     iconBackgrouundColor: Color.fromARGB(40, 153, 0, 255),
+                //   ),
+                // ),
+              ],
+            ),
           ),
         ),
       ),

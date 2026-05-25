@@ -34,7 +34,7 @@ class MainCard extends StatelessWidget {
             offset: const Offset(0, 3),
           ),
         ],
-        border: BoxBorder.all(color: boaderC, width: 0.5),
+        // border: BoxBorder.all(color: boaderC, width: 0.5),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

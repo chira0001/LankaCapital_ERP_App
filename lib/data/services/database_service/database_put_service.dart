@@ -1,4 +1,6 @@
+import 'package:flutter/material.dart';
 import 'package:nkrs_app/data/services/database_initializer_service.dart';
+import 'package:nkrs_app/models/add_loan_model.dart';
 import 'package:sqflite_sqlcipher/sqflite.dart';
 
 class DatabasePutService {
@@ -14,8 +16,8 @@ class DatabasePutService {
         conflictAlgorithm: ConflictAlgorithm.replace,
       );
     } catch (e) {
-      return null; 
-    //   throw Exception('Failed to insert customer: $e');
+      return null;
+      //   throw Exception('Failed to insert customer: $e');
     }
   }
 
@@ -28,8 +30,8 @@ class DatabasePutService {
         conflictAlgorithm: ConflictAlgorithm.replace,
       );
     } catch (e) {
-      return null; 
-    //   throw Exception('Failed to insert employee: $e');
+      return null;
+      //   throw Exception('Failed to insert employee: $e');
     }
   }
 
@@ -42,8 +44,8 @@ class DatabasePutService {
         conflictAlgorithm: ConflictAlgorithm.replace,
       );
     } catch (e) {
-      return null; 
-    //   throw Exception('Failed to insert employee: $e');
+      return null;
+      //   throw Exception('Failed to insert employee: $e');
     }
   }
 
@@ -56,8 +58,22 @@ class DatabasePutService {
         conflictAlgorithm: ConflictAlgorithm.replace,
       );
     } catch (e) {
-      return null; 
-    //   throw Exception('Failed to insert employee: $e');
+      return null;
+      //   throw Exception('Failed to insert employee: $e');
+    }
+  }
+
+  Future<int?> insertLoan(AddLoanModel loan) async {
+    try {
+      final db = await _databaseService.database;
+      return await db?.insert(
+        'loans',
+        loan.toJsonServer(),
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
+    } catch (e) {
+      debugPrint("Loan Insert Error : $e");
+      return null;
     }
   }
 }

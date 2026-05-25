@@ -22,7 +22,7 @@ double outerBoxVerticalPD = 16.0;
 double outerBoxHorizontalPD = 16.0;
 
 double safeAreaVerticalPD = 30.0;
-double safeAreaHorizontalPD = 20.0;
+double safeAreaHorizontalPD = 15.0;
 
 double cardBorderRadius = 20.0;
 double btnBorderRadius = 10;
@@ -33,12 +33,12 @@ double iconSize = 30.0;
 double selectedIconSize = 33.0;
 
 double descriptionFontSize = 15;
-double headerFontSize = 22.0; //<-26
+double headerFontSize = 20.0; //<-26
 double btnFontSize = 16.0;
 
-double cardDescriptionFS = 14; //16
-double cardHeaderFS = 18; // <-20
-int cardDescriptionFW = 400;
+double cardDescriptionFS = 13.5; //16
+double cardHeaderFS = 17; // <-20
+int cardDescriptionFW = 410;
 
 double appBarFontS = 20;
 double appBarIconS = 25;
