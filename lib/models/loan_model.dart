@@ -22,20 +22,12 @@ class Loan {
   });
 
   factory Loan.fromJson(Map<String, dynamic> json) {
-    int installments = 0;
-    final instData = json['numberOfInstallments'] ?? json['noOfInstallments'];
-    if (instData is int) {
-      installments = instData;
-    } else if (instData is Map) {
-      installments = (instData['value'] as num?)?.toInt() ?? 0;
-    }
-
     return Loan(
       fileNumber: json['fileNumber'] ?? "N/A",
       interestRate: (json['interestRate'] as num?)?.toDouble() ?? 0.0,
       amount: double.tryParse(json['amount']?.toString() ?? "0.0") ?? 0.0,
       createdAt: json['createdAt'] ?? "N/A",
-      noOfInstallments: installments,
+      noOfInstallments: json['noOfInstallments'] as int? ?? 0,
       documentCharge: (json['documentCharge'] as num?)?.toDouble() ?? 0.0,
     );
   }
