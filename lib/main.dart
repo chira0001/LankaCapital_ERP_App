@@ -28,6 +28,8 @@ class MyApp extends StatelessWidget {
       // home: LoginPage(),
       home: LoanRequestSection(),
       // home: isLoggedIn ? const AppLockWrapper(child: CustomerCollectionHome()) : const LoginPage(),
+      // home: (),
+      home: isLoggedIn ? const AppLockWrapper(child: CustomerCollectionHome()) : const LoginPage(),
     );
   }
 }
