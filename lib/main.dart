@@ -24,8 +24,8 @@ class MyApp extends StatelessWidget {
       title: "NKRS App",
       debugShowCheckedModeBanner: false,
       theme: ThemeData(fontFamily: "Inter"),
-      home: LoginPage(),
-      // home: isLoggedIn ? const AppLockWrapper(child: CustomerCollectionHome()) : const LoginPage(),
+      // home: (),
+      home: isLoggedIn ? const AppLockWrapper(child: CustomerCollectionHome()) : const LoginPage(),
     );
   }
 }

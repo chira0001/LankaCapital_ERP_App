@@ -5,6 +5,7 @@ import 'package:nkrs_app/models/add_loan_model.dart';
 import 'package:nkrs_app/models/loan_model.dart';
 import 'package:http/http.dart' as http;
 import 'package:nkrs_app/models/user_model.dart';
+import 'package:nkrs_app/data/services/api_config.dart';
 // import 'package:nkrs_app/views/new_loan_request_view/utility/check_connection.dart';
 
 class LoanService {
@@ -46,7 +47,7 @@ class LoanService {
 
   Future<(User, List<Loan>)> fetchUserAndLoans(int nic) async {
     final Uri url = Uri.parse(
-      'http://10.230.135.234:8080/api/v1/recep/customers/loans/$nic',
+      '${ApiConfig.baseUrl}/recep/customers/loans/$nic',
     );
 
     try {
@@ -76,7 +77,7 @@ class LoanService {
 
   Future<bool> addLoan(AddLoanModel loan) async {
     final Uri url = Uri.parse(
-      'http://10.230.135.234/api/v1/field/customers/loans',
+      '${ApiConfig.baseUrl}/field/customers/loans',
     );
 
     try {
