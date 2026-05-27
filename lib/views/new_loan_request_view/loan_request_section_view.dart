@@ -9,6 +9,7 @@ import 'package:nkrs_app/views/customer_collection_views/customerCollectionpage/
 import 'package:nkrs_app/views/new_loan_request_view/loan_request/existing_customer_loan.dart';
 import 'package:nkrs_app/views/new_loan_request_view/new_loan_request/new_client_loan_request.dart';
 import 'package:nkrs_app/views/new_loan_request_view/utility/custom_navi_bar.dart';
+import 'package:nkrs_app/views/new_loan_request_view/utility/debug_view.dart';
 import 'package:nkrs_app/views/new_loan_request_view/utility/loading_dialog.dart';
 import 'package:nkrs_app/views/new_loan_request_view/utility/main_card.dart';
 import 'package:nkrs_app/views/new_loan_request_view/utility/scaffold_message.dart';
@@ -253,26 +254,26 @@ class _LoanRequestSectionState extends State<LoanRequestSection> {
                   ),
                 ),
                 //debug function for test database
-                // InkWell(
-                //   borderRadius: BorderRadius.circular(30),
-                //   onTap: () {
-                //     Navigator.push(
-                //       context,
-                //       MaterialPageRoute(
-                //         builder: (context) => DebugView(),
-                //         // builder: (context)=> LoanSuccessScreen(),
-                //       ),
-                //     );
-                //   },
-                //   child: MainCard(
-                //     header: "Debug Section",
-                //     description:
-                //         "Register and create a loan application   for a first-time borrower.",
-                //     cusIconRight: Iconsax.user_add_copy,
-                //     iconColor: const Color.fromARGB(255, 153, 0, 255),
-                //     iconBackgrouundColor: Color.fromARGB(40, 153, 0, 255),
-                //   ),
-                // ),
+                InkWell(
+                  borderRadius: BorderRadius.circular(30),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => DebugView(),
+                        // builder: (context)=> LoanSuccessScreen(),
+                      ),
+                    );
+                  },
+                  child: MainCard(
+                    header: "Debug Section",
+                    description:
+                        "Register and create a loan application   for a first-time borrower.",
+                    cusIconRight: Iconsax.user_add_copy,
+                    iconColor: const Color.fromARGB(255, 153, 0, 255),
+                    iconBackgrouundColor: Color.fromARGB(40, 153, 0, 255),
+                  ),
+                ),
               ],
             ),
           ),

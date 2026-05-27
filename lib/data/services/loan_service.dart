@@ -80,11 +80,13 @@ class LoanService {
     final Uri url = Uri.parse('$_baseUrl/customers/loans');
 
     try {
-      final response = await http.post(
-        url,
-        headers: {"Content-Type": "application/json"},
-        body: jsonEncode(loan.toJsonServer()),
-      );
+      final response = await http
+          .post(
+            url,
+            headers: {"Content-Type": "application/json"},
+            body: jsonEncode(loan.toJsonServer()),
+          )
+          .timeout(Duration(seconds: 10));
       if (response.statusCode == 200 || response.statusCode == 201) {
         return '';
       } else {

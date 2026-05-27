@@ -49,11 +49,25 @@ class DatabasePutService {
     }
   }
 
+  Future<int?> insertDataToInterests(Map<String, dynamic> data) async {
+    try {
+      final db = await _databaseService.database;
+      return await db?.insert(
+        'interest_rates',
+        data,
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
+    } catch (e) {
+      return null;
+      //   throw Exception('Failed to insert employee: $e');
+    }
+  }
+
   Future<int?> insertDataToLoans(Map<String, dynamic> data) async {
     try {
       final db = await _databaseService.database;
       return await db?.insert(
-        'employees',
+        'loans',
         data,
         conflictAlgorithm: ConflictAlgorithm.replace,
       );

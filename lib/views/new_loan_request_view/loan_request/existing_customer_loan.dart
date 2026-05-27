@@ -214,7 +214,7 @@ class _ExistingCustomerLoanState extends State<ExistingCustomerLoan> {
                                 // DatabaseService().dropTables();
                                 // DatabaseService().deleteDatabaseFile();
                                 // DatabaseService().close();
-                                database();
+                                // database();
                                 if (_formKey.currentState!.validate()) {
                                   var customerId = int.tryParse(
                                     nicNumber.text.trim(),
@@ -568,20 +568,20 @@ class _ExistingCustomerLoanState extends State<ExistingCustomerLoan> {
   }
 
   void database() async {
-    await DatabaseService().insertCustomer(
-      address: "116/3",
-      email: "example@gmail.com",
-      name: "vihaga",
-      nic: 200210801480,
-      phoneNumber: "07766303438",
-    );
-    await DatabaseService().insertCustomer(
-      address: "116/3",
-      email: "example2@gmail.com",
-      name: "vihaga",
-      nic: 200210801481,
-      phoneNumber: "07766303438",
-    );
+    // await DatabaseService().insertCustomer(
+    //   address: "116/3",
+    //   email: "example@gmail.com",
+    //   name: "vihaga",
+    //   nic: 200210801480,
+    //   phoneNumber: "07766303438",
+    // );
+    // await DatabaseService().insertCustomer(
+    //   address: "116/3",
+    //   email: "example2@gmail.com",
+    //   name: "vihaga",
+    //   nic: 200210801481,
+    //   phoneNumber: "07766303438",
+    // );
     // await DatabaseService().deleteCustomerByNic(200210801481);
     await DatabaseService().getAllCustomers();
     // await DatabaseService().printAllTables();

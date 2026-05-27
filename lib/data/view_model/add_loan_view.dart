@@ -5,6 +5,7 @@ import 'package:nkrs_app/data/services/database_service/database_put_service.dar
 import 'package:nkrs_app/data/services/loan_service.dart';
 import 'package:nkrs_app/models/add_loan_model.dart';
 import 'package:nkrs_app/views/new_loan_request_view/utility/scaffold_message.dart';
+import 'package:nkrs_app/views/new_loan_request_view/utility/scaffold_message_bottom.dart';
 
 class AddLoanView {
   Future<bool> addLoanByOnline(
@@ -26,12 +27,7 @@ class AddLoanView {
         return false;
       }
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Server connection failed"),
-          backgroundColor: Colors.red,
-        ),
-      );
+      ScaffoldMessageBottom.show(context, "Server connection failed");
     }
     return false;
   }
@@ -45,12 +41,7 @@ class AddLoanView {
     if (r != null) {
       return true;
     }
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text("Database connection failed"),
-        backgroundColor: Colors.red,
-      ),
-    );
+    ScaffoldMessageBottom.show(context, "Database connection failed");
     return false;
   }
 }

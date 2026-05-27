@@ -40,11 +40,28 @@ class DatabaseGetService {
     }
   }
 
-  Future<List<String>?> getinstallmentsId() async {
+  Future<List<String>?> getInstallmentsId() async {
     try {
       final db = await _databaseService.database;
       final List<Map<String, dynamic>> maps = await db!.query(
-        'loans',
+        'installments',
+        columns: ['id'],
+        where: 'sync = ?',
+        whereArgs: [1],
+      );
+      return maps.map((e) => e['id'].toString()).toList();
+    } catch (e) {
+      // ignore: avoid_print
+      print("Database Error: $e");
+      throw Exception(e);
+    }
+  }
+
+  Future<List<String>?> getInterestRatesId() async {
+    try {
+      final db = await _databaseService.database;
+      final List<Map<String, dynamic>> maps = await db!.query(
+        'interest_rates',
         columns: ['id'],
         where: 'sync = ?',
         whereArgs: [1],

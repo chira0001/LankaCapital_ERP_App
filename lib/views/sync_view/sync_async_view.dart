@@ -1,5 +1,8 @@
+// ignore_for_file: avoid_unnecessary_containers
+
 import 'package:flutter/material.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
+import 'package:nkrs_app/data/view_model/async_controller_view_model.dart';
 import 'package:nkrs_app/data/view_model/check_connection.dart';
 import 'package:nkrs_app/utility/constanst.dart';
 import 'package:nkrs_app/views/new_loan_request_view/utility/main_card.dart'
@@ -271,7 +274,9 @@ class _SyncAsyncViewState extends State<SyncAsyncView> {
                       ),
                       const SizedBox(height: 15),
                       GestureDetector(
-                        onTap: () {},
+                        onTap: () {
+                          AsyncControllerViewModel().asyncController(context);
+                        },
                         child: Container(
                           padding: const EdgeInsets.symmetric(
                             horizontal: 15,

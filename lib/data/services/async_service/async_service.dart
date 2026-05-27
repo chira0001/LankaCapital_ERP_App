@@ -3,22 +3,21 @@ import 'package:http/http.dart' as http;
 
 class AsyncService {
   final String _baseUrl = 'http://192.168.43.90:8080/api/v1/field';
+  final int _time = 10;
 
   Future<List<Map<String, dynamic>>?> asyncCustomers(
     int page,
     Map<String, dynamic> customersId,
   ) async {
     try {
-      final Uri url = Uri.parse(
-        '$_baseUrl/async/customers?page=$page',
-      ); //important : change this url
+      final Uri url = Uri.parse('$_baseUrl/async/customers?page=$page');
       final response = await http
           .post(
             url,
             headers: {"Content-Type": "application/json"},
             body: jsonEncode(customersId),
           )
-          .timeout(Duration(seconds: 5));
+          .timeout(Duration(seconds: _time));
       if (response.statusCode == 200 || response.statusCode == 201) {
         final data = jsonDecode(response.body);
         if (data is List) {
@@ -39,7 +38,7 @@ class AsyncService {
   ) async {
     try {
       final Uri url = Uri.parse(
-        '$_baseUrl/employeeTable?page=$page',
+        '$_baseUrl/async/fieldOfficers?page=$page',
       ); //important : change this url
       final response = await http
           .post(
@@ -47,13 +46,11 @@ class AsyncService {
             headers: {"Content-Type": "application/json"},
             body: jsonEncode(employeesId),
           )
-          .timeout(Duration(seconds: 10));
+          .timeout(Duration(seconds: _time));
       if (response.statusCode == 200 || response.statusCode == 201) {
         final data = jsonDecode(response.body);
-        if (data) {
-          return List<Map<String, dynamic>>.from(data);
-        } else {
-          return [];
+        if (data is List) {
+          return data.map((e) => Map<String, dynamic>.from(e)).toList();
         }
       }
       return null;
@@ -70,7 +67,7 @@ class AsyncService {
   ) async {
     try {
       final Uri url = Uri.parse(
-        '$_baseUrl/loanTable?page=$page',
+        '$_baseUrl/async/installments?page=$page',
       ); //important : change this url
       final response = await http
           .post(
@@ -78,19 +75,48 @@ class AsyncService {
             headers: {"Content-Type": "application/json"},
             body: jsonEncode(id),
           )
-          .timeout(Duration(seconds: 10));
+          .timeout(Duration(seconds: _time));
       if (response.statusCode == 200 || response.statusCode == 201) {
         final data = jsonDecode(response.body);
-        if (data) {
-          return List<Map<String, dynamic>>.from(data);
-        } else {
-          return [];
+        if (data is List) {
+          return data.map((e) => Map<String, dynamic>.from(e)).toList();
         }
+        return null;
       }
       return null;
     } catch (e) {
       // ignore: avoid_print
       print("installments Sync Error: $e");
+      return null;
+    }
+  }
+
+  Future<List<Map<String, dynamic>>?> asyncInterestRates(
+    int page,
+    Map<String, dynamic> id,
+  ) async {
+    try {
+      final Uri url = Uri.parse(
+        '$_baseUrl/async/interests?page=$page',
+      ); //important : change this url
+      final response = await http
+          .post(
+            url,
+            headers: {"Content-Type": "application/json"},
+            body: jsonEncode(id),
+          )
+          .timeout(Duration(seconds: _time));
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final data = jsonDecode(response.body);
+        if (data is List) {
+          return data.map((e) => Map<String, dynamic>.from(e)).toList();
+        }
+        return null;
+      }
+      return null;
+    } catch (e) {
+      // ignore: avoid_print
+      print("interestRates Sync Error: $e");
       return null;
     }
   }
@@ -101,7 +127,7 @@ class AsyncService {
   ) async {
     try {
       final Uri url = Uri.parse(
-        '$_baseUrl/loanTable?page=$page',
+        '$_baseUrl/async/loans?page=$page',
       ); //important : change this url
       final response = await http
           .post(
@@ -109,14 +135,13 @@ class AsyncService {
             headers: {"Content-Type": "application/json"},
             body: jsonEncode(loansId),
           )
-          .timeout(Duration(seconds: 10));
+          .timeout(Duration(seconds: _time));
       if (response.statusCode == 200 || response.statusCode == 201) {
         final data = jsonDecode(response.body);
-        if (data) {
-          return List<Map<String, dynamic>>.from(data);
-        } else {
-          return [];
+        if (data is List) {
+          return data.map((e) => Map<String, dynamic>.from(e)).toList();
         }
+        return null;
       }
       return null;
     } catch (e) {

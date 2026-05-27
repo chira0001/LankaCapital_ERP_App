@@ -115,15 +115,23 @@ class _DebugViewState extends State<DebugView> {
                   Text("Customer"),
                   ElevatedButton(
                     onPressed: () {
-                      databaseService.deleteAllCustomers("customer");
+                      databaseService.deleteAllData("employees");
+                      databaseService.deleteAllData("customers");
+                      databaseService.deleteAllData("installments");
+                      databaseService.deleteAllData("interest_rates");
+                      databaseService.deleteAllData("loans");
                     },
-                    child: const Text("delete all customer"),
+                    child: const Text("delete all table data"),
                   ),
                   ElevatedButton(
                     onPressed: () {
-                      databaseService.getAllCustomers();
+                      databaseService.getAllTableData("employees");
+                      databaseService.getAllTableData("customers");
+                      databaseService.getAllTableData("installments");
+                      databaseService.getAllTableData("interest_rates");
+                      databaseService.getAllTableData("loans");
                     },
-                    child: const Text("print customer"),
+                    child: const Text("print Table Data"),
                   ),
                   ElevatedButton(
                     onPressed: () {
@@ -163,13 +171,17 @@ class _DebugViewState extends State<DebugView> {
                   ),
                   OutlinedButton(
                     onPressed: () {
-                      asyncDatabaseTable.customersTable();
+                      asyncDatabaseTable.customersTable(context);
+                      asyncDatabaseTable.employeesTable(context);
+                      asyncDatabaseTable.installmentsTable(context);
                     },
                     child: const Text("Sync"),
                   ),
                   SizedBox(height: 10),
                   OutlinedButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      databaseService.dropTables();
+                    },
                     child: const Text("delete all tables"),
                   ),
                   SizedBox(height: 40),

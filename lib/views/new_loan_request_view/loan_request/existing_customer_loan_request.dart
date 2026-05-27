@@ -44,14 +44,10 @@ class _ExistingCustomerLoanRequestState
   final TextEditingController loanAmount = TextEditingController();
   final TextEditingController interestRate = TextEditingController();
   final TextEditingController installment = TextEditingController();
-  final TextEditingController nic = TextEditingController();
   final double _customSize_1 = 4;
   final double _customSize_2 = 25;
-
-  // double amount = 0.0;
-  // double interestRates = 0.0;
-  // int noOfInstallments = 0;
   bool state = false;
+  // late double amount;
 
   @override
   Widget build(BuildContext context) {
@@ -183,13 +179,20 @@ class _ExistingCustomerLoanRequestState
                         labelText_: "XXXXX.XX",
                         type: TextInputType.number,
                         validatorCallback: (value) {
-                          if (value == null || value.isEmpty) {
+                          if (value == null || value.trim().isEmpty) {
                             return "Please enter the loan amount";
-                          } else if (value as double == 0) {
-                            return "Please enter a valid loan amount";
-                          } else {
-                            return null;
                           }
+                          final amount = double.tryParse(value.trim());
+                          if (amount == null) {
+                            return "Please enter a valid number";
+                          }
+                          if (amount <= 0) {
+                            return "Loan amount must be greater than 0";
+                          }
+                          return null;
+                        },
+                        onSaveCallback: (p0) {
+                          // amount = loanAmount.value as double;
                         },
                       ),
                       SizedBox(height: _customSize_2),
@@ -225,7 +228,6 @@ class _ExistingCustomerLoanRequestState
                         items: widget.installments.map((item) {
                           return DropdownMenuItem<int>(
                             value: item.id.toInt(),
-
                             child: Text(item.value.toString()),
                           );
                         }).toList(),
@@ -245,114 +247,106 @@ class _ExistingCustomerLoanRequestState
                       SizedBox(height: 50),
                       SizedBox(
                         width: double.infinity,
-                        child: (state)
-                            ? const Center(child: CircularProgressIndicator())
-                            : ElevatedButton(
-                                onPressed: () async {
-                                  print("star1");
-                                  FocusScope.of(context).unfocus();
-                                  if (_formKey.currentState!.validate()) {
-                                    _formKey.currentState!.save();
-                                    print("star2");
-
-                                    setState(() {
-                                      state = true;
-                                    });
-                                    final AddLoanView addLoanView =
-                                        AddLoanView();
-                                    bool success = await addLoanView
-                                        .addLoanByOnline(
-                                          AddLoanModel(
-                                            amount: double.parse(
-                                              loanAmount.text.trim(),
-                                            ),
-                                            // customerNic: widget.nicNumber,
-                                            customerNic: 200227800587,
-                                            employeeId: 1,
-                                            installmentId: 1,
-                                          ),
-                                          context,
-                                        );
-                                    setState(() {
-                                      state = false;
-                                    });
-                                    if (success) {
-                                      Navigator.push(
-                                        // ignore: use_build_context_synchronously
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) =>
-                                              const LoanSuccessScreen(),
-                                        ),
-                                      );
-                                    }
-                                  }
-                                  setState(() {
-                                    state = false;
-                                  });
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: btnC,
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 20,
-                                    vertical: 15,
+                        child: ElevatedButton(
+                          onPressed: () async {
+                            print("star1");
+                            if (_formKey.currentState!.validate()) {
+                              // _formKey.currentState!.save();
+                              print("star2");
+                              setState(() {
+                                state = true;
+                              });
+                              bool success = false;
+                              final AddLoanView addLoanView = AddLoanView();
+                              AddLoanModel loan = AddLoanModel(
+                                amount: double.tryParse(
+                                  loanAmount.text.trim(),
+                                )!,
+                                // customerNic: widget.nicNumber,
+                                customerNic: 200227800587,
+                                employeeId: 1,
+                                installmentId: 1,
+                              );
+                              if (CheckConnection.isOnline.value) {
+                                success = await addLoanView.addLoanByOnline(
+                                  loan,
+                                  context,
+                                );
+                              } else {}
+                              setState(() {
+                                state = false;
+                              });
+                              if (success) {
+                                Navigator.push(
+                                  // ignore: use_build_context_synchronously
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        const LoanSuccessScreen(),
                                   ),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(
-                                      btnBorderRadius,
-                                    ),
-                                  ),
-                                ),
-                                child:
-                                    //  (state)
-                                    //     ? Container(
-                                    //         width: 28,
-                                    //         height: 28,
-                                    //         padding: const EdgeInsets.all(4),
-                                    //         decoration: BoxDecoration(
-                                    //           color: Colors.white.withOpacity(0.15),
-                                    //           shape: BoxShape.circle,
-                                    //           boxShadow: [
-                                    //             BoxShadow(
-                                    //               color: Colors.black.withOpacity(
-                                    //                 0.15,
-                                    //               ),
-                                    //               blurRadius: 8,
-                                    //               offset: const Offset(0, 3),
-                                    //             ),
-                                    //           ],
-                                    //         ),
-                                    //         child: const CircularProgressIndicator(
-                                    //           strokeWidth: 3,
-                                    //           valueColor:
-                                    //               AlwaysStoppedAnimation<Color>(
-                                    //                 Colors.white,
-                                    //               ),
-                                    //         ),
-                                    //       )
-                                    //     :
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        Text(
-                                          "Apply for Loan",
-                                          textAlign: TextAlign.center,
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: btnFontSize,
-                                            fontWeight: FontWeight(700),
-                                          ),
-                                        ),
-                                        const SizedBox(width: 10),
-                                        const Icon(
-                                          Icons.arrow_forward_ios,
-                                          color: Colors.white,
-                                          size: 16,
-                                        ),
-                                      ],
-                                    ),
+                                );
+                              }
+                            }
+                            setState(() {
+                              state = false;
+                            });
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: btnC,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                              vertical: 15,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(
+                                btnBorderRadius,
                               ),
+                            ),
+                          ),
+                          child: (state)
+                              ? Container(
+                                  width: 28,
+                                  height: 28,
+                                  padding: const EdgeInsets.all(4),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white.withOpacity(0.15),
+                                    shape: BoxShape.circle,
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withOpacity(0.15),
+                                        blurRadius: 8,
+                                        offset: const Offset(0, 3),
+                                      ),
+                                    ],
+                                  ),
+                                  child: const CircularProgressIndicator(
+                                    strokeWidth: 3,
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                      Colors.white,
+                                    ),
+                                  ),
+                                )
+                              : Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      "Apply for Loan",
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: btnFontSize,
+                                        fontWeight: FontWeight(700),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 10),
+                                    const Icon(
+                                      Icons.arrow_forward_ios,
+                                      color: Colors.white,
+                                      size: 16,
+                                    ),
+                                  ],
+                                ),
+                        ),
                       ),
                     ],
                   ),

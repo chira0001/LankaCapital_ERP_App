@@ -33,6 +33,7 @@ class DatabaseService {
       await db?.execute('DROP TABLE IF EXISTS loans');
       await db?.execute('DROP TABLE IF EXISTS employees');
       await db?.execute('DROP TABLE IF EXISTS customers');
+      await db?.execute('DROP TABLE IF EXISTS installments');
 
       debugPrint("Tables dropped successfully.");
     } catch (e) {
@@ -208,6 +209,41 @@ class DatabaseService {
     } catch (e) {
       debugPrint('Error retrieving today\'s collections: $e');
       return [];
+    }
+  }
+
+  Future<bool> deleteAllData(String table) async {
+    try {
+      final db = await _databaseService.database;
+      await db!.delete(table);
+      return true;
+    } catch (e) {
+      debugPrint("Delete Employees Error: $e");
+      return false;
+    }
+  }
+
+  Future<void> getAllTableData(String table) async {
+    try {
+      final db = await _databaseService.database;
+      final List<Map<String, dynamic>> employees = await db!.query(table);
+      print("----------------------");
+      for (var employee in employees) {
+        // print("----------------------");
+        // print("ID : ${employee['id']}");
+        // print("First Name : ${employee['first_name']}");
+        // print("Last Name : ${employee['last_name']}");
+        // print("Email : ${employee['email']}");
+        // print("NIC : ${employee['nic']}");
+        // print("Phone : ${employee['phone_number']}");
+        // print("Address : ${employee['address']}");
+        // print("Sync : ${employee['sync']}");
+        print(employee);
+      }
+      print("----------------------");
+      // return employees;
+    } catch (e) {
+      debugPrint("Get Employees Error: $e");
     }
   }
 }
