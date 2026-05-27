@@ -46,8 +46,9 @@ class _AppLockWrapperState extends State<AppLockWrapper> with WidgetsBindingObse
       if (!_isAuthenticated && !_isAuthenticating) {
          _checkAndAuthenticate();
       }
-    } else if (state == AppLifecycleState.paused || state == AppLifecycleState.inactive) {
-      // Lock the app when it goes to the background
+    } else if (state == AppLifecycleState.paused) {
+      // Lock the app ONLY when it goes fully to the background (paused).
+      // 'inactive' state (notifications, recent tasks) will no longer trigger a lock.
       setState(() {
         _isAuthenticated = false;
       });

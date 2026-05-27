@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
@@ -170,6 +171,7 @@ class AuthService {
     try {
       await _storage.delete(key: _tokenKey);
       await _storage.delete(key: _refreshTokenKey);
+      await _storage.delete(key: 'cached_profile');
     } catch (e) {
       debugPrint("Error deleting token: $e");
     }
@@ -213,33 +215,27 @@ class AuthService {
 
   Future<Map<String, dynamic>?> getCustomerProfile() async {
     try {
-      final token = await getToken();
-      if (token != null) {
-        debugPrint("Decoded JWT: ${JwtDecoder.decode(token)}");
-      }
-
       final userId = await getUserIdFromToken();
-      debugPrint("Extracted userId from token: $userId");
       if (userId == null) return null;
 
-      debugPrint("Fetching all employees from: /recep/employees");
-      final response = await _dio.get('/recep/employees');
-      debugPrint("Profile response status: ${response.statusCode}");
-
-      if (response.statusCode == 200) {
-        final List<dynamic> employees = response.data;
-        for (var emp in employees) {
-          if (emp['email'] == userId) {
-            debugPrint("Found matching employee profile: $emp");
-            return emp;
+      try {
+        final response = await _dio.get('/recep/employees');
+        if (response.statusCode == 200) {
+          final List<dynamic> employees = response.data;
+          for (var emp in employees) {
+            if (emp['email'] == userId) {
+              await _storage.write(key: 'cached_profile', value: jsonEncode(emp));
+              return emp;
+            }
           }
         }
-        debugPrint("Employee with email $userId not found in the list.");
+      } catch (e) {
+        debugPrint("Network error fetching profile, falling back to cache: $e");
+        final cached = await _storage.read(key: 'cached_profile');
+        if (cached != null) {
+          return jsonDecode(cached);
+        }
       }
-    } on DioException catch (e) {
-      debugPrint(
-        "Dio Error fetching profile: ${e.response?.statusCode} - ${e.response?.data}",
-      );
     } catch (e) {
       debugPrint("Error fetching profile: $e");
     }
@@ -252,7 +248,16 @@ class AuthService {
   ) async {
     try {
       final response = await _dio.put('/recep/employees/$userId', data: data);
-      return response.statusCode == 200 || response.statusCode == 204;
+      if (response.statusCode == 200 || response.statusCode == 204) {
+        final cachedStr = await _storage.read(key: 'cached_profile');
+        if (cachedStr != null) {
+          Map<String, dynamic> cached = jsonDecode(cachedStr);
+          cached.addAll(data);
+          await _storage.write(key: 'cached_profile', value: jsonEncode(cached));
+        }
+        return true;
+      }
+      return false;
     } catch (e) {
       debugPrint("Error updating profile: $e");
       return false;
