@@ -251,7 +251,6 @@ class AuthService {
     Map<String, dynamic> data,
   ) async {
     try {
-     
       final response = await _dio.put('/recep/employees/$userId', data: data);
       return response.statusCode == 200 || response.statusCode == 204;
     } catch (e) {

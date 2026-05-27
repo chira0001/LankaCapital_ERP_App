@@ -21,7 +21,7 @@ class CheckConnection {
     try {
       final response = await http
           .get(Uri.parse('https://www.google.com/generate_204'))
-          .timeout(const Duration(seconds: 4));
+          .timeout(const Duration(seconds: 5));
       return response.statusCode == 204;
     } catch (_) {
       return false;

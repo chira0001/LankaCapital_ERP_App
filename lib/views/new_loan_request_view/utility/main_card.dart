@@ -23,18 +23,18 @@ class MainCard extends StatelessWidget {
     return Container(
       padding: EdgeInsets.all(innerBoxPD),
       decoration: BoxDecoration(
-        color: safeAreaC,
+        color: appBarC,
         borderRadius: BorderRadius.circular(cardBorderRadius),
         boxShadow: [
           BoxShadow(
             // ignore: deprecated_member_use
             color: boxShadowC.withOpacity(0.1),
-            spreadRadius: 2,
-            blurRadius: 5,
+            spreadRadius: 1,
+            blurRadius: 3,
             offset: const Offset(0, 3),
           ),
         ],
-        border: BoxBorder.all(color: boaderC, width: 0.5),
+        // border: BoxBorder.all(color: boaderC, width: 0.5),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

@@ -7,16 +7,12 @@ import 'package:nkrs_app/models/user_model.dart';
 class LoanViewModel extends ChangeNotifier {
   late User? _user;
   List<Loan> _loans = [];
-  bool _isLoading = false;
 
   User? get user => _user;
-
-  bool get isLoading => _isLoading;
 
   Future<void> searchByNic(int nic) async {
     final LoanService service = LoanService();
 
-    _isLoading = true;
     notifyListeners();
 
     try {
@@ -27,7 +23,6 @@ class LoanViewModel extends ChangeNotifier {
       _user = null;
       _loans = [];
     } finally {
-      _isLoading = false;
       notifyListeners();
     }
   }
@@ -60,7 +55,6 @@ class LoanViewModel extends ChangeNotifier {
       _loans = [];
       debugPrint("Offline search error: $e");
     } finally {
-      _isLoading = false;
       notifyListeners();
     }
   }
