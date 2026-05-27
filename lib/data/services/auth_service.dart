@@ -13,6 +13,7 @@ class AuthService {
   late final Dio _dio;
   final String _tokenKey = 'jwt_token';
   final String _refreshTokenKey = 'refresh_token';
+  final String _baseUrl = 'http://192.168.43.90:8080/api/v1';
   final String _baseUrl = ApiConfig.baseUrl;
 
   AuthService() {
@@ -251,7 +252,6 @@ class AuthService {
     Map<String, dynamic> data,
   ) async {
     try {
-     
       final response = await _dio.put('/recep/employees/$userId', data: data);
       return response.statusCode == 200 || response.statusCode == 204;
     } catch (e) {

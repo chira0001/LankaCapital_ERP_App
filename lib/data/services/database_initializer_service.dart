@@ -2,12 +2,13 @@ import 'package:path/path.dart';
 import 'package:sqflite_sqlcipher/sqflite.dart';
 
 class DatabaseInitializerService {
-  static final DatabaseInitializerService _instance = DatabaseInitializerService._internal();
+  static final DatabaseInitializerService _instance =
+      DatabaseInitializerService._internal();
   static Database? _databse;
   factory DatabaseInitializerService() => _instance;
   DatabaseInitializerService._internal();
 
-  String get filePath => "lankacapitals.db";
+  String get filePath => "lankacapital.db";
   final String password = "1234";
 
   Future<Database?> get database async {
@@ -31,43 +32,64 @@ class DatabaseInitializerService {
     // create employee table
     await db.execute('''
       CREATE TABLE IF NOT EXISTS employees (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        address VARCHAR(255) NOT NULL,
-        email VARCHAR(255) NOT NULL UNIQUE,
-        first_name VARCHAR(255) NOT NULL,
-        last_name VARCHAR(255) NOT NULL,
-        nic BIGINT NOT NULL,
-        phone_number VARCHAR(255) NOT NULL
+        id INTEGER PRIMARY KEY,
+        address TEXT,
+        email TEXT NOT NULL UNIQUE,
+        first_name TEXT,
+        last_name TEXT,
+        nic INTEGER NOT NULL UNIQUE,
+        phone_number TEXT,
+        sync INTEGER DEFAULT 0
       )
-    ''');
-    // create customer table
+  ''');
+    // create customers table
     await db.execute('''
-      CREATE TABLE IF NOT EXISTS customers (
-        nic BIGINT PRIMARY KEY,
-        address VARCHAR(255) NOT NULL,
-        email VARCHAR(255) NOT NULL UNIQUE,
-        name VARCHAR(255) NOT NULL,
-        phone_number VARCHAR(255) NOT NULL
+    CREATE TABLE IF NOT EXISTS customers (
+      nic INTEGER PRIMARY KEY,
+      address TEXT NOT NULL,
+      email TEXT,
+      name TEXT NOT NULL,
+      phone_number TEXT NOT NULL,
+      sync INTEGER DEFAULT 0
+    )
+  ''');
+    // create installments table
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS installments (
+        id INTEGER PRIMARY KEY,
+        value INTEGER NOT NULL UNIQUE,
+        sync INTEGER DEFAULT 0
       )
     ''');
-    // create loan table
+    // create interest_rates table
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS interest_rates (
+        id INTEGER PRIMARY KEY,
+        rate REAL NOT NULL UNIQUE,
+        sync INTEGER DEFAULT 0
+      )
+    ''');
+    // create loans table
     await db.execute('''
       CREATE TABLE IF NOT EXISTS loans (
-        file_number VARCHAR(255) PRIMARY KEY,
-        amount DECIMAL(12,2),
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        interest_rate DOUBLE,
-        customer_id BIGINT,
-        employee_id BIGINT,
-        no_of_installments DOUBLE,
-        rejection_note VARCHAR(1000),
+        file_number TEXT PRIMARY KEY,
+        amount REAL,
+        created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+        document_charge REAL DEFAULT 100.00,
+        interest_rate_id INTEGER NOT NULL,
+        customer_id INTEGER NOT NULL,
+        employee_id INTEGER NOT NULL,
+        installment_id INTEGER NOT NULL,
+        rejection_note TEXT,
         risk TEXT CHECK(risk IN ('HIGH', 'LOW', 'MEDIUM')),
-        status TEXT CHECK(status IN ('APPROVED', 'PENDING', 'REJECTED')),
-        FOREIGN KEY (customer_id) REFERENCES customers(id) ON DELETE CASCADE,
-        FOREIGN KEY (employee_id) REFERENCES employees(id) ON DELETE SET NULL
+        status TEXT CHECK(status IN ('APPROVED', 'PENDING', 'REJECTED'))DEFAULT 'PENDING',
+        sync INTEGER DEFAULT 0,
+        FOREIGN KEY (customer_id) REFERENCES customers(nic),
+        FOREIGN KEY (employee_id) REFERENCES employees(id),
+        FOREIGN KEY (installment_id) REFERENCES installments(id),
+        FOREIGN KEY (interest_rate_id) REFERENCES interest_rates(id)
       )
     ''');
-
     // create collections table
     await db.execute('''
       CREATE TABLE IF NOT EXISTS collections (

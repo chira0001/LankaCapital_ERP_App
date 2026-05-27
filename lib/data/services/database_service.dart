@@ -7,14 +7,14 @@ class DatabaseService {
   final DatabaseInitializerService _databaseService =
       DatabaseInitializerService();
 
-  Future<bool?> isTableExists(String tableName) async {
-    final db = await _databaseService.database; //risk
-    final result = await db?.rawQuery(
-      "SELECT name FROM sqlite_master WHERE type='table' AND name=?",
-      [tableName],
-    );
-    return result?.isNotEmpty;
-  }
+  // Future<bool?> isTableExists(String tableName) async {
+  //   final db = await _databaseService.database; //risk
+  //   final result = await db?.rawQuery(
+  //     "SELECT name FROM sqlite_master WHERE type='table' AND name=?",
+  //     [tableName],
+  //   );
+  //   return result?.isNotEmpty;
+  // }
 
   Future<void> printAllTables() async {
     final db = await _databaseService.database;
@@ -33,6 +33,7 @@ class DatabaseService {
       await db?.execute('DROP TABLE IF EXISTS loans');
       await db?.execute('DROP TABLE IF EXISTS employees');
       await db?.execute('DROP TABLE IF EXISTS customers');
+      await db?.execute('DROP TABLE IF EXISTS installments');
 
       debugPrint("Tables dropped successfully.");
     } catch (e) {
@@ -98,6 +99,7 @@ class DatabaseService {
         debugPrint('  Email:        ${data['email']}');
         debugPrint('  Address:      ${data['address']}');
         debugPrint('  Phone Number: ${data['phone_number']}');
+        debugPrint('  Sync:         ${data['sync']}');
         debugPrint('-----------------------------------');
       }
       // return maps;
@@ -149,9 +151,7 @@ class DatabaseService {
     debugPrint(customerResult.toString());
     if (customerResult.isEmpty) {
       return null;
-    }else{
-      
-    }
+    } else {}
 
     final loansResult = await db.query(
       'loans',
@@ -209,6 +209,41 @@ class DatabaseService {
     } catch (e) {
       debugPrint('Error retrieving today\'s collections: $e');
       return [];
+    }
+  }
+
+  Future<bool> deleteAllData(String table) async {
+    try {
+      final db = await _databaseService.database;
+      await db!.delete(table);
+      return true;
+    } catch (e) {
+      debugPrint("Delete Employees Error: $e");
+      return false;
+    }
+  }
+
+  Future<void> getAllTableData(String table) async {
+    try {
+      final db = await _databaseService.database;
+      final List<Map<String, dynamic>> employees = await db!.query(table);
+      print("----------------------");
+      for (var employee in employees) {
+        // print("----------------------");
+        // print("ID : ${employee['id']}");
+        // print("First Name : ${employee['first_name']}");
+        // print("Last Name : ${employee['last_name']}");
+        // print("Email : ${employee['email']}");
+        // print("NIC : ${employee['nic']}");
+        // print("Phone : ${employee['phone_number']}");
+        // print("Address : ${employee['address']}");
+        // print("Sync : ${employee['sync']}");
+        print(employee);
+      }
+      print("----------------------");
+      // return employees;
+    } catch (e) {
+      debugPrint("Get Employees Error: $e");
     }
   }
 }
