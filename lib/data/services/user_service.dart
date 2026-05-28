@@ -1,36 +1,23 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:flutter/foundation.dart';
 import 'package:nkrs_app/models/user_model.dart';
 
 class UserService {
-  Future<User> fetchAllUsers(String jwtToken, String nic) async {
-    final Uri url = Uri.parse('https://fakestoreapi.com/products');
+  static const String baseUrl = 'http://192.168.43.90:8080/api/v1/field';
 
+  Future<User?> findUserInfoById(int nic) async {
+    final Uri url = Uri.parse('$baseUrl/customers/loans/$nic');
     try {
-      final response = await http.post(
-        url,
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-          'Authorization': 'Bearer $jwtToken',
-        },
-        body: json.encode({'nic', nic}),
-      );
-
+      final response = await http.get(url).timeout(const Duration(seconds: 10));
       if (response.statusCode == 200 || response.statusCode == 201) {
-        final Map<String, dynamic> responseData = json.decode(response.body);
-        debugPrint("fetch the user");
-
-        return User.fromJson(responseData);
-      } else if (response.statusCode == 401) {
-        throw Exception('Unauthorized: Please log in again.');
-      } else {
-        throw Exception('Server error: ${response.statusCode}');
+        final Map<String, dynamic> data = jsonDecode(response.body);
+        final User user = User.fromJson(data);
+        return user;
       }
+      return null;
     } catch (e) {
-      debugPrint("Failt to get a user data $e");
-      throw Exception('Request failed: $e');
+      print("findUserInfoById error: $e");
+      return null;
     }
   }
 }

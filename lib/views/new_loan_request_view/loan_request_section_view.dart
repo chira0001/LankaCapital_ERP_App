@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
-import 'package:nkrs_app/data/services/database_service/database_get_service.dart';
 import 'package:nkrs_app/data/view_model/check_connection.dart';
-import 'package:nkrs_app/data/view_model/get_loan_view_model.dart';
-import 'package:nkrs_app/models/installments_model.dart';
+import 'package:nkrs_app/data/view_model/loan_view_model.dart';
+import 'package:nkrs_app/models/installment_model.dart';
 import 'package:nkrs_app/utility/constanst.dart';
 import 'package:nkrs_app/views/customer_collection_views/customerCollectionpage/customer_collection_home.dart';
 import 'package:nkrs_app/views/new_loan_request_view/loan_request/existing_customer_loan.dart';
@@ -204,19 +203,14 @@ class _LoanRequestSectionState extends State<LoanRequestSection> {
                 InkWell(
                   borderRadius: BorderRadius.circular(30),
                   onTap: () async {
-                    List<InstallmentsModel>? installments;
+                    List<InstallmentModel>? installments;
                     LoadingDialog.show(context, message: 'Please Wait...');
                     try {
-                      final bool isOnline = CheckConnection.isOnline.value;
-                      if (isOnline) {
-                        installments = await GetLoanViewModel()
-                            .getLoanDataByOnline(context);
-                      } else {
-                        installments = await DatabaseGetService()
-                            .getInstallments();
-                      }
+                      installments = await LoanViewModel().getInstallmentInfo(
+                        context,
+                      );
                     } catch (e) {
-                      // handle/log error if you want
+                      // handle log error
                     } finally {
                       if (context.mounted) {
                         LoadingDialog.hide(

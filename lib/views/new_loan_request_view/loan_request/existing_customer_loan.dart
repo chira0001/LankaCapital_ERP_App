@@ -1,15 +1,9 @@
 // ignore_for_file: use_build_context_synchronously
-
 import 'package:flutter/material.dart';
-import 'package:nkrs_app/data/services/database_initializer_service.dart';
-import 'package:nkrs_app/data/services/database_service.dart';
-import 'package:nkrs_app/data/services/database_service/database_get_service.dart';
 import 'package:nkrs_app/data/view_model/check_connection.dart';
-import 'package:nkrs_app/data/view_model/get_loan_view_model.dart';
 import 'package:nkrs_app/data/view_model/loan_view_model.dart';
-import 'package:nkrs_app/models/installments_model.dart';
-import 'package:nkrs_app/models/loan_model.dart';
-import 'package:nkrs_app/models/user_model.dart';
+import 'package:nkrs_app/models/installment_model.dart';
+import 'package:nkrs_app/models/user_loan_model.dart';
 import 'package:nkrs_app/utility/constanst.dart';
 import 'package:nkrs_app/views/new_loan_request_view/loan_request/existing_customer_loan_details.dart';
 import 'package:nkrs_app/views/new_loan_request_view/loan_request/existing_customer_loan_request.dart';
@@ -18,7 +12,6 @@ import 'package:nkrs_app/views/new_loan_request_view/utility/custom_text_field.d
 import 'package:nkrs_app/views/new_loan_request_view/utility/loading_dialog.dart';
 import 'package:nkrs_app/views/new_loan_request_view/utility/main_card.dart';
 import 'package:nkrs_app/views/new_loan_request_view/utility/popup_box_message.dart';
-import 'package:nkrs_app/views/new_loan_request_view/utility/popup_box_message_.dart';
 import 'package:nkrs_app/views/new_loan_request_view/utility/scaffold_message.dart';
 
 class ExistingCustomerLoan extends StatefulWidget {
@@ -30,22 +23,16 @@ class ExistingCustomerLoan extends StatefulWidget {
 
 class _ExistingCustomerLoanState extends State<ExistingCustomerLoan> {
   bool showDetails = false;
-  late bool online;
   late bool isLoading = false;
 
-  LoanViewModel loanData = LoanViewModel();
   TextEditingController nicNumber = TextEditingController();
   final _formKey = GlobalKey<FormState>();
-  User? _user;
+  dynamic _user;
 
   @override
   void initState() {
     super.initState();
     CheckConnection.initialize();
-    DatabaseInitializerService().database;
-    DatabaseService().printAllTables();
-    // DatabaseService().isTableExists("");
-    // CheckConnection().initialize();
   }
 
   @override
@@ -199,7 +186,7 @@ class _ExistingCustomerLoanState extends State<ExistingCustomerLoan> {
                                 labelText_: "Enter Customer ID",
                                 type: TextInputType.number,
                                 validatorCallback: (value) {
-                                  if (value == null || value.trim().isEmpty) {
+                                  if (value == null) {
                                     return "Please fill this field";
                                   } else if (value.isEmpty) {
                                     return "Enter a valid NIC number";
@@ -211,48 +198,32 @@ class _ExistingCustomerLoanState extends State<ExistingCustomerLoan> {
                             ),
                             ElevatedButton(
                               onPressed: () async {
-                                // DatabaseService().dropTables();
-                                // DatabaseService().deleteDatabaseFile();
-                                // DatabaseService().close();
-                                // database();
                                 if (_formKey.currentState!.validate()) {
-                                  var customerId = int.tryParse(
-                                    nicNumber.text.trim(),
-                                  );
-                                  if (customerId == null) {
-                                    showTopNotification(
-                                      context,
-                                      "Invalid NIC number",
-                                    );
-                                    return;
-                                  }
-                                  setState(() {
-                                    isLoading = true;
-                                  });
+                                  setState(() => isLoading = true);
                                   try {
-                                    if (CheckConnection.isOnline.value) {
-                                      await loanData.searchByNic(customerId);
+                                    _user = await LoanViewModel()
+                                        .findUserAndLoanById(
+                                          context,
+                                          int.parse(nicNumber.text.trim()),
+                                        );
+                                    if (_user != null) {
+                                      setState(() {
+                                        showDetails = true;
+                                      });
                                     } else {
-                                      await loanData.searchByNicOffline(
-                                        customerId,
+                                      setState(() {
+                                        showDetails = false;
+                                        _user = null;
+                                      });
+                                      showTopNotification(
+                                        context,
+                                        "User not found. Please check the ID.",
                                       );
                                     }
-                                    setState(() {
-                                      _user = loanData.user;
-                                      if (_user != null) {
-                                        showDetails = true;
-                                      } else {
-                                        showDetails = false;
-                                        showCustomTopMessageBox(
-                                          isError: true,
-                                          context,
-                                          "No customer record found for NIC: $customerId",
-                                        );
-                                      }
-                                    });
                                   } catch (e) {
                                     setState(() {
                                       showDetails = false;
+                                      _user = null;
                                     });
                                     showTopNotification(
                                       context,
@@ -263,11 +234,6 @@ class _ExistingCustomerLoanState extends State<ExistingCustomerLoan> {
                                       isLoading = false;
                                     });
                                   }
-                                } else {
-                                  setState(() {
-                                    showDetails = false;
-                                    isLoading = false;
-                                  });
                                 }
                               },
                               style: ElevatedButton.styleFrom(
@@ -296,13 +262,13 @@ class _ExistingCustomerLoanState extends State<ExistingCustomerLoan> {
                               child: isLoading
                                   ? Padding(
                                       padding: const EdgeInsets.symmetric(
-                                        horizontal: 11,
+                                        horizontal: 10,
                                       ),
                                       child: SizedBox(
-                                        height: 22,
-                                        width: 21,
+                                        height: 20,
+                                        width: 20,
                                         child: CircularProgressIndicator(
-                                          strokeWidth: 2,
+                                          strokeWidth: 2.5,
                                           color: Colors.white,
                                         ),
                                       ),
@@ -364,17 +330,13 @@ class _ExistingCustomerLoanState extends State<ExistingCustomerLoan> {
                 CustomRow(label: "Phone Number", value: _user!.phoneNumber),
                 GestureDetector(
                   onTap: () async {
-                    List<InstallmentsModel>? installments;
+                    List<InstallmentModel>? installments;
+                    // List<InterestRateModel>? interestRate;
                     LoadingDialog.show(context, message: 'Please Wait...');
                     try {
-                      final bool isOnline = CheckConnection.isOnline.value;
-                      if (isOnline) {
-                        installments = await GetLoanViewModel()
-                            .getLoanDataByOnline(context);
-                      } else {
-                        installments = await DatabaseGetService()
-                            .getInstallments();
-                      }
+                      installments = await LoanViewModel().getInstallmentInfo(
+                        context,
+                      );
                     } catch (e) {
                       // handle/log error if you want
                     } finally {
@@ -383,14 +345,14 @@ class _ExistingCustomerLoanState extends State<ExistingCustomerLoan> {
                       }
                     }
                     if (!context.mounted) return;
-                    if (installments != null) {
+                    if (installments != null && installments.isNotEmpty) {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
                           builder: (_) => ExistingCustomerLoanRequest(
                             installments: installments!,
                             interestRates: null,
-                            nicNumber: 1234,
+                            nicNumber: int.tryParse(nicNumber.text.trim()) ?? 0,
                           ),
                         ),
                       );
@@ -438,8 +400,8 @@ class _ExistingCustomerLoanState extends State<ExistingCustomerLoan> {
             ),
           ),
           SizedBox(height: 20),
-          FutureBuilder<List<Loan>>(
-            future: loanData.getLoansByID(), //getter
+          FutureBuilder<List<UserLoanModel>>(
+            future: Future.value(_user?.loans), //getter
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return Center(
@@ -470,7 +432,7 @@ class _ExistingCustomerLoanState extends State<ExistingCustomerLoan> {
                   physics: const NeverScrollableScrollPhysics(),
                   itemCount: snapshot.data!.length,
                   itemBuilder: (context, index) {
-                    Loan loan = snapshot.data![index];
+                    UserLoanModel loan = snapshot.data![index];
                     return Container(
                       margin: const EdgeInsets.only(bottom: 12),
                       decoration: BoxDecoration(
@@ -503,7 +465,7 @@ class _ExistingCustomerLoanState extends State<ExistingCustomerLoan> {
                           ),
                         ),
                         subtitle: Text(
-                          "Issued: ${loan.createdAt?.split('T')[0]}",
+                          "Issued: ${loan.createdAt.split('T')[0]}",
                         ),
                         trailing: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -517,32 +479,32 @@ class _ExistingCustomerLoanState extends State<ExistingCustomerLoan> {
                               ),
                             ),
                             const SizedBox(height: 4),
-                            // Container(
-                            //   padding: const EdgeInsets.symmetric(
-                            //     horizontal: 8,
-                            //     vertical: 2,
-                            //   ),
-                            //   decoration: BoxDecoration(
-                            //     color:
-                            //         loan.status.toString().toLowerCase() ==
-                            //             "active"
-                            //         ? Colors.green[50]
-                            //         : Colors.grey[100],
-                            //     borderRadius: BorderRadius.circular(5),
-                            //   ),
-                            //   child: Text(
-                            //     loan.status.toString().toLowerCase(),
-                            //     style: TextStyle(
-                            //       fontSize: 10,
-                            //       fontWeight: FontWeight.bold,
-                            //       color:
-                            //           loan.status.toString().toLowerCase() ==
-                            //               "active"
-                            //           ? Colors.green[700]
-                            //           : Colors.grey[600],
-                            //     ),
-                            //   ),
-                            // ),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 2,
+                              ),
+                              decoration: BoxDecoration(
+                                color:
+                                    loan.status.toString().toLowerCase() ==
+                                        "active"
+                                    ? Colors.green[50]
+                                    : Colors.grey[100],
+                                borderRadius: BorderRadius.circular(5),
+                              ),
+                              child: Text(
+                                loan.status.toString().toLowerCase(),
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.bold,
+                                  color:
+                                      loan.status.toString().toLowerCase() ==
+                                          "active"
+                                      ? Colors.green[700]
+                                      : Colors.grey[600],
+                                ),
+                              ),
+                            ),
                           ],
                         ),
                         onTap: () {
@@ -565,29 +527,5 @@ class _ExistingCustomerLoanState extends State<ExistingCustomerLoan> {
     } else {
       return Container();
     }
-  }
-
-  void database() async {
-    // await DatabaseService().insertCustomer(
-    //   address: "116/3",
-    //   email: "example@gmail.com",
-    //   name: "vihaga",
-    //   nic: 200210801480,
-    //   phoneNumber: "07766303438",
-    // );
-    // await DatabaseService().insertCustomer(
-    //   address: "116/3",
-    //   email: "example2@gmail.com",
-    //   name: "vihaga",
-    //   nic: 200210801481,
-    //   phoneNumber: "07766303438",
-    // );
-    // await DatabaseService().deleteCustomerByNic(200210801481);
-    await DatabaseService().getAllCustomers();
-    // await DatabaseService().printAllTables();
-    // await DatabaseService().isTableExists("");
-    // await DatabaseService().dropTables();
-    // await DatabaseService().deleteDatabaseFile();
-    // DatabaseService().close();
   }
 }

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:nkrs_app/data/view_model/check_connection.dart';
 import 'package:nkrs_app/models/Interest_rate_model.dart';
-import 'package:nkrs_app/models/installments_model.dart';
+import 'package:nkrs_app/models/installment_model.dart';
 import 'package:nkrs_app/utility/constanst.dart';
 import 'package:nkrs_app/views/new_loan_request_view/loan_request_section_view.dart';
 import 'package:nkrs_app/views/new_loan_request_view/new_loan_request/new_client_loan_request_status.dart';
@@ -14,7 +14,7 @@ import 'package:nkrs_app/views/new_loan_request_view/utility/navigator_back.dart
 import 'package:nkrs_app/views/new_loan_request_view/utility/popup_box_message.dart';
 
 class NewClientLoanRequest extends StatefulWidget {
-  final List<InstallmentsModel> installments;
+  final List<InstallmentModel> installments;
   final List<InterestRateModel>? interestRates;
   const NewClientLoanRequest({
     super.key,
@@ -234,7 +234,7 @@ class _NewClientLoanRequestState extends State<NewClientLoanRequest> {
                   safeAreaC: safeAreaC,
                   items: widget.installments.map((item) {
                     return DropdownMenuItem<int>(
-                      value: item.id.toInt(),
+                      value: item.id?.toInt(),
                       child: Text(item.value.toString()),
                     );
                   }).toList(),
@@ -257,7 +257,7 @@ class _NewClientLoanRequestState extends State<NewClientLoanRequest> {
                   safeAreaC: safeAreaC,
                   items: widget.installments.map((item) {
                     return DropdownMenuItem<int>(
-                      value: item.id.toInt(),
+                      value: item.id?.toInt(),
 
                       child: Text(item.value.toString()),
                     );
@@ -269,7 +269,7 @@ class _NewClientLoanRequestState extends State<NewClientLoanRequest> {
                     return null;
                   },
                   onChanged: (int? newValue) {
-                    InstallmentsModel selectedItem = widget.installments
+                    InstallmentModel selectedItem = widget.installments
                         .firstWhere((item) => item.id == newValue!.toDouble());
                     print(selectedItem.id);
                     print(selectedItem.value);

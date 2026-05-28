@@ -4,6 +4,7 @@ import 'package:nkrs_app/data/view_model/async_database_table.dart';
 import 'package:nkrs_app/data/view_model/check_connection.dart';
 import 'package:nkrs_app/utility/constanst.dart';
 import 'package:nkrs_app/views/new_loan_request_view/utility/popup_box_message.dart';
+import 'package:nkrs_app/views/new_loan_request_view/utility/test.dart';
 import 'package:nkrs_app/views/sync_view/sync_async_view.dart';
 
 class DebugView extends StatefulWidget {
@@ -146,8 +147,15 @@ class _DebugViewState extends State<DebugView> {
                   ),
                   Text("Lons"),
                   ElevatedButton(
-                    onPressed: () {},
-                    child: const Text("delete all Loans"),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ManualExpandableContainer(),
+                        ),
+                      );
+                    },
+                    child: const Text("Expandable Container"),
                   ),
                   ElevatedButton(
                     onPressed: () {},

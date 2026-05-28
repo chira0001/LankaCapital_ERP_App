@@ -1,15 +1,15 @@
 // ignore_for_file: deprecated_member_use
-
 import 'package:flutter/material.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:nkrs_app/data/view_model/add_loan_view.dart';
 import 'package:nkrs_app/data/view_model/check_connection.dart';
 import 'package:nkrs_app/models/Interest_rate_model.dart';
 import 'package:nkrs_app/models/add_loan_model.dart';
-import 'package:nkrs_app/models/installments_model.dart';
+import 'package:nkrs_app/models/installment_model.dart';
 import 'package:nkrs_app/utility/constanst.dart';
 import 'package:nkrs_app/views/new_loan_request_view/utility/custom_drop_down.dart';
 import 'package:nkrs_app/views/new_loan_request_view/utility/custom_text_field.dart';
+import 'package:nkrs_app/views/new_loan_request_view/utility/loading_dialog.dart';
 import 'package:nkrs_app/views/new_loan_request_view/utility/main_card.dart';
 import 'package:nkrs_app/views/new_loan_request_view/loan_request_section_view.dart';
 import 'package:nkrs_app/views/new_loan_request_view/utility/navigator_back.dart';
@@ -18,7 +18,7 @@ import 'package:nkrs_app/views/new_loan_request_view/utility/successfull_message
 
 class ExistingCustomerLoanRequest extends StatefulWidget {
   final int nicNumber;
-  final List<InstallmentsModel> installments;
+  final List<InstallmentModel> installments;
   final List<InterestRateModel>? interestRates;
   const ExistingCustomerLoanRequest({
     super.key,
@@ -46,11 +46,11 @@ class _ExistingCustomerLoanRequestState
   final TextEditingController installment = TextEditingController();
   final double _customSize_1 = 4;
   final double _customSize_2 = 25;
-  bool state = false;
-  // late double amount;
 
   @override
   Widget build(BuildContext context) {
+    late int id;
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: appBarC,
@@ -191,32 +191,6 @@ class _ExistingCustomerLoanRequestState
                           }
                           return null;
                         },
-                        onSaveCallback: (p0) {
-                          // amount = loanAmount.value as double;
-                        },
-                      ),
-                      SizedBox(height: _customSize_2),
-                      customText("Loan Type"),
-                      SizedBox(height: _customSize_1),
-                      CustomDropDown<int>(
-                        hint: "-- --",
-                        btnBorderRadius: btnBorderRadius,
-                        safeAreaC: safeAreaC,
-                        items: widget.installments.map((item) {
-                          return DropdownMenuItem<int>(
-                            value: item.id.toInt(),
-                            child: Text(item.value.toString()),
-                          );
-                        }).toList(),
-                        validator: (value) {
-                          if (value == null) {
-                            return "Please select Loan type";
-                          }
-                          return null;
-                        },
-                        onChanged: (int? newValue) {
-                          print(newValue);
-                        },
                       ),
                       SizedBox(height: _customSize_2),
                       customText("Interest Rate"),
@@ -227,7 +201,7 @@ class _ExistingCustomerLoanRequestState
                         safeAreaC: safeAreaC,
                         items: widget.installments.map((item) {
                           return DropdownMenuItem<int>(
-                            value: item.id.toInt(),
+                            value: item.id?.toInt(),
                             child: Text(item.value.toString()),
                           );
                         }).toList(),
@@ -238,10 +212,9 @@ class _ExistingCustomerLoanRequestState
                           return null;
                         },
                         onChanged: (int? newValue) {
-                          InstallmentsModel selectedItem = widget.installments
+                          InstallmentModel selectedItem = widget.installments
                               .firstWhere((item) => item.id == newValue!);
-                          print(selectedItem.id);
-                          print(selectedItem.value);
+                          id = selectedItem.id as int;
                         },
                       ),
                       SizedBox(height: 50),
@@ -249,47 +222,37 @@ class _ExistingCustomerLoanRequestState
                         width: double.infinity,
                         child: ElevatedButton(
                           onPressed: () async {
-                            print("star1");
                             if (_formKey.currentState!.validate()) {
-                              // _formKey.currentState!.save();
-                              print("star2");
-                              setState(() {
-                                state = true;
-                              });
-                              bool success = false;
-                              final AddLoanView addLoanView = AddLoanView();
-                              AddLoanModel loan = AddLoanModel(
-                                amount: double.tryParse(
-                                  loanAmount.text.trim(),
-                                )!,
-                                // customerNic: widget.nicNumber,
-                                customerNic: 200227800587,
-                                employeeId: 1,
-                                installmentId: 1,
+                              LoadingDialog.show(
+                                context,
+                                message: 'Please Wait...',
                               );
-                              if (CheckConnection.isOnline.value) {
-                                success = await addLoanView.addLoanByOnline(
-                                  loan,
-                                  context,
-                                );
-                              } else {}
-                              setState(() {
-                                state = false;
-                              });
+                              final bool success = await AddLoanView()
+                                  .existingLoan(
+                                    AddLoanModel(
+                                      amount: double.parse(
+                                        loanAmount.text.trim(),
+                                      ),
+                                      customerNic: widget.nicNumber,
+                                      employeeId: 1,
+                                      installmentId: id,
+                                    ),
+                                    context,
+                                  );
+                              if (!context.mounted) return;
+                              LoadingDialog.hide(context);
                               if (success) {
                                 Navigator.push(
-                                  // ignore: use_build_context_synchronously
                                   context,
                                   MaterialPageRoute(
                                     builder: (context) =>
                                         const LoanSuccessScreen(),
                                   ),
                                 );
+                              }else{
+                                
                               }
                             }
-                            setState(() {
-                              state = false;
-                            });
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: btnC,
@@ -303,49 +266,50 @@ class _ExistingCustomerLoanRequestState
                               ),
                             ),
                           ),
-                          child: (state)
-                              ? Container(
-                                  width: 28,
-                                  height: 28,
-                                  padding: const EdgeInsets.all(4),
-                                  decoration: BoxDecoration(
-                                    color: Colors.white.withOpacity(0.15),
-                                    shape: BoxShape.circle,
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.black.withOpacity(0.15),
-                                        blurRadius: 8,
-                                        offset: const Offset(0, 3),
-                                      ),
-                                    ],
-                                  ),
-                                  child: const CircularProgressIndicator(
-                                    strokeWidth: 3,
-                                    valueColor: AlwaysStoppedAnimation<Color>(
-                                      Colors.white,
-                                    ),
-                                  ),
-                                )
-                              : Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      "Apply for Loan",
-                                      textAlign: TextAlign.center,
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: btnFontSize,
-                                        fontWeight: FontWeight(700),
-                                      ),
-                                    ),
-                                    const SizedBox(width: 10),
-                                    const Icon(
-                                      Icons.arrow_forward_ios,
+                          child:
+                              // ? Container(
+                              //     width: 28,
+                              //     height: 28,
+                              //     padding: const EdgeInsets.all(4),
+                              //     decoration: BoxDecoration(
+                              //       color: Colors.white.withOpacity(0.15),
+                              //       shape: BoxShape.circle,
+                              //       boxShadow: [
+                              //         BoxShadow(
+                              //           color: Colors.black.withOpacity(0.15),
+                              //           blurRadius: 8,
+                              //           offset: const Offset(0, 3),
+                              //         ),
+                              //       ],
+                              //     ),
+                              //     child: const CircularProgressIndicator(
+                              //       strokeWidth: 3,
+                              //       valueColor: AlwaysStoppedAnimation<Color>(
+                              //         Colors.white,
+                              //       ),
+                              //     ),
+                              //   )
+                              // :
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    "Apply for Loan",
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
                                       color: Colors.white,
-                                      size: 16,
+                                      fontSize: btnFontSize,
+                                      fontWeight: FontWeight(700),
                                     ),
-                                  ],
-                                ),
+                                  ),
+                                  const SizedBox(width: 10),
+                                  const Icon(
+                                    Icons.arrow_forward_ios,
+                                    color: Colors.white,
+                                    size: 16,
+                                  ),
+                                ],
+                              ),
                         ),
                       ),
                     ],

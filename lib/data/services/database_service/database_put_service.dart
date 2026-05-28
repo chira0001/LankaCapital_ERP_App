@@ -77,17 +77,25 @@ class DatabasePutService {
     }
   }
 
-  Future<int?> insertLoan(AddLoanModel loan) async {
+  Future<String?> insertExistingLoan(AddLoanModel loan) async {
     try {
       final db = await _databaseService.database;
-      return await db?.insert(
+      int? u = await db?.insert(
         'loans',
         loan.toJsonServer(),
         conflictAlgorithm: ConflictAlgorithm.replace,
       );
+      if (u != null) {
+        return "";
+      }
+      return null;
     } catch (e) {
       debugPrint("Loan Insert Error : $e");
       return null;
     }
+  }
+
+  Future<int?> insertCustomer() async {
+    return 1;
   }
 }

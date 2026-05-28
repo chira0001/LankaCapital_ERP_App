@@ -21,11 +21,11 @@ class AddLoanModel {
   }
 
   Map<String, dynamic> toJsonServer() {
-  return {
-    "amount": amount,
-    "customerNic": customerNic,
-    "employeeId": employeeId,
-    "installmentId": installmentId,
-  };
-}
+    return {
+      "amount": amount,
+      "customerNic": customerNic,
+      "employeeId": employeeId,
+      "installmentId": installmentId,
+    };
+  }
 }

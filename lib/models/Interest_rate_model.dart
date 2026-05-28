@@ -1,26 +1,16 @@
 class InterestRateModel {
-  final int id;
+  // final int id;
   final double rate;
 
   InterestRateModel({
-    required this.id,
+    // required this.id,
     required this.rate,
   });
 
-  factory InterestRateModel.fromJson(
-    Map<String, dynamic> json,
-  ) {
-
+  factory InterestRateModel.fromMap(Map<String, dynamic> json) {
     return InterestRateModel(
-      id: json["id"],
-      rate: json["rate"].toDouble(),
+      // id: json["id"],
+      rate: json["rate"] as double,
     );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      "id": id,
-      "rate": rate,
-    };
   }
 }

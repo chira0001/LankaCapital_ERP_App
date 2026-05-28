@@ -151,7 +151,7 @@ class DatabaseService {
     debugPrint(customerResult.toString());
     if (customerResult.isEmpty) {
       return null;
-    } else {}
+    }
 
     final loansResult = await db.query(
       'loans',
@@ -159,6 +159,7 @@ class DatabaseService {
       whereArgs: [nic],
       orderBy: 'created_at DESC',
     );
+    print(loansResult);
 
     return {'customer': customerResult.first, 'loans': loansResult};
   }

@@ -1,6 +1,6 @@
 import 'package:nkrs_app/data/services/database_initializer_service.dart';
 import 'package:nkrs_app/models/Interest_rate_model.dart';
-import 'package:nkrs_app/models/installments_model.dart';
+import 'package:nkrs_app/models/installment_model.dart';
 
 class DatabaseGetService {
   final DatabaseInitializerService _databaseService =
@@ -91,12 +91,12 @@ class DatabaseGetService {
     }
   }
 
-  Future<List<InstallmentsModel>?> getInstallments() async {
+  Future<List<InstallmentModel>?> getInstallments() async {
     try {
       final db = await _databaseService.database;
       final List<Map<String, dynamic>> maps = await db!.query('installments');
 
-      return maps.map((e) => InstallmentsModel.fromJson(e)).toList();
+      return maps.map((e) => InstallmentModel.fromJson(e)).toList();
     } catch (e) {
       return null;
     }
@@ -107,7 +107,7 @@ class DatabaseGetService {
       final db = await _databaseService.database;
       final List<Map<String, dynamic>> maps = await db!.query('interest_rates');
 
-      return maps.map((e) => InterestRateModel.fromJson(e)).toList();
+      return maps.map((e) => InterestRateModel.fromMap(e)).toList();
     } catch (e) {
       return null;
     }

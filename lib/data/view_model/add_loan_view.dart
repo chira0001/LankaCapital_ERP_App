@@ -3,45 +3,38 @@
 import 'package:flutter/material.dart';
 import 'package:nkrs_app/data/services/database_service/database_put_service.dart';
 import 'package:nkrs_app/data/services/loan_service.dart';
+import 'package:nkrs_app/data/view_model/check_connection.dart';
 import 'package:nkrs_app/models/add_loan_model.dart';
 import 'package:nkrs_app/views/new_loan_request_view/utility/scaffold_message.dart';
 import 'package:nkrs_app/views/new_loan_request_view/utility/scaffold_message_bottom.dart';
 
 class AddLoanView {
-  Future<bool> addLoanByOnline(
-    AddLoanModel addLoan,
-    BuildContext context,
-  ) async {
-    final LoanService service = LoanService();
-    String? m = await service.addLoan(addLoan);
-    if (m != null) {
-      if (m.isEmpty) {
-        return true;
+  Future<bool> existingLoan(AddLoanModel loan, BuildContext context) async {
+    try {
+      String? m;
+      if (CheckConnection.isOnline.value) {
+        m = await LoanService().addExistingLoan(loan);
       } else {
-        AppTopSnackBar.error(
-          context,
-          m,
-          showClose: true,
-          duration: Duration(seconds: 4),
-        );
-        return false;
+        m = await DatabasePutService().insertExistingLoan(loan);
       }
-    } else {
-      ScaffoldMessageBottom.show(context, "Server connection failed");
+      if (m != null) {
+        if (m.isEmpty) {
+          return true;
+        } else {
+          AppTopSnackBar.error(
+            context,
+            m,
+            showClose: true,
+            duration: Duration(seconds: 3),
+          );
+          return false;
+        }
+      } else {
+        ScaffoldMessageBottom.show(context, "Connection failed");
+      }
+      return false;
+    } catch (e) {
+      return false;
     }
-    return false;
-  }
-
-  Future<bool> addLoanByOffline(
-    AddLoanModel addLoan,
-    BuildContext context,
-  ) async {
-    DatabasePutService service = DatabasePutService();
-    int? r = await service.insertLoan(addLoan);
-    if (r != null) {
-      return true;
-    }
-    ScaffoldMessageBottom.show(context, "Database connection failed");
-    return false;
   }
 }

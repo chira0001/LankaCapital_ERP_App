@@ -1,8 +1,10 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
+import 'package:nkrs_app/data/services/user_service.dart';
+import 'package:nkrs_app/models/Interest_rate_model.dart';
 import 'package:nkrs_app/models/add_loan_model.dart';
-import 'package:nkrs_app/models/installments_model.dart';
+import 'package:nkrs_app/models/installment_model.dart';
 import 'package:nkrs_app/models/loan_model.dart';
 import 'package:http/http.dart' as http;
 import 'package:nkrs_app/models/user_model.dart';
@@ -12,39 +14,6 @@ class LoanService {
   static const String _baseUrl = 'http://192.168.43.90:8080/api/v1/field';
   late final String _message;
   String? get message => _message;
-
-  static const String jwtToken = "he;fsf";
-  // Future<List<Loan>> fetchAllLoans(String jwtToken) async {
-  //   final Uri url = Uri.parse('https://fakestoreapi.com/products');
-
-  //   try {
-  //     final response = await http.get(
-  //       url,
-  //       headers: {
-  //         'Content-Type': 'application/json',
-  //         'Accept': 'application/json',
-  //         'Authorization': 'Bearer $jwtToken',
-  //       },
-  //     );
-
-  //     if (response.statusCode == 200 || response.statusCode == 201) {
-  //       final List<dynamic> responseData = json.decode(response.body);
-  //       List<Loan> loans = responseData.map((json) {
-  //         return Loan.fromJson(json);
-  //       }).toList();
-  //       print("fetch the loan list");
-
-  //       return loans;
-  //     } else if (response.statusCode == 401) {
-  //       throw Exception('Unauthorized: Please log in again.');
-  //     } else {
-  //       throw Exception('Server error: ${response.statusCode}');
-  //     }
-  //   } catch (e) {
-  //     print("Failt to get data ${e}");
-  //     throw Exception('Request failed: $e');
-  //   }
-  // }
 
   Future<(User, List<Loan>)> fetchUserAndLoans(int nic) async {
     final Uri url = Uri.parse(
@@ -76,9 +45,8 @@ class LoanService {
     }
   }
 
-  Future<String?> addLoan(AddLoanModel loan) async {
-    final Uri url = Uri.parse('$_baseUrl/customers/loans');
-
+  Future<String?> addExistingLoan(AddLoanModel loan) async {
+    final Uri url = Uri.parse('${UserService.baseUrl}/customers/loans');
     try {
       final response = await http
           .post(
@@ -99,7 +67,9 @@ class LoanService {
     }
   }
 
-  Future<List<InstallmentsModel>?> getInstallments() async {
+  // getInterestRates
+  Future<List<InstallmentModel>?> getInstallments() async {
+    // final Uri url = Uri.parse('${UserService.baseUrl}/installments');
     final Uri url = Uri.parse(
       'http://192.168.43.90:8080/api/v1/recep/installments',
     );
@@ -109,9 +79,23 @@ class LoanService {
         final data = jsonDecode(response.body);
         print("$data : debug data");
 
-        return (data as List)
-            .map((e) => InstallmentsModel.fromJson(e))
-            .toList();
+        return (data as List).map((e) => InstallmentModel.fromJson(e)).toList();
+      }
+    } catch (e) {
+      return null;
+    }
+    return null;
+  }
+
+  Future<List<InterestRateModel>?> getInterestRates() async {
+    final Uri url = Uri.parse('${UserService.baseUrl}/installments');
+    try {
+      final response = await http.get(url).timeout(const Duration(seconds: 10));
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final data = jsonDecode(response.body);
+        print("$data : debug data");
+
+        return (data as List).map((e) => InterestRateModel.fromMap(e)).toList();
       }
     } catch (e) {
       return null;

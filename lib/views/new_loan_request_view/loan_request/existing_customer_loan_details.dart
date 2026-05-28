@@ -3,7 +3,7 @@ import 'package:nkrs_app/utility/constanst.dart';
 
 // ignore: must_be_immutable
 class LoanDetailsPage extends StatelessWidget {
-  String fileNumber = "nkfs";
+  String? fileNumber = "nkfs";
   double amount = 10000.0;
   String? createdAt = "20026/56/5";
   double interestRate = 10.5;
@@ -248,7 +248,7 @@ class LoanDetailsPage extends StatelessWidget {
           ),
           const SizedBox(height: 4),
           Text(
-            fileNumber,
+            fileNumber!,
             style: const TextStyle(
               color: Colors.white,
               fontSize: 20,

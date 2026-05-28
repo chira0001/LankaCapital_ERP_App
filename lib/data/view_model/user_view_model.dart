@@ -36,12 +36,5 @@ class UserViewModel extends ChangeNotifier {
   //   }
   //   notifyListeners();
   // }
-  Future<void> fetchLoans() async {
-    try {
-      _foundUser = await _service.fetchAllUsers("faf", "15"); // add jwt token
-    } catch (e) {
-      debugPrint("Failed to user loans.");
-      throw Exception("Can't upload data $e");
-    }
-  }
+
 }
