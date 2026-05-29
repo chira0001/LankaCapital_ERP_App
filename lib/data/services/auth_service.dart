@@ -4,6 +4,7 @@ import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:nkrs_app/models/loan_model.dart';
 import 'package:nkrs_app/models/user_model.dart';
 import 'package:flutter/foundation.dart';
+import 'package:nkrs_app/data/services/api_config.dart';
 
 class AuthService {
   final FlutterSecureStorage _storage = const FlutterSecureStorage(
@@ -12,7 +13,7 @@ class AuthService {
   late final Dio _dio;
   final String _tokenKey = 'jwt_token';
   final String _refreshTokenKey = 'refresh_token';
-  final String _baseUrl = 'http://192.168.43.90:8080/api/v1';
+  final String _baseUrl = ApiConfig.baseUrl;
 
   AuthService() {
     // 1. Initialize Dio with base configurations
@@ -120,6 +121,41 @@ class AuthService {
     }
     return false;
   }
+
+  Future<bool> register({
+    String? id,
+    required String firstName,
+    required String lastName,
+    required String email,
+    required String phoneNumber,
+    required String password,
+  }) async {
+    try {
+      final response = await _dio.post(
+        '/auth/register',
+        data: {
+          'id': id,
+          'firstName': firstName,
+          'lastName': lastName,
+          'email': email,
+          'phoneNumber': phoneNumber,
+          'password': password,
+        },
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return true;
+      }
+    } on DioException catch (e) {
+      debugPrint("Registration failed: ${e.response?.statusCode} - ${e.response?.data}");
+      rethrow;
+    } catch (e) {
+      debugPrint("Registration error: $e");
+      rethrow;
+    }
+    return false;
+  }
+
 
   Future<String?> getToken() async {
     try {

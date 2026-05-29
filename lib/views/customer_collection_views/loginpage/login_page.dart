@@ -6,6 +6,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:flutter/services.dart';
 import 'package:nkrs_app/views/customer_collection_views/utility/app_lock_wrapper.dart';
+import 'package:nkrs_app/views/customer_collection_views/utility/custom_snackbar.dart';
 
 
 class LoginPage extends StatefulWidget {
@@ -29,8 +30,12 @@ class _LoginPageState extends State<LoginPage> {
   @override
   void initState() {
     super.initState();
-    _checkBiometrics();
-    _loadSavedCredentials();
+    _initAuth();
+  }
+
+  Future<void> _initAuth() async {
+    await _checkBiometrics();
+    await _loadSavedCredentials();
   }
 
   Future<void> _checkBiometrics() async {
@@ -75,9 +80,7 @@ class _LoginPageState extends State<LoginPage> {
           ),
         );
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Please login with password first.')),
-        );
+        CustomSnackBar.showError(context, 'Please login with password first.');
       }
     }
   }
@@ -113,9 +116,7 @@ class _LoginPageState extends State<LoginPage> {
     final password = _passwordController.text.trim();
 
     if (email.isEmpty || password.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter email and password')),
-      );
+      CustomSnackBar.showError(context, 'Please enter email and password');
       setState(() {
         _isLoading = false;
       });
@@ -146,9 +147,7 @@ class _LoginPageState extends State<LoginPage> {
         ),
       );
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Login failed. Please check your credentials.')),
-      );
+      CustomSnackBar.showError(context, 'Login failed. Please check your credentials.');
     }
   }
 
@@ -330,13 +329,13 @@ class _LoginPageState extends State<LoginPage> {
                 const SizedBox(height: 25),
 
                 Row(
-                  children: const [
-                    Expanded(child: Divider()),
-                    Padding(
+                  children: [
+                    const Expanded(child: Divider()),
+                    const Padding(
                       padding: EdgeInsets.symmetric(horizontal: 10),
                       child: Text("OR CONTINUE WITH"),
                     ),
-                    Expanded(child: Divider()),
+                    const Expanded(child: Divider()),
                   ],
                 ),
 
