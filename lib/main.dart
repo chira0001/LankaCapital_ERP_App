@@ -5,7 +5,7 @@ import 'package:nkrs_app/views/customer_collection_views/utility/app_lock_wrappe
 
 import 'package:nkrs_app/data/services/auth_service.dart';
 import 'package:nkrs_app/views/customer_collection_views/customerCollectionpage/customer_collection_home.dart';
-import 'package:nkrs_app/views/new_loan_request_view/loan_request_section_view.dart';
+// import 'package:nkrs_app/views/new_loan_request_view/loan_request_section_view.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -26,7 +26,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(fontFamily: "Inter"),
       // home: LoginPage(),
-      home: LoanRequestSection(),
+      // home: LoanRequestSection(),
       // home: isLoggedIn ? const AppLockWrapper(child: CustomerCollectionHome()) : const LoginPage(),
       // home: (),
       home: isLoggedIn ? const AppLockWrapper(child: CustomerCollectionHome()) : const LoginPage(),
