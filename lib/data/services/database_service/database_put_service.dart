@@ -80,9 +80,10 @@ class DatabasePutService {
   Future<String?> insertExistingLoan(AddLoanModel loan) async {
     try {
       final db = await _databaseService.database;
+      print(loan);
       int? u = await db?.insert(
         'loans',
-        loan.toJsonServer(),
+        loan.toJson(),
         conflictAlgorithm: ConflictAlgorithm.replace,
       );
       if (u != null) {

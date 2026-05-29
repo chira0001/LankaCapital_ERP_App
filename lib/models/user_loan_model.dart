@@ -3,7 +3,6 @@ import 'package:nkrs_app/models/employee_model.dart';
 import 'package:nkrs_app/models/installment_model.dart';
 
 class UserLoanModel {
-  // final String? uuID;
   final String? fileNumber;
   final double amount;
   final String createdAt;
@@ -17,7 +16,6 @@ class UserLoanModel {
   final InstallmentModel installments;
 
   UserLoanModel({
-    // this.uuID,
     this.fileNumber,
     required this.amount,
     required this.createdAt,
@@ -40,9 +38,11 @@ class UserLoanModel {
       rejectionNote: json['rejectionNote']?.toString() ?? "N/A",
       risk: json['risk']?.toString() ?? "N/A",
       status: json['status'].toString(),
-      interestRate: InterestRateModel.fromMap(
-        json['interestRate'] as Map<String, dynamic>,
-      ),
+      interestRate: json['interest_rate_id'] != null
+          ? InterestRateModel.fromMap(
+              json['interest_rate_id'] as Map<String, dynamic>,
+            )
+          : null,
       employee: EmployeeModel.fromMap(json['employee'] as Map<String, dynamic>),
       installments: InstallmentModel.fromMap(
         json['Installments'] as Map<String, dynamic>,
@@ -52,18 +52,21 @@ class UserLoanModel {
 
   factory UserLoanModel.fromMap(Map<String, dynamic> map) {
     return UserLoanModel(
-      // uuID: map['uuID'].toString(),
-      fileNumber: map['file_number']?.toString() ?? "N/A",
+      fileNumber: (map['file_number']?.toString().length ?? 0) < 7
+          ? map['file_number'].toString()
+          : "Not Approved",
       amount: map['amount'] as double,
       createdAt: map['created_at'].toString(),
       documentCharge: double.tryParse(map['document_charge'].toString()) ?? 0,
       rejectionNote: map['rejection_note']?.toString() ?? "N/A",
       risk: map['risk']?.toString() ?? "N/A",
-      status: map['status'].toString(),
+      status: map['status']?.toString() ?? "test",
       sync: map['sync'] as int,
-      interestRate: InterestRateModel.fromMap(
-        map['interest_rate_id'] as Map<String, dynamic>,
-      ),
+      interestRate: map['interest_rate_id'] != null
+          ? InterestRateModel.fromMap(
+              map['interest_rate_id'] as Map<String, dynamic>,
+            )
+          : null,
       employee: EmployeeModel.fromMap(
         map['employee_id'] as Map<String, dynamic>,
       ),

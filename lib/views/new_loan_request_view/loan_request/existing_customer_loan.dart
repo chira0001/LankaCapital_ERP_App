@@ -13,6 +13,7 @@ import 'package:nkrs_app/views/new_loan_request_view/utility/loading_dialog.dart
 import 'package:nkrs_app/views/new_loan_request_view/utility/main_card.dart';
 import 'package:nkrs_app/views/new_loan_request_view/utility/popup_box_message.dart';
 import 'package:nkrs_app/views/new_loan_request_view/utility/scaffold_message.dart';
+import 'package:nkrs_app/views/sync_view/connection_view.dart';
 
 class ExistingCustomerLoan extends StatefulWidget {
   const ExistingCustomerLoan({super.key});
@@ -67,24 +68,25 @@ class _ExistingCustomerLoanState extends State<ExistingCustomerLoan> {
               builder: (context, online, child) {
                 return GestureDetector(
                   onTap: () {
-                    setState(() {
-                      CheckConnection.initialize();
-                    });
-                    if (online) {
-                      AppTopSnackBar.success(
-                        context,
-                        "Device is Online.",
-                        showClose: false,
-                        duration: Duration(seconds: 2),
-                      );
-                    } else {
-                      AppTopSnackBar.error(
-                        context,
-                        "Device is Offline.",
-                        showClose: false,
-                        duration: Duration(seconds: 2),
-                      );
-                    }
+                    // setState(() {
+                    //   CheckConnection.initialize();
+                    // });
+                    // if (online) {
+                    //   AppTopSnackBar.success(
+                    //     context,
+                    //     "Device is Online.",
+                    //     showClose: false,
+                    //     duration: Duration(seconds: 2),
+                    //   );
+                    // } else {
+                    //   AppTopSnackBar.error(
+                    //     context,
+                    //     "Device is Offline.",
+                    //     showClose: false,
+                    //     duration: Duration(seconds: 2),
+                    //   );
+                    // }
+                    ConnectionView.show(context);
                   },
                   child: Container(
                     padding: const EdgeInsets.symmetric(

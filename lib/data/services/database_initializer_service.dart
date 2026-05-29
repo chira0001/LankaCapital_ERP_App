@@ -71,23 +71,23 @@ class DatabaseInitializerService {
     ''');
     // create loans table
     await db.execute('''
-      CREATE TABLE IF NOT EXISTS loans (
-        file_number TEXT PRIMARY KEY,
-        amount REAL,
-        created_at TEXT DEFAULT CURRENT_TIMESTAMP,
-        document_charge REAL DEFAULT 100.00,
-        interest_rate_id INTEGER NOT NULL,
-        customer_id INTEGER NOT NULL,
-        employee_id INTEGER NOT NULL,
-        installment_id INTEGER NOT NULL,
-        rejection_note TEXT,
-        risk TEXT CHECK(risk IN ('HIGH', 'LOW', 'MEDIUM')),
-        status TEXT CHECK(status IN ('APPROVED', 'PENDING', 'REJECTED'))DEFAULT 'PENDING',
-        sync INTEGER DEFAULT 0,
-        FOREIGN KEY (customer_id) REFERENCES customers(nic),
-        FOREIGN KEY (employee_id) REFERENCES employees(id),
-        FOREIGN KEY (installment_id) REFERENCES installments(id),
-        FOREIGN KEY (interest_rate_id) REFERENCES interest_rates(id)
+    CREATE TABLE IF NOT EXISTS loans (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      file_number TEXT,
+      amount REAL,
+      created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+      document_charge REAL DEFAULT 0.0,
+      interest_rate_id INTEGER,
+      customer_id INTEGER NOT NULL,
+      employee_id INTEGER NOT NULL,
+      installment_id INTEGER NOT NULL,
+      rejection_note TEXT,
+      risk TEXT CHECK(risk IN ('HIGH', 'LOW', 'MEDIUM')),
+      status TEXT CHECK(status IN ('APPROVED', 'PENDING', 'REJECTED')) DEFAULT 'PENDING',
+      sync INTEGER DEFAULT 0,
+      FOREIGN KEY (customer_id) REFERENCES customers(nic),
+      FOREIGN KEY (employee_id) REFERENCES employees(id),
+      FOREIGN KEY (installment_id) REFERENCES installments(id)
       )
     ''');
     // create collections table

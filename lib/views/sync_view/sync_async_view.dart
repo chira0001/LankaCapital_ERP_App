@@ -5,6 +5,7 @@ import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:nkrs_app/data/view_model/async_controller_view_model.dart';
 import 'package:nkrs_app/data/view_model/check_connection.dart';
 import 'package:nkrs_app/utility/constanst.dart';
+import 'package:nkrs_app/views/new_loan_request_view/utility/loading_dialog.dart';
 import 'package:nkrs_app/views/new_loan_request_view/utility/main_card.dart'
     show MainCard;
 import 'package:nkrs_app/views/new_loan_request_view/utility/popup_box_message.dart';
@@ -274,8 +275,16 @@ class _SyncAsyncViewState extends State<SyncAsyncView> {
                       ),
                       const SizedBox(height: 15),
                       GestureDetector(
-                        onTap: () {
-                          AsyncControllerViewModel().asyncController(context);
+                        onTap: () async {
+                          LoadingDialog.show(
+                            context,
+                            message: 'Please Wait...',
+                          );
+                          await AsyncControllerViewModel().asyncController(
+                            context,
+                          );
+                          if (!context.mounted) return;
+                          LoadingDialog.hide(context);
                         },
                         child: Container(
                           padding: const EdgeInsets.symmetric(

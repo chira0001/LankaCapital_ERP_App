@@ -14,9 +14,9 @@ class AddLoanModel {
   Map<String, dynamic> toJson() {
     return {
       'amount': amount,
-      'customer_nic': customerNic,
+      'customer_id': customerNic,
       'employee_id': employeeId,
-      'interest_rate_id': installmentId,
+      'installment_id': installmentId,
     };
   }
 

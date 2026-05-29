@@ -249,9 +249,7 @@ class _ExistingCustomerLoanRequestState
                                         const LoanSuccessScreen(),
                                   ),
                                 );
-                              }else{
-                                
-                              }
+                              } else {}
                             }
                           },
                           style: ElevatedButton.styleFrom(

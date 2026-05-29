@@ -43,7 +43,7 @@ class LoanViewModel extends ChangeNotifier {
       if (CheckConnection.isOnline.value) {
         user = await UserService().findUserInfoById(nic);
       } else {
-        user = await DatabaseUserService().getUserWithAllLoanDetails(nic);
+        user = await DatabaseUserService().getUserWithLoans(nic);
       }
       if (user != null) {
         if (user.loans != null) {

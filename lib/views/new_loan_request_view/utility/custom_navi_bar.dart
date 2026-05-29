@@ -33,10 +33,7 @@ class FancyBottomNavBar extends StatelessWidget {
 
   final int currentIndex;
   final ValueChanged<int> onTap;
-
-  /// If provided, center button will call this; otherwise it calls onTap(2).
   final VoidCallback? onCenterTap;
-
   final Color activeColor;
   final Color inactiveColor;
   final Color backgroundColor;
@@ -44,7 +41,7 @@ class FancyBottomNavBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const double barHeight = 92;
+    const double barHeight = 82;
     const double radius = 20;
 
     return SafeArea(
@@ -75,7 +72,7 @@ class FancyBottomNavBar extends StatelessWidget {
                   _NavItem(
                     active: currentIndex == 0,
                     label: 'Home',
-                    activeIcon: PhosphorIconsFill.house,
+                    activeIcon: Iconsax.home_2,
                     inactiveIcon: Iconsax.home_2_copy,
                     activeColor: activeColor,
                     inactiveColor: inactiveColor,
@@ -83,9 +80,9 @@ class FancyBottomNavBar extends StatelessWidget {
                   ),
                   _NavItem(
                     active: currentIndex == 1,
-                    label: 'Search',
-                    activeIcon: PhosphorIconsFill.magnifyingGlass,
-                    inactiveIcon: Iconsax.search_favorite_copy,
+                    label: 'Loan',
+                    activeIcon: Iconsax.wallet_1,
+                    inactiveIcon: Iconsax.wallet_1_copy,
                     activeColor: activeColor,
                     inactiveColor: inactiveColor,
                     onTap: () => onTap(1),
@@ -93,9 +90,9 @@ class FancyBottomNavBar extends StatelessWidget {
                   const SizedBox(width: 74),
                   _NavItem(
                     active: currentIndex == 3,
-                    label: 'History',
-                    activeIcon: PhosphorIconsFill.clockCounterClockwise,
-                    inactiveIcon: Iconsax.safe_home_copy,
+                    label: 'Sync',
+                    activeIcon: Iconsax.cloud,
+                    inactiveIcon: Iconsax.cloud_copy,
                     activeColor: activeColor,
                     inactiveColor: inactiveColor,
                     onTap: () => onTap(3),
@@ -103,7 +100,7 @@ class FancyBottomNavBar extends StatelessWidget {
                   _NavItem(
                     active: currentIndex == 4,
                     label: 'Profile',
-                    activeIcon: PhosphorIconsFill.user,
+                    activeIcon: Iconsax.user_edit,
                     inactiveIcon: Iconsax.user_copy,
                     activeColor: activeColor,
                     inactiveColor: inactiveColor,
@@ -159,14 +156,14 @@ class _NavItem extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(active ? activeIcon : inactiveIcon, size: 25, color: color),
-              const SizedBox(height: 8),
+              Icon(active ? activeIcon : inactiveIcon, size: 26, color: color),
+              const SizedBox(height: 5),
               Text(
                 label,
                 style: TextStyle(
                   color: color,
                   fontWeight: active ? FontWeight.w700 : FontWeight.w500,
-                  fontSize: 14,
+                  fontSize: 13,
                 ),
               ),
             ],
