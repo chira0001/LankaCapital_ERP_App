@@ -82,7 +82,6 @@ class DatabaseInitializerService {
       employee_id INTEGER NOT NULL,
       installment_id INTEGER NOT NULL,
       rejection_note TEXT,
-      risk TEXT CHECK(risk IN ('HIGH', 'LOW', 'MEDIUM')),
       status TEXT CHECK(status IN ('APPROVED', 'PENDING', 'REJECTED')) DEFAULT 'PENDING',
       sync INTEGER DEFAULT 0,
       FOREIGN KEY (customer_id) REFERENCES customers(nic),
@@ -103,5 +102,27 @@ class DatabaseInitializerService {
         FOREIGN KEY (file_number) REFERENCES loans(file_number) ON DELETE CASCADE
       )
     ''');
+
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS time (
+        id INTEGER PRIMARY KEY,
+        last_sync TEXT,
+        last_async TEXT
+      )
+    ''');
+
+    await createTimeTable(db);
+  }
+
+  Future<void> createTimeTable(Database db) async {
+    try {
+      await db.insert('time', {
+        'id': 1,
+        'last_sync': DateTime.now().toIso8601String(),
+        'last_async': DateTime.now().toIso8601String(),
+      }, conflictAlgorithm: ConflictAlgorithm.ignore);
+    } catch (e) {
+      return;
+    }
   }
 }

@@ -27,9 +27,13 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(fontFamily: "Inter"),
       // home: LoginPage(),
       // home: LoanRequestSection(),
-      // home: isLoggedIn ? const AppLockWrapper(child: CustomerCollectionHome()) : const LoginPage(),
+      // home: isLoggedIn
+      //     ? const AppLockWrapper(child: CustomerCollectionHome())
+      //     : const LoginPage(),
       // home: (),
-      home: isLoggedIn ? const AppLockWrapper(child: CustomerCollectionHome()) : const LoginPage(),
+      home: isLoggedIn
+          ? const AppLockWrapper(child: CustomerCollectionHome())
+          : const LoginPage(),
     );
   }
 }

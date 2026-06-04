@@ -15,7 +15,6 @@ class DatabaseUserService {
         whereArgs: [customerId],
         limit: 1,
       );
-      print(customerResult);
       if (customerResult.isEmpty) return null;
       final loanResult = await db.query(
         'loans',
@@ -23,11 +22,7 @@ class DatabaseUserService {
         whereArgs: [customerId],
         orderBy: 'created_at DESC',
       );
-      for (final data in loanResult) {
-        print("-----------------------------------------");
-        print(data);
-        print("-----------------------------------------");
-      }
+
       final loans = await Future.wait(
         loanResult.map((loan) async {
           final employeeResult = await db.query(
@@ -75,10 +70,8 @@ class DatabaseUserService {
         }),
       );
       final userMap = {...customerResult.first, 'loans': loans};
-      print(userMap);
       return User.fromMapUser(userMap);
     } catch (e) {
-      print(e);
       return null;
     }
   }

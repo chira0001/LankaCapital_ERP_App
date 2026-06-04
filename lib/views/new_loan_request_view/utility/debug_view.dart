@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:nkrs_app/data/services/database_service.dart';
+import 'package:nkrs_app/data/services/database_service/database_get_service.dart';
+import 'package:nkrs_app/data/services/database_service/database_sync_service.dart';
 import 'package:nkrs_app/data/view_model/async_database_table.dart';
 import 'package:nkrs_app/data/view_model/check_connection.dart';
 import 'package:nkrs_app/utility/constanst.dart';
 import 'package:nkrs_app/views/new_loan_request_view/utility/popup_box_message.dart';
-import 'package:nkrs_app/views/new_loan_request_view/utility/test.dart';
 import 'package:nkrs_app/views/sync_view/connection_view.dart'
     hide CheckConnection;
 import 'package:nkrs_app/views/sync_view/sync_async_view.dart';
@@ -137,11 +138,16 @@ class _DebugViewState extends State<DebugView> {
                     child: const Text("print Table Data"),
                   ),
                   ElevatedButton(
-                    onPressed: () {
+                    onPressed: () async {
+                      // await DatabaseAsyncService().updateSyncTime(0);
+                      // await DatabaseAsyncService().updateSyncTime(1);
+                      final syncData = await DatabaseGetService().getSyncTime();
                       Navigator.push(
+                        // ignore: use_build_context_synchronously
                         context,
                         MaterialPageRoute(
-                          builder: (context) => SyncAsyncView(),
+                          builder: (context) =>
+                              SyncAsyncView(syncTime: syncData),
                         ),
                       );
                     },
@@ -149,15 +155,10 @@ class _DebugViewState extends State<DebugView> {
                   ),
                   Text("Lons"),
                   ElevatedButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => ManualExpandableContainer(),
-                        ),
-                      );
+                    onPressed: () async {
+                      await DatabaseSyncService().resetCustomerSync();
                     },
-                    child: const Text("Expandable Container"),
+                    child: const Text("Reset Customer"),
                   ),
                   ElevatedButton(
                     onPressed: () {},

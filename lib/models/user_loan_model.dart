@@ -8,7 +8,6 @@ class UserLoanModel {
   final String createdAt;
   final double? documentCharge;
   final String? rejectionNote;
-  final String? risk;
   final String status;
   final int? sync;
   final InterestRateModel? interestRate;
@@ -21,7 +20,6 @@ class UserLoanModel {
     required this.createdAt,
     this.documentCharge,
     this.rejectionNote,
-    this.risk,
     required this.status,
     this.sync,
     this.interestRate,
@@ -31,21 +29,20 @@ class UserLoanModel {
 
   factory UserLoanModel.fromJson(Map<String, dynamic> json) {
     return UserLoanModel(
-      fileNumber: json['fileNumber']?.toString() ?? "N/A",
+      fileNumber: (json['fileNumber']?.toString().length ?? 0) < 7
+          ? json['fileNumber'].toString()
+          : "Pending",
       amount: json['amount'] as double,
       createdAt: json['createdAt'].toString(),
-      documentCharge: double.tryParse(json['document_charge'].toString()) ?? 0,
+      documentCharge: double.tryParse(json['documentCharge'].toString()) ?? 0,
       rejectionNote: json['rejectionNote']?.toString() ?? "N/A",
-      risk: json['risk']?.toString() ?? "N/A",
       status: json['status'].toString(),
-      interestRate: json['interest_rate_id'] != null
-          ? InterestRateModel.fromMap(
-              json['interest_rate_id'] as Map<String, dynamic>,
-            )
-          : null,
+      interestRate: InterestRateModel.fromMap(
+        json['interestRate'] as Map<String, dynamic>,
+      ),
       employee: EmployeeModel.fromMap(json['employee'] as Map<String, dynamic>),
       installments: InstallmentModel.fromMap(
-        json['Installments'] as Map<String, dynamic>,
+        json['installments'] as Map<String, dynamic>,
       ),
     );
   }
@@ -54,13 +51,12 @@ class UserLoanModel {
     return UserLoanModel(
       fileNumber: (map['file_number']?.toString().length ?? 0) < 7
           ? map['file_number'].toString()
-          : "Not Approved",
+          : "Pending",
       amount: map['amount'] as double,
       createdAt: map['created_at'].toString(),
-      documentCharge: double.tryParse(map['document_charge'].toString()) ?? 0,
+      documentCharge: double.tryParse(map['document_charge'].toString()) ?? 0.0,
       rejectionNote: map['rejection_note']?.toString() ?? "N/A",
-      risk: map['risk']?.toString() ?? "N/A",
-      status: map['status']?.toString() ?? "test",
+      status: map['status'].toString(),
       sync: map['sync'] as int,
       interestRate: map['interest_rate_id'] != null
           ? InterestRateModel.fromMap(

@@ -2,12 +2,22 @@
 import 'package:flutter/material.dart';
 import 'package:nkrs_app/data/services/database_service/database_async_service.dart';
 import 'package:nkrs_app/data/view_model/async_database_table.dart';
+import 'package:nkrs_app/data/view_model/check_connection.dart';
+import 'package:nkrs_app/views/new_loan_request_view/utility/scaffold_message.dart';
+import 'package:nkrs_app/views/new_loan_request_view/utility/scaffold_message_bottom.dart';
 
 class AsyncControllerViewModel {
   final AsyncDatabaseTable _service = AsyncDatabaseTable();
   final DatabaseAsyncService _database = DatabaseAsyncService();
 
   Future<void> asyncController(BuildContext context) async {
+    if (!CheckConnection.isOnline.value) {
+      AppTopSnackBar.wifi(
+        context,
+        "Device is offline. Turn on mobile data to continue.",
+      );
+      return;
+    }
     bool anyParentFailed = false;
     final Map<int, bool?> checker = {};
     try {
@@ -16,26 +26,22 @@ class AsyncControllerViewModel {
         _service.employeesTable(context), // 2
         _service.installmentsTable(context), // 3
         _service.interestRatesTable(context), // 4
-        // _service.loansTable(context), // 5
       ]);
 
       checker[1] = results[0];
       checker[2] = results[1];
       checker[3] = results[2];
       checker[4] = results[3];
-      // checker[5] = results[4];
 
       for (final entry in checker.entries) {
         if (entry.value != true || entry.value == null) {
           anyParentFailed = true;
           final failedIndex = entry.key;
-
           await retryFailedMethod(failedIndex, context, checker);
         }
       }
 
       if (!anyParentFailed) {
-        debugPrint('🔄 Syncing/Running Loans Table (5)...');
         checker[5] = await _service.loansTable(context);
         if (checker[5] == false || checker[5] == null) {
           final _ = await _database.deleteSyncedInstallments("loans");
@@ -46,39 +52,48 @@ class AsyncControllerViewModel {
         if (successCount == 4) {
           checker[5] = await _service.loansTable(context);
         }
-        debugPrint("Other table error");
       }
-
-      _updateAsync(checker);
-
-      debugPrint("Update sync -------------: $checker");
+      // _updateAsync(checker);
+      await _database.updateAsync(checker);
+      final successCount = checker.values.where((v) => v == true).length;
+      if (successCount == 5) {
+        await _database.updateSyncTime(1);
+        AppTopSnackBar.success(context, "Async completed successfully.");
+      }
+      //   AppTopSnackBar.error(
+      //     context,
+      //     "Loan sync failed. Other data synced successfully.",
+      //   );
+      // }
     } catch (e) {
-      debugPrint('An error occurred during sync controller execution: $e');
+      ScaffoldMessageBottom.show(
+        context,
+        "An error occurred during sync controller execution: $e'",
+      );
     }
   }
 
-  Future<void> _updateAsync(Map<int, bool?> checker) async {
-    final tableNames = {
-      1: "customers",
-      2: "employees",
-      3: "installments",
-      4: "interest_rates",
-      5: "loans",
-    };
-    try {
-      for (final entry in checker.entries) {
-        if (entry.value == true) {
-          final tableName = tableNames[entry.key];
-          print(tableName);
-          if (tableName != null) {
-            await _database.updateSyncStatus(tableName);
-          }
-        }
-      }
-    } catch (e) {
-      debugPrint("Update sync status error: $e");
-    }
-  }
+  // Future<void> _updateAsync(Map<int, bool?> checker) async {
+  //   final tableNames = {
+  //     1: "customers",
+  //     2: "employees",
+  //     3: "installments",
+  //     4: "interest_rates",
+  //     5: "loans",
+  //   };
+  //   try {
+  //     for (final entry in checker.entries) {
+  //       if (entry.value == true) {
+  //         final tableName = tableNames[entry.key];
+  //         if (tableName != null) {
+  //           await _database.updateSyncStatus(tableName);
+  //         }
+  //       }
+  //     }
+  //   } catch (e) {
+  //     return;
+  //   }
+  // }
 
   // final successCount = checker.values.where((v) => v == true).length;
   // if (successCount == 5) {
@@ -96,36 +111,26 @@ class AsyncControllerViewModel {
     BuildContext context,
     Map<int, bool?> checker,
   ) async {
-    final int? n;
     switch (index) {
       case 1:
-        n = await _database.deleteSyncedInstallments("customers");
-        debugPrint('Cleared synced customer records: $n');
+        await _database.deleteSyncedInstallments("customers");
         checker[1] = await _service.customersTable(context);
         break;
       case 2:
-        n = await _database.deleteSyncedInstallments("employees");
-        debugPrint('Cleared synced employee records: $n');
+        await _database.deleteSyncedInstallments("employees");
         checker[2] = await _service.employeesTable(context);
         break;
       case 3:
         debugPrint("can;t insertt dsad-------");
-        n = await _database.deleteSyncedInstallments("installments");
-        debugPrint('Cleared synced installment records: $n');
+        await _database.deleteSyncedInstallments("installments");
         checker[3] = await _service.installmentsTable(context);
         break;
       case 4:
-        n = await _database.deleteSyncedInstallments("interest_rates");
-        debugPrint('Cleared synced interest rate records: $n');
+        await _database.deleteSyncedInstallments("interest_rates");
         checker[4] = await _service.interestRatesTable(context);
         break;
-      // case 5:
-      //   final n = await _database.deleteSyncedInstallments("loans");
-      //   debugPrint('Cleared synced loan records: $n');
-      //   checker[5] = await _service.loansTable(context);
-      //   break;
       default:
-        debugPrint('Unknown index passed to retry: $index');
+        AppTopSnackBar.error(context, 'Unknown index passed to retry: $index');
         break;
     }
   }

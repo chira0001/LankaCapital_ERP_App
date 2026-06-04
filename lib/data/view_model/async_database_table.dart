@@ -4,10 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:nkrs_app/data/services/async_service/async_service.dart';
 import 'package:nkrs_app/data/services/database_service/database_get_service.dart';
 import 'package:nkrs_app/data/services/database_service/database_put_service.dart';
+import 'package:nkrs_app/views/new_loan_request_view/utility/scaffold_message.dart';
 import 'package:nkrs_app/views/new_loan_request_view/utility/scaffold_message_bottom.dart';
 
 class AsyncDatabaseTable {
-  // final DatabaseService _databaseService = DatabaseService();
   final DatabaseGetService _databaseGetService = DatabaseGetService();
   final DatabasePutService _databasePutService = DatabasePutService();
   final AsyncService asyncService = AsyncService();
@@ -28,16 +28,16 @@ class AsyncDatabaseTable {
       List<Map<String, dynamic>>? tableData = await asyncService.asyncCustomers(
         pageNo,
         json,
-      ); //call the server 'post'
+      );
       if (tableData == null) {
-        ScaffoldMessageBottom.show(
+        AppTopSnackBar.info(
           context,
           "Server or Connection or Error : Customers",
         );
         return false;
       }
       if (tableData.isEmpty) {
-        ScaffoldMessageBottom.show(context, "Customers Sync Completed");
+        // AppTopSnackBar.success(context, "Customers Sync Completed");
         return true;
       }
       tableData = tableData.map((e) {
@@ -47,14 +47,11 @@ class AsyncDatabaseTable {
       for (var item in tableData) {
         savedId = (await _databasePutService.insertDataToCustomers(item));
         if (savedId == null) {
-          //delete all sync column value is 1 rows
           ScaffoldMessageBottom.show(context, "Can't insert data Customers");
           return false;
         }
       }
       ++pageNo;
-      // ignore: avoid_print
-      print("Saved ${tableData.length} rows");
     }
   }
 
@@ -83,7 +80,7 @@ class AsyncDatabaseTable {
         return false;
       }
       if (tableData.isEmpty) {
-        ScaffoldMessageBottom.show(context, "Employees Sync Completed");
+        // AppTopSnackBar.success(context, "Employees Sync Completed");
         return true;
       }
       tableData = tableData.map((e) {
@@ -93,14 +90,11 @@ class AsyncDatabaseTable {
       for (var item in tableData) {
         savedId = (await _databasePutService.insertDataToEmployees(item));
         if (savedId == null) {
-          //delete all sync column value is 1 rows
           ScaffoldMessageBottom.show(context, "Can't insert data Employees");
           return false;
         }
       }
       ++pageNo;
-      // ignore: avoid_print
-      print("Saved ${tableData.length} rows");
     }
   }
 
@@ -129,7 +123,7 @@ class AsyncDatabaseTable {
         return false;
       }
       if (tableData.isEmpty) {
-        ScaffoldMessageBottom.show(context, "Loans Sync Completed");
+        // ScaffoldMessageBottom.show(context, "Loans Sync Completed");
         return true;
       }
       tableData = tableData.map((e) {
@@ -138,19 +132,12 @@ class AsyncDatabaseTable {
       }).toList();
       for (var item in tableData) {
         savedId = (await _databasePutService.insertDataToLoans(item));
-        print(savedId);
         if (savedId == null) {
           ScaffoldMessageBottom.show(context, "Can't insert data Loans");
           return false;
         }
-        // if(savedId ==){
-        //   ScaffoldMessageBottom.show(context, "Can't insert data Loans");
-        //   return false;
-        // }
       }
       ++pageNo;
-      // ignore: avoid_print
-      print("Saved ${tableData.length} rows");
     }
   }
 
@@ -180,7 +167,7 @@ class AsyncDatabaseTable {
         return false;
       }
       if (tableData.isEmpty) {
-        ScaffoldMessageBottom.show(context, "Installments Sync Completed");
+        // ScaffoldMessageBottom.show(context, "Installments Sync Completed");
         return true;
       }
       tableData = tableData.map((e) {
@@ -196,8 +183,6 @@ class AsyncDatabaseTable {
         }
       }
       ++pageNo;
-      // ignore: avoid_print
-      print("Saved ${tableData.length} rows");
     }
   }
 
@@ -226,7 +211,7 @@ class AsyncDatabaseTable {
         return false;
       }
       if (tableData.isEmpty) {
-        ScaffoldMessageBottom.show(context, "Interest Rates Sync Completed");
+        // ScaffoldMessageBottom.show(context, "Interest Rates Sync Completed");
         return true;
       }
       tableData = tableData.map((e) {
@@ -245,8 +230,6 @@ class AsyncDatabaseTable {
         }
       }
       ++pageNo;
-      // ignore: avoid_print
-      print("Saved ${tableData.length} rows");
     }
   }
 }

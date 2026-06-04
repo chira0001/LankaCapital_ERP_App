@@ -16,7 +16,6 @@ class UserService {
       }
       return null;
     } catch (e) {
-      print("findUserInfoById error: $e");
       return null;
     }
   }

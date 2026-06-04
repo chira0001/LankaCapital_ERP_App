@@ -42,17 +42,16 @@ class _OfflineDialogContentState extends State<_OfflineDialogContent> {
           mainAxisSize: MainAxisSize.min,
           children: [
             _header(context),
-            const SizedBox(height: 15),
-            _modeSwitch(),
-            const SizedBox(height: 3),
             const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 10),
+              padding: EdgeInsets.symmetric(horizontal: 15),
               child: Divider(
                 color: Color.fromARGB(40, 51, 51, 51),
                 thickness: 1.5,
               ),
             ),
             const SizedBox(height: 5),
+            _modeSwitch(),
+            const SizedBox(height: 3),
             _statusText(),
             _refreshButton(),
             const SizedBox(height: 5),

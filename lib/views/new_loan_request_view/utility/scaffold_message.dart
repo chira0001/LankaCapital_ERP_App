@@ -22,6 +22,38 @@ class AppTopSnackBar {
     );
   }
 
+  static void info(
+    BuildContext context,
+    String message, {
+    Duration duration = const Duration(seconds: 3),
+    bool showClose = true,
+  }) {
+    _show(
+      context,
+      message: message,
+      icon: Icons.error_outline_rounded,
+      color: Colors.blue,
+      duration: duration,
+      showClose: showClose,
+    );
+  }
+
+  static void wifi(
+    BuildContext context,
+    String message, {
+    Duration duration = const Duration(seconds: 3),
+    bool showClose = true,
+  }) {
+    _show(
+      context,
+      message: message,
+      icon: Icons.wifi_off_rounded,
+      color: Colors.deepOrangeAccent,
+      duration: duration,
+      showClose: showClose,
+    );
+  }
+
   static void success(
     BuildContext context,
     String message, {

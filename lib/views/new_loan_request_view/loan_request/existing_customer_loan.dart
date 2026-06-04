@@ -5,7 +5,7 @@ import 'package:nkrs_app/data/view_model/loan_view_model.dart';
 import 'package:nkrs_app/models/installment_model.dart';
 import 'package:nkrs_app/models/user_loan_model.dart';
 import 'package:nkrs_app/utility/constanst.dart';
-import 'package:nkrs_app/views/new_loan_request_view/loan_request/existing_customer_loan_details.dart';
+import 'package:nkrs_app/views/new_loan_request_view/loan_request/loan_details/existing_customer_loan_details.dart';
 import 'package:nkrs_app/views/new_loan_request_view/loan_request/existing_customer_loan_request.dart';
 import 'package:nkrs_app/views/new_loan_request_view/utility/custom_row.dart';
 import 'package:nkrs_app/views/new_loan_request_view/utility/custom_text_field.dart';
@@ -13,7 +13,7 @@ import 'package:nkrs_app/views/new_loan_request_view/utility/loading_dialog.dart
 import 'package:nkrs_app/views/new_loan_request_view/utility/main_card.dart';
 import 'package:nkrs_app/views/new_loan_request_view/utility/popup_box_message.dart';
 import 'package:nkrs_app/views/new_loan_request_view/utility/scaffold_message.dart';
-import 'package:nkrs_app/views/sync_view/connection_view.dart';
+import 'package:nkrs_app/views/new_loan_request_view/utility/custom_app_bar.dart';
 
 class ExistingCustomerLoan extends StatefulWidget {
   const ExistingCustomerLoan({super.key});
@@ -39,89 +39,9 @@ class _ExistingCustomerLoanState extends State<ExistingCustomerLoan> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: appBarC,
-        elevation: 2.0,
-        shadowColor: appBarShadow,
-        leading: IconButton(
-          onPressed: () {
-            Navigator.pop(context);
-          },
-          icon: Icon(
-            Icons.arrow_back_ios,
-            color: const Color.fromARGB(255, 0, 0, 0),
-            size: 20,
-            fontWeight: FontWeight.w900,
-          ),
-        ),
-        title: Text("Existing Customer Loan"),
-        titleTextStyle: TextStyle(
-          color: btnC,
-          fontSize: appBarFontS,
-          fontWeight: FontWeight.bold,
-        ),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 15),
-            child: ValueListenableBuilder<bool>(
-              valueListenable: CheckConnection.isOnline,
-              builder: (context, online, child) {
-                return GestureDetector(
-                  onTap: () {
-                    // setState(() {
-                    //   CheckConnection.initialize();
-                    // });
-                    // if (online) {
-                    //   AppTopSnackBar.success(
-                    //     context,
-                    //     "Device is Online.",
-                    //     showClose: false,
-                    //     duration: Duration(seconds: 2),
-                    //   );
-                    // } else {
-                    //   AppTopSnackBar.error(
-                    //     context,
-                    //     "Device is Offline.",
-                    //     showClose: false,
-                    //     duration: Duration(seconds: 2),
-                    //   );
-                    // }
-                    ConnectionView.show(context);
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 5,
-                    ),
-                    decoration: BoxDecoration(
-                      color: online
-                          ? const Color.fromARGB(40, 9, 172, 58)
-                          : const Color.fromARGB(40, 172, 9, 9),
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color: online
-                            ? const Color.fromARGB(255, 9, 172, 58)
-                            : const Color.fromARGB(255, 172, 9, 9),
-                        width: 0.5,
-                      ),
-                    ),
-                    child: Text(
-                      online ? "ONLINE" : "OFFLINE",
-                      style: TextStyle(
-                        color: online
-                            ? const Color.fromARGB(255, 9, 172, 58)
-                            : const Color.fromARGB(255, 172, 9, 9),
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: 1,
-                        fontSize: 10,
-                      ),
-                    ),
-                  ),
-                );
-              },
-            ),
-          ),
-        ],
+      appBar: CustomAppBar(
+        title: "Existing Customer Loan",
+        onBackPressed: () => Navigator.pop(context),
       ),
       backgroundColor: safeAreaC,
       body: SafeArea(
@@ -217,7 +137,7 @@ class _ExistingCustomerLoanState extends State<ExistingCustomerLoan> {
                                         showDetails = false;
                                         _user = null;
                                       });
-                                      showTopNotification(
+                                      AppTopSnackBar.error(
                                         context,
                                         "User not found. Please check the ID.",
                                       );
@@ -227,7 +147,7 @@ class _ExistingCustomerLoanState extends State<ExistingCustomerLoan> {
                                       showDetails = false;
                                       _user = null;
                                     });
-                                    showTopNotification(
+                                    AppTopSnackBar.error(
                                       context,
                                       "Something went wrong. Please try again.",
                                     );
@@ -332,6 +252,7 @@ class _ExistingCustomerLoanState extends State<ExistingCustomerLoan> {
                 CustomRow(label: "Phone Number", value: _user!.phoneNumber),
                 GestureDetector(
                   onTap: () async {
+                    // if (_user.loan?.length < 3) {
                     List<InstallmentModel>? installments;
                     // List<InterestRateModel>? interestRate;
                     LoadingDialog.show(context, message: 'Please Wait...');
@@ -364,6 +285,7 @@ class _ExistingCustomerLoanState extends State<ExistingCustomerLoan> {
                         "Failed to load installments. Cannot proceed.",
                       );
                     }
+                    // }
                   },
                   child: Container(
                     width: double.infinity,
@@ -487,23 +409,30 @@ class _ExistingCustomerLoanState extends State<ExistingCustomerLoan> {
                                 vertical: 2,
                               ),
                               decoration: BoxDecoration(
-                                color:
-                                    loan.status.toString().toLowerCase() ==
-                                        "active"
-                                    ? Colors.green[50]
-                                    : Colors.grey[100],
+                                color: switch (loan.status.toString()) {
+                                  'APPROVED' => Colors.green[50],
+                                  'PENDING' => const Color.fromARGB(
+                                    255,
+                                    255,
+                                    238,
+                                    225,
+                                  ),
+                                  'REJECTED' => Colors.red[50],
+                                  _ => Colors.grey[100],
+                                },
                                 borderRadius: BorderRadius.circular(5),
                               ),
                               child: Text(
-                                loan.status.toString().toLowerCase(),
+                                loan.status.toString(),
                                 style: TextStyle(
                                   fontSize: 10,
                                   fontWeight: FontWeight.bold,
-                                  color:
-                                      loan.status.toString().toLowerCase() ==
-                                          "active"
-                                      ? Colors.green[700]
-                                      : Colors.grey[600],
+                                  color: switch (loan.status) {
+                                    'APPROVED' => Colors.green[700],
+                                    'PENDING' => Colors.amber[600],
+                                    'REJECTED' => Colors.red[700],
+                                    _ => Colors.grey[600],
+                                  },
                                 ),
                               ),
                             ),
@@ -513,7 +442,7 @@ class _ExistingCustomerLoanState extends State<ExistingCustomerLoan> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => LoanDetailsPage(),
+                              builder: (context) => LoanDetailsPage(loan: loan),
                             ),
                           );
                         },

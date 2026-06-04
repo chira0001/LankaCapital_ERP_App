@@ -1,6 +1,8 @@
 import 'package:nkrs_app/data/services/database_initializer_service.dart';
 import 'package:nkrs_app/models/Interest_rate_model.dart';
+import 'package:nkrs_app/models/add_loan_model.dart';
 import 'package:nkrs_app/models/installment_model.dart';
+import 'package:nkrs_app/models/user_model.dart';
 
 class DatabaseGetService {
   final DatabaseInitializerService _databaseService =
@@ -109,6 +111,53 @@ class DatabaseGetService {
 
       return maps.map((e) => InterestRateModel.fromMap(e)).toList();
     } catch (e) {
+      return null;
+    }
+  }
+
+  Future<Map<String, dynamic>?> getSyncTime() async {
+    try {
+      final db = await _databaseService.database;
+      final result = await db!.query(
+        'time',
+        where: 'id = ?',
+        whereArgs: [1],
+        limit: 1,
+      );
+      return result.first;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  Future<List<User>?> getUnsyncedCustomers() async {
+    try {
+      final db = await _databaseService.database;
+
+      final result = await db!.query(
+        'customers',
+        where: 'sync = ?',
+        whereArgs: [0],
+      );
+
+      return result.map(User.fromMapUser).toList();
+    } catch (e) {
+      print(e);
+      return null;
+    }
+  }
+
+  Future<List<AddLoanModel>?> getUnsyncedLoans() async {
+    try {
+      final db = await _databaseService.database;
+      final result = await db!.query(
+        'loans',
+        where: 'sync = ?',
+        whereArgs: [0],
+      );
+      return result.map(AddLoanModel.fromJson).toList();
+    } catch (e) {
+      print(e);
       return null;
     }
   }

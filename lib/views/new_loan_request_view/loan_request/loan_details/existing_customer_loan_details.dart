@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:nkrs_app/models/user_loan_model.dart';
 import 'package:nkrs_app/utility/constanst.dart';
+import 'package:nkrs_app/views/new_loan_request_view/utility/custom_app_bar.dart';
 
 // ignore: must_be_immutable
 class LoanDetailsPage extends StatelessWidget {
@@ -12,33 +14,17 @@ class LoanDetailsPage extends StatelessWidget {
   int? employeeId = 12;
   String? employeeName = "Chirath wijesinghan";
 
-  LoanDetailsPage({super.key});
+  final UserLoanModel loan;
+
+  LoanDetailsPage({super.key, required this.loan});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: safeAreaC,
-      appBar: AppBar(
-        backgroundColor: appBarC,
-        elevation: 2.0,
-        shadowColor: appBarShadow,
-        leading: IconButton(
-          onPressed: () {
-            Navigator.pop(context);
-          },
-          icon: Icon(
-            Icons.arrow_back_ios,
-            color: const Color.fromARGB(185, 0, 0, 0),
-            size: 20,
-            fontWeight: FontWeight.w900,
-          ),
-        ),
-        title: Text("Customer Loan Details"),
-        titleTextStyle: TextStyle(
-          color: btnC,
-          fontSize: appBarFontS,
-          fontWeight: FontWeight.bold,
-        ),
+      appBar: CustomAppBar(
+        title: "Customer Loan Details",
+        onBackPressed: () => Navigator.pop(context),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -66,10 +52,92 @@ class LoanDetailsPage extends StatelessWidget {
                 ),
                 _buildOfficerCard(),
                 const SizedBox(height: 20),
+                Padding(
+                  padding: const EdgeInsets.only(left: 4.0, bottom: 8.0),
+                  child: Text(
+                    (loan.status.toLowerCase() == "rejected")
+                        ? 'LOAN REJECTED NOTE'
+                        : 'LOAN SPECIFICATIONS',
+                    style: const TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.bold,
+                      color: Color.fromARGB(255, 149, 149, 149),
+                      letterSpacing: 1.1,
+                    ),
+                  ),
+                ),
+                (loan.status.toLowerCase() == "rejected")
+                    ? Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(16),
+                          boxShadow: [
+                            BoxShadow(
+                              // ignore: deprecated_member_use
+                              color: Colors.black.withOpacity(0.04),
+                              blurRadius: 10,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        padding: const EdgeInsets.all(16.0),
+                        child: Text(
+                          "data",
+                          style: TextStyle(
+                            color: Color(0xFF1A3D81),
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      )
+                    : Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(16),
+                          boxShadow: [
+                            BoxShadow(
+                              // ignore: deprecated_member_use
+                              color: Colors.black.withOpacity(0.04),
+                              blurRadius: 10,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        padding: const EdgeInsets.all(16.0),
+                        child: Column(
+                          children: [
+                            _buildDetailRow(
+                              'Interest Rate',
+                              (loan.interestRate?.rate!) != null
+                                  ? '${loan.interestRate?.rate!.toStringAsFixed(2)}%'
+                                  : "Pending",
+                            ),
+                            const Divider(height: 24, thickness: 0.8),
+                            _buildDetailRow(
+                              'Installments',
+                              '${loan.installments.value}',
+                            ),
+                            const Divider(height: 24, thickness: 0.8),
+                            _buildDetailRow(
+                              'Document Charge',
+                              (loan.documentCharge ?? 0.0) > 0
+                                  ? 'Rs. ${loan.documentCharge!.toStringAsFixed(2)}'
+                                  : 'Pending',
+                            ),
+                            const Divider(height: 24, thickness: 0.8),
+                            _buildDetailRow(
+                              'Created Date',
+                              loan.createdAt.split('T')[0],
+                            ),
+                          ],
+                        ),
+                      ),
+                const SizedBox(height: 20),
                 const Padding(
                   padding: EdgeInsets.only(left: 4.0, bottom: 8.0),
                   child: Text(
-                    'LOAN SPECIFICATIONS',
+                    'LOAN STATUS',
                     style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.bold,
@@ -78,41 +146,32 @@ class LoanDetailsPage extends StatelessWidget {
                     ),
                   ),
                 ),
-                Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(16),
-                    boxShadow: [
-                      BoxShadow(
-                        // ignore: deprecated_member_use
-                        color: Colors.black.withOpacity(0.04),
-                        blurRadius: 10,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
-                  ),
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    children: [
-                      _buildDetailRow(
-                        'Interest Rate',
-                        '${interestRate.toStringAsFixed(2)}%',
-                      ),
-                      const Divider(height: 24, thickness: 0.8),
-                      _buildDetailRow(
-                        'Installments',
-                        '$noOfInstallments Months',
-                      ),
-                      const Divider(height: 24, thickness: 0.8),
-                      _buildDetailRow(
-                        'Document Charge',
-                        'Rs. ${documentCharge.toStringAsFixed(2)}',
-                      ),
-                      const Divider(height: 24, thickness: 0.8),
-                      _buildDetailRow('Created Date', createdAt ?? 'N/A'),
-                    ],
-                  ),
-                ),
+                loan.status.toLowerCase() == "pending"
+                    ? Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(16),
+                          boxShadow: [
+                            BoxShadow(
+                              // ignore: deprecated_member_use
+                              color: Colors.black.withOpacity(0.04),
+                              blurRadius: 10,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        padding: const EdgeInsets.all(16.0),
+                        child: const Text(
+                          "Your loan application is under review. Thank you for your patience.",
+                          style: TextStyle(
+                            color: Color(0xFF1A3D81),
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      )
+                    : const SizedBox.shrink(),
               ],
             ),
           ),
@@ -165,7 +224,7 @@ class LoanDetailsPage extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  employeeName ?? 'No Officer Assigned',
+                  "${loan.employee.firstName} ${loan.employee.lastName}",
                   style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
@@ -174,7 +233,9 @@ class LoanDetailsPage extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  employeeId != null ? 'Officer ID: #$employeeId' : 'ID: N/A',
+                  employeeId != null
+                      ? 'Contact No: ${loan.employee.phoneNumber}'
+                      : 'ID: N/A',
                   style: TextStyle(
                     fontSize: 13,
                     color: Colors.grey[600],
@@ -232,14 +293,19 @@ class LoanDetailsPage extends StatelessWidget {
                 ),
                 decoration: BoxDecoration(
                   // ignore: deprecated_member_use
-                  color: Colors.white.withOpacity(0.15),
+                  color: const Color.fromARGB(31, 255, 238, 225),
                   borderRadius: BorderRadius.circular(20),
                 ),
-                child: const Text(
-                  'Active',
+                child: Text(
+                  loan.status,
                   style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 11,
+                    color: switch (loan.status) {
+                      'APPROVED' => Colors.green[700],
+                      'PENDING' => Colors.amber[600],
+                      'REJECTED' => Colors.red[700],
+                      _ => Colors.grey[600],
+                    },
+                    fontSize: 12,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -248,7 +314,7 @@ class LoanDetailsPage extends StatelessWidget {
           ),
           const SizedBox(height: 4),
           Text(
-            fileNumber!,
+            loan.fileNumber!,
             style: const TextStyle(
               color: Colors.white,
               fontSize: 20,
@@ -267,7 +333,7 @@ class LoanDetailsPage extends StatelessWidget {
           ),
           const SizedBox(height: 4),
           Text(
-            'Rs. ${amount.toStringAsFixed(2)}',
+            'Rs. ${loan.amount.toStringAsFixed(2)}',
             style: const TextStyle(
               color: Colors.white,
               fontSize: 32,

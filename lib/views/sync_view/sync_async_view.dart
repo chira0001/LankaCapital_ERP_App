@@ -2,16 +2,20 @@
 
 import 'package:flutter/material.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
+import 'package:intl/intl.dart';
 import 'package:nkrs_app/data/view_model/async_controller_view_model.dart';
 import 'package:nkrs_app/data/view_model/check_connection.dart';
+import 'package:nkrs_app/data/view_model/sync_controller_view_model.dart';
 import 'package:nkrs_app/utility/constanst.dart';
+import 'package:nkrs_app/views/new_loan_request_view/utility/custom_app_bar.dart';
 import 'package:nkrs_app/views/new_loan_request_view/utility/loading_dialog.dart';
 import 'package:nkrs_app/views/new_loan_request_view/utility/main_card.dart'
     show MainCard;
-import 'package:nkrs_app/views/new_loan_request_view/utility/popup_box_message.dart';
 
 class SyncAsyncView extends StatefulWidget {
-  const SyncAsyncView({super.key});
+  final Map<String, dynamic>? syncTime;
+
+  const SyncAsyncView({super.key, this.syncTime});
 
   @override
   State<SyncAsyncView> createState() => _SyncAsyncViewState();
@@ -27,78 +31,9 @@ class _SyncAsyncViewState extends State<SyncAsyncView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: appBarC,
-        elevation: 2.0,
-        shadowColor: appBarShadow,
-        leading: IconButton(
-          onPressed: () {
-            Navigator.pop(context);
-          },
-          icon: Icon(
-            Icons.arrow_back_ios,
-            color: const Color.fromARGB(255, 0, 0, 0),
-            size: 20,
-            fontWeight: FontWeight.w900,
-          ),
-        ),
-        title: Text("Existing Customer Loan"),
-        titleTextStyle: TextStyle(
-          color: btnC,
-          fontSize: appBarFontS,
-          fontWeight: FontWeight.bold,
-        ),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 15),
-            child: ValueListenableBuilder<bool>(
-              valueListenable: CheckConnection.isOnline,
-              builder: (context, online, child) {
-                return GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      CheckConnection.initialize();
-                    });
-
-                    showTopNotification(
-                      context,
-                      online ? "Device is Online" : "Device is Offline",
-                    );
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 5,
-                    ),
-                    decoration: BoxDecoration(
-                      color: online
-                          ? const Color.fromARGB(40, 9, 172, 58)
-                          : const Color.fromARGB(40, 172, 9, 9),
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color: online
-                            ? const Color.fromARGB(255, 9, 172, 58)
-                            : const Color.fromARGB(255, 172, 9, 9),
-                        width: 0.5,
-                      ),
-                    ),
-                    child: Text(
-                      online ? "ONLINE" : "OFFLINE",
-                      style: TextStyle(
-                        color: online
-                            ? const Color.fromARGB(255, 9, 172, 58)
-                            : const Color.fromARGB(255, 172, 9, 9),
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: 1,
-                        fontSize: 10,
-                      ),
-                    ),
-                  ),
-                );
-              },
-            ),
-          ),
-        ],
+      appBar: CustomAppBar(
+        title: "Sync Setting",
+        onBackPressed: () => Navigator.pop(context),
       ),
       backgroundColor: safeAreaC,
       body: SafeArea(
@@ -182,7 +117,13 @@ class _SyncAsyncViewState extends State<SyncAsyncView> {
                               ),
                             ),
                             Text(
-                              "2024:43:23",
+                              widget.syncTime?['last_sync'] != null
+                                  ? DateFormat('dd/MM  hh:mm a').format(
+                                      DateTime.parse(
+                                        widget.syncTime!['last_sync'],
+                                      ),
+                                    )
+                                  : 'Not Synced',
                               style: TextStyle(
                                 color: Color(0xFF1A3D81),
                                 fontSize: 17,
@@ -217,7 +158,13 @@ class _SyncAsyncViewState extends State<SyncAsyncView> {
                               ),
                             ),
                             Text(
-                              "2026:10:10",
+                              widget.syncTime?['last_async'] != null
+                                  ? DateFormat('dd/MM  hh:mm a').format(
+                                      DateTime.parse(
+                                        widget.syncTime!['last_async'],
+                                      ),
+                                    )
+                                  : 'Not Synced',
                               style: TextStyle(
                                 color: Color(0xFF1A3D81),
                                 fontSize: 17,
@@ -234,7 +181,18 @@ class _SyncAsyncViewState extends State<SyncAsyncView> {
                       ),
                       SizedBox(height: 30),
                       GestureDetector(
-                        onTap: () {},
+                        onTap: () async {
+                          // if(){}
+                          LoadingDialog.show(
+                            context,
+                            message: 'Please Wait...',
+                          );
+                          await SyncControllerViewModel().syncController(
+                            context,
+                          );
+                          if (!context.mounted) return;
+                          LoadingDialog.hide(context);
+                        },
                         child: Container(
                           padding: const EdgeInsets.symmetric(
                             horizontal: 15,
@@ -252,17 +210,7 @@ class _SyncAsyncViewState extends State<SyncAsyncView> {
                             children: [
                               Icon(Icons.cloud_download, color: btnC),
                               const SizedBox(width: 12),
-                              Expanded(
-                                child: Text(
-                                  "Sync",
-                                  style: TextStyle(
-                                    color: headerTextC,
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                    letterSpacing: 1,
-                                  ),
-                                ),
-                              ),
+                              Expanded(child: Text("Sync", style: _style())),
                               Icon(
                                 Iconsax.arrow_right_3_copy,
                                 size: 18,
@@ -303,17 +251,7 @@ class _SyncAsyncViewState extends State<SyncAsyncView> {
                             children: [
                               Icon(Icons.cloud_upload, color: btnC),
                               const SizedBox(width: 12),
-                              Expanded(
-                                child: Text(
-                                  "Async",
-                                  style: TextStyle(
-                                    color: headerTextC,
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                    letterSpacing: 1,
-                                  ),
-                                ),
-                              ),
+                              Expanded(child: Text("Async", style: _style())),
                               Icon(
                                 Iconsax.arrow_right_3_copy,
                                 size: 18,
@@ -333,6 +271,15 @@ class _SyncAsyncViewState extends State<SyncAsyncView> {
           ),
         ),
       ),
+    );
+  }
+
+  TextStyle _style() {
+    return TextStyle(
+      color: headerTextC,
+      fontSize: 18,
+      fontWeight: FontWeight.bold,
+      letterSpacing: 1,
     );
   }
 }

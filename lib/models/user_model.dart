@@ -1,7 +1,7 @@
 import 'package:nkrs_app/models/user_loan_model.dart';
 
 class User {
-  final int nic;
+  final int? nic;
   final String email;
   final String name;
   final String phoneNumber;
@@ -10,7 +10,7 @@ class User {
   final List<UserLoanModel>? loans;
 
   User({
-    required this.nic,
+    this.nic,
     required this.email,
     required this.name,
     required this.phoneNumber,
@@ -21,7 +21,7 @@ class User {
 
   factory User.fromJson(Map<String, dynamic> json) {
     return User(
-      nic: json['nic'] as int,
+      // nic: json['nic'] as int,
       email: json['email'].toString(),
       name: json['name'].toString(),
       phoneNumber: json['phoneNumber'].toString(),
@@ -44,5 +44,15 @@ class User {
       sync: map['sync'] as int,
       loans: (map['loans'] as List<UserLoanModel>?) ?? [],
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'nic': nic,
+      'email': email,
+      'name': name,
+      'phoneNumber': phoneNumber,
+      'address': address,
+    };
   }
 }

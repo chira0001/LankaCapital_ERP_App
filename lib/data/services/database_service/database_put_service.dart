@@ -83,7 +83,7 @@ class DatabasePutService {
       print(loan);
       int? u = await db?.insert(
         'loans',
-        loan.toJson(),
+        loan.toMap(),
         conflictAlgorithm: ConflictAlgorithm.replace,
       );
       if (u != null) {

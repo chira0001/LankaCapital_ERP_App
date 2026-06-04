@@ -48,15 +48,9 @@ class LoanViewModel extends ChangeNotifier {
       if (user != null) {
         if (user.loans != null) {
           return user;
-        } else {
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(const SnackBar(content: Text("No User found")));
-        }
+        } else {}
       } else {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text("No User details found")));
+        // AppTopSnackBar.error(context, "");
       }
       return null;
       // ignore: empty_catches
@@ -75,11 +69,7 @@ class LoanViewModel extends ChangeNotifier {
         installments = await DatabaseGetService().getInstallments();
       }
       if (installments != null) {
-        if (installments.isEmpty) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("No Installment data found")),
-          );
-        } else {
+        if (installments.isNotEmpty) {
           return installments;
         }
       } else {
@@ -89,12 +79,16 @@ class LoanViewModel extends ChangeNotifier {
       }
       return null;
     } catch (e) {
-      print(e);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("No Installment data found")),
+      );
       return null;
     }
   }
 
-  Future<List<InterestRateModel>?> getInterestByOnline(BuildContext context) async {
+  Future<List<InterestRateModel>?> getInterestByOnline(
+    BuildContext context,
+  ) async {
     try {
       List<InterestRateModel>? interest;
       if (CheckConnection.isOnline.value) {
