@@ -1,5 +1,6 @@
-// ignore_for_file: use_build_context_synchronously
+// ignore_for_file: deprecated_member_use, use_build_context_synchronously
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:nkrs_app/data/view_model/check_connection.dart';
 import 'package:nkrs_app/data/view_model/loan_view_model.dart';
 import 'package:nkrs_app/models/installment_model.dart';
@@ -11,7 +12,6 @@ import 'package:nkrs_app/views/new_loan_request_view/utility/custom_row.dart';
 import 'package:nkrs_app/views/new_loan_request_view/utility/custom_text_field.dart';
 import 'package:nkrs_app/views/new_loan_request_view/utility/loading_dialog.dart';
 import 'package:nkrs_app/views/new_loan_request_view/utility/main_card.dart';
-import 'package:nkrs_app/views/new_loan_request_view/utility/popup_box_message.dart';
 import 'package:nkrs_app/views/new_loan_request_view/utility/scaffold_message.dart';
 import 'package:nkrs_app/views/new_loan_request_view/utility/custom_app_bar.dart';
 
@@ -159,13 +159,7 @@ class _ExistingCustomerLoanState extends State<ExistingCustomerLoan> {
                                 }
                               },
                               style: ElevatedButton.styleFrom(
-                                // ignore: deprecated_member_use
-                                backgroundColor: const Color.fromARGB(
-                                  96,
-                                  0,
-                                  102,
-                                  255,
-                                ),
+                                backgroundColor: btnC,
                                 padding: const EdgeInsets.symmetric(
                                   horizontal: 20,
                                   vertical: 14,
@@ -174,11 +168,11 @@ class _ExistingCustomerLoanState extends State<ExistingCustomerLoan> {
                                   borderRadius: BorderRadius.circular(
                                     btnBorderRadius,
                                   ),
-                                  side: BorderSide(
-                                    width: 2,
-                                    // ignore: deprecated_member_use
-                                    color: btnC.withOpacity(0.3),
-                                  ),
+                                  //   side: BorderSide(
+                                  //     width: 2,
+                                  //     // ignore: deprecated_member_use
+                                  //     color: btnC.withOpacity(0.3),
+                                  //   ),
                                 ),
                               ),
                               child: isLoading
@@ -362,7 +356,6 @@ class _ExistingCustomerLoanState extends State<ExistingCustomerLoan> {
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(12),
-                        // ignore: deprecated_member_use
                         border: Border.all(color: Colors.blue.withOpacity(0.1)),
                       ),
                       child: ListTile(
@@ -371,10 +364,8 @@ class _ExistingCustomerLoanState extends State<ExistingCustomerLoan> {
                           vertical: 8,
                         ),
                         leading: CircleAvatar(
-                          // ignore: deprecated_member_use
                           backgroundColor: const Color(
                             0xFF1A3D81,
-                            // ignore: deprecated_member_use
                           ).withOpacity(0.1),
                           child: const Icon(
                             Icons.account_balance_wallet,
@@ -389,7 +380,8 @@ class _ExistingCustomerLoanState extends State<ExistingCustomerLoan> {
                           ),
                         ),
                         subtitle: Text(
-                          "Issued: ${loan.createdAt.split('T')[0]}",
+                          "Issued: ${DateFormat('yyyy-MM-dd').format(DateTime.parse(loan.createdAt.replaceFirst(' ', 'T')))}",
+                          // "Issued: ${loan.createdAt.split('T')[0]}",
                         ),
                         trailing: Column(
                           mainAxisAlignment: MainAxisAlignment.center,

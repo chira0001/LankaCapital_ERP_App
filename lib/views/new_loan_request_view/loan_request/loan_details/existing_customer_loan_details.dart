@@ -1,22 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:nkrs_app/models/user_loan_model.dart';
 import 'package:nkrs_app/utility/constanst.dart';
 import 'package:nkrs_app/views/new_loan_request_view/utility/custom_app_bar.dart';
 
-// ignore: must_be_immutable
 class LoanDetailsPage extends StatelessWidget {
-  String? fileNumber = "nkfs";
-  double amount = 10000.0;
-  String? createdAt = "20026/56/5";
-  double interestRate = 10.5;
-  int noOfInstallments = 5;
-  double documentCharge = 100;
-  int? employeeId = 12;
-  String? employeeName = "Chirath wijesinghan";
-
   final UserLoanModel loan;
-
-  LoanDetailsPage({super.key, required this.loan});
+  const LoanDetailsPage({super.key, required this.loan});
 
   @override
   Widget build(BuildContext context) {
@@ -128,7 +118,11 @@ class LoanDetailsPage extends StatelessWidget {
                             const Divider(height: 24, thickness: 0.8),
                             _buildDetailRow(
                               'Created Date',
-                              loan.createdAt.split('T')[0],
+                              DateFormat('yyyy-MM-dd').format(
+                                DateTime.parse(
+                                  loan.createdAt.replaceFirst(' ', 'T'),
+                                ),
+                              ),
                             ),
                           ],
                         ),
@@ -233,9 +227,7 @@ class LoanDetailsPage extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  employeeId != null
-                      ? 'Contact No: ${loan.employee.phoneNumber}'
-                      : 'ID: N/A',
+                  'Contact No: ${loan.employee.phoneNumber}',
                   style: TextStyle(
                     fontSize: 13,
                     color: Colors.grey[600],
@@ -250,7 +242,6 @@ class LoanDetailsPage extends StatelessWidget {
     );
   }
 
-  // Highlight Card (Top Area)
   Widget _buildMainCard() {
     return Container(
       width: double.infinity,

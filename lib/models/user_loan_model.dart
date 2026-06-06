@@ -49,7 +49,9 @@ class UserLoanModel {
 
   factory UserLoanModel.fromMap(Map<String, dynamic> map) {
     return UserLoanModel(
-      fileNumber: (map['file_number']?.toString().length ?? 0) < 7
+      fileNumber:
+          (map['file_number'] != null &&
+              map['file_number'].toString().length < 7)
           ? map['file_number'].toString()
           : "Pending",
       amount: map['amount'] as double,

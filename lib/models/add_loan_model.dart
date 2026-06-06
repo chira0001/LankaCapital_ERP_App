@@ -32,7 +32,7 @@ class AddLoanModel {
       'customer_id': customerNic,
       'employee_id': employeeId,
       'installment_id': installmentId,
-      'created_at': createdAt,
+      // 'created_at': createdAt,
     };
   }
 
