@@ -17,10 +17,7 @@ class LoanFailureScreen extends StatelessWidget {
           icon: Icon(Icons.arrow_back_ios, size: 0),
           onPressed: () {},
         ),
-        title: const Text(
-          'Failed',
-          // style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
-        ),
+        title: const Text('Failed'),
         titleTextStyle: TextStyle(
           color: cardHeaderFC,
           fontSize: appBarFontS,
