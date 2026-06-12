@@ -1,27 +1,29 @@
 // ignore_for_file: use_build_context_synchronously
-
 import 'package:flutter/material.dart';
-import 'package:nkrs_app/data/services/database_service/database_loan_service.dart';
-import 'package:nkrs_app/data/services/loan_service.dart';
+import 'package:nkrs_app/data/services/database_service/database_user_service.dart';
+import 'package:nkrs_app/data/services/user_service.dart';
 import 'package:nkrs_app/data/view_model/check_connection.dart';
-import 'package:nkrs_app/models/add_loan_model.dart';
+import 'package:nkrs_app/models/new_customer_model.dart';
 import 'package:nkrs_app/views/new_loan_request_view/utility/scaffold_message.dart';
 import 'package:nkrs_app/views/new_loan_request_view/utility/scaffold_message_bottom.dart';
 
-class AddLoanView {
-  Future<bool> existingLoan(AddLoanModel loan, BuildContext context) async {
+class UserViewModel {
+  Future<bool> newCustomer(
+    NewCustomerModel customer,
+    BuildContext context,
+  ) async {
     try {
       String? m;
       if (CheckConnection.isOnline.value) {
-        m = await LoanService().addExistingLoan(loan);
+        m = await UserService().addCustomerAndLoan(customer);
         if (m == null) {
           ScaffoldMessageBottom.show(context, "Server Connection failed");
           return false;
         }
       } else {
-        m = await DatabaseLoanService().insertExistingLoan(loan);
+        m = await DatabaseUserService().addCustomerAndLoan(customer);
         if (m == null) {
-          ScaffoldMessageBottom.show(context, "Database Connection failed");
+          ScaffoldMessageBottom.show(context, "Server Connection failed");
           return false;
         }
       }
@@ -36,7 +38,7 @@ class AddLoanView {
         );
         return false;
       }
-        } catch (e) {
+    } catch (e) {
       return false;
     }
   }

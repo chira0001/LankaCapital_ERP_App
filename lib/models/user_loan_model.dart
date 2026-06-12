@@ -40,7 +40,7 @@ class UserLoanModel {
       interestRate: InterestRateModel.fromMap(
         json['interestRate'] as Map<String, dynamic>,
       ),
-      employee: EmployeeModel.fromMap(json['employee'] as Map<String, dynamic>),
+      employee: EmployeeModel.fromJson(json['employee'] as Map<String, dynamic>),
       installments: InstallmentModel.fromMap(
         json['installments'] as Map<String, dynamic>,
       ),

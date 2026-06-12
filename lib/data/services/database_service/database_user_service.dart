@@ -1,6 +1,8 @@
 import 'package:nkrs_app/data/services/database_initializer_service.dart';
+import 'package:nkrs_app/models/new_customer_model.dart';
 import 'package:nkrs_app/models/user_loan_model.dart';
 import 'package:nkrs_app/models/user_model.dart';
+import 'package:sqflite_sqlcipher/sqflite.dart';
 
 class DatabaseUserService {
   final DatabaseInitializerService _databaseService =
@@ -71,6 +73,37 @@ class DatabaseUserService {
       );
       final userMap = {...customerResult.first, 'loans': loans};
       return User.fromMapUser(userMap);
+    } catch (e) {
+      return null;
+    }
+  }
+
+  Future<String?> addCustomerAndLoan(NewCustomerModel customer) async {
+    try {
+      final db = await _databaseService.database;
+
+      await db?.transaction((txn) async {
+        await txn.insert('customers', {
+          'nic': customer.customerId,
+          'email': customer.email,
+          'name': customer.name,
+          'phone_number': customer.phoneNumber,
+          'address': customer.address,
+          'sync': 0,
+        }, conflictAlgorithm: ConflictAlgorithm.replace);
+
+        await txn.insert('loans', {
+          'amount': customer.amount,
+          'customer_id': customer.customerId,
+          'employee_id': customer.employeeId,
+          'installment_id': customer.installmentId,
+          'status': 'PENDING',
+          'sync': 0,
+          'created_at': DateTime.now().toIso8601String(),
+        });
+      });
+
+      return '';
     } catch (e) {
       return null;
     }

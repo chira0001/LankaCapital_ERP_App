@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:nkrs_app/models/new_customer_model.dart';
 import 'package:nkrs_app/models/user_model.dart';
 
 class UserService {
@@ -15,6 +16,29 @@ class UserService {
         return user;
       }
       return null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  Future<String?> addCustomerAndLoan(NewCustomerModel customer) async {
+    final Uri url = Uri.parse('$baseUrl/add/customer');
+    try {
+      final response = await http
+          .post(
+            url,
+            headers: {"Content-Type": "application/json"},
+            body: jsonEncode(customer.toServer()),
+          )
+          .timeout(Duration(seconds: 10));
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return '';
+      } else if (response.statusCode == 409) {
+        return jsonDecode(response.body);
+      } else {
+        final Map<String, dynamic> data = jsonDecode(response.body);
+        return data["message"].toString();
+      }
     } catch (e) {
       return null;
     }

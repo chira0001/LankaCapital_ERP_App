@@ -221,7 +221,8 @@ class _LoanRequestSectionState extends State<LoanRequestSection> {
                     if (!context.mounted) return;
                     // REMOVE this unless you really want to close the current page:
                     // Navigator.pop(context);
-                    if (installments != null && installments.isNotEmpty) {
+                    if (installments != null) {
+                      // && installments.isNotEmpty
                       Navigator.push(
                         context,
                         MaterialPageRoute(

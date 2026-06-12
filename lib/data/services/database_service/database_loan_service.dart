@@ -1,5 +1,8 @@
+import 'package:flutter/foundation.dart';
 import 'package:nkrs_app/data/services/database_initializer_service.dart';
+import 'package:nkrs_app/models/add_loan_model.dart';
 import 'package:nkrs_app/models/user_loan_model.dart';
+import 'package:sqflite_sqlcipher/sqflite.dart';
 
 class DatabaseLoanService {
   final DatabaseInitializerService _databaseService =
@@ -32,6 +35,25 @@ class DatabaseLoanService {
         whereArgs: ['', 1],
       );
     } catch (e) {
+      return null;
+    }
+  }
+
+  Future<String?> insertExistingLoan(AddLoanModel loan) async {
+    try {
+      final db = await _databaseService.database;
+      print(loan);
+      int? u = await db?.insert(
+        'loans',
+        loan.toMap(),
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
+      if (u != null) {
+        return "";
+      }
+      return null;
+    } catch (e) {
+      debugPrint("Loan Insert Error : $e");
       return null;
     }
   }

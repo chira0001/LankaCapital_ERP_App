@@ -2,14 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:nkrs_app/utility/constanst.dart';
 
 class LoanFailureScreen extends StatelessWidget {
-  final VoidCallback? appBarNavigator;
-  final VoidCallback? bottomNavigatorBackButton;
+  final void Function()? bottomNavigatorBackButton;
 
-  const LoanFailureScreen({
-    super.key,
-    this.appBarNavigator,
-    this.bottomNavigatorBackButton,
-  });
+  const LoanFailureScreen({super.key, this.bottomNavigatorBackButton});
 
   @override
   Widget build(BuildContext context) {
@@ -19,20 +14,8 @@ class LoanFailureScreen extends StatelessWidget {
         backgroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(
-            Icons.arrow_back_ios,
-            color: const Color.fromARGB(255, 0, 0, 0),
-            size: 20,
-            fontWeight: FontWeight.w900,
-          ),
-          onPressed: () {
-            // Navigator.pushAndRemoveUntil(
-            //   context,
-            //   MaterialPageRoute(builder: (context) => const MyApp()),
-            //   (Route<dynamic> route) => false,
-            // );
-            appBarNavigator?.call();
-          },
+          icon: Icon(Icons.arrow_back_ios, size: 0),
+          onPressed: () {},
         ),
         title: const Text(
           'Failed',

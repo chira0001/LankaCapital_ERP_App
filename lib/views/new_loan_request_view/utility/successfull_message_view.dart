@@ -1,15 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:nkrs_app/utility/constanst.dart';
-import 'package:nkrs_app/views/new_loan_request_view/loan_request_section_view.dart';
 
 class LoanSuccessScreen extends StatelessWidget {
-  final VoidCallback? appBarNavigator;
-  final VoidCallback? bottomNavigatorBackButton;
-  final VoidCallback? bottomNavigatorViewButton;
+  final void Function()? bottomNavigatorBackButton;
+  final void Function()? bottomNavigatorViewButton;
 
   const LoanSuccessScreen({
     super.key,
-    this.appBarNavigator,
     this.bottomNavigatorBackButton,
     this.bottomNavigatorViewButton,
   });
@@ -22,27 +19,8 @@ class LoanSuccessScreen extends StatelessWidget {
         backgroundColor: appBarC,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(
-            Icons.arrow_back_ios,
-            color: const Color.fromARGB(255, 0, 0, 0),
-            size: 20,
-            fontWeight: FontWeight.w900,
-          ),
-          onPressed: () {
-            // Navigator.pushAndRemoveUntil(
-            //   context,
-            //   MaterialPageRoute(builder: (context) => const MyApp()),
-            //   (Route<dynamic> route) => false,
-            // );
-            // appBarNavigator?.call();
-            Navigator.pushAndRemoveUntil(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const LoanRequestSection(),
-              ),
-              (route) => false,
-            );
-          },
+          icon: Icon(Icons.arrow_back_ios, size: 0),
+          onPressed: () {},
         ),
         title: const Text('Success'),
         centerTitle: true,
@@ -100,14 +78,14 @@ class LoanSuccessScreen extends StatelessWidget {
                 height: 55,
                 child: ElevatedButton(
                   onPressed: () {
-                    // bottomNavigatorBackButton?.call();
-                    Navigator.pushAndRemoveUntil(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const LoanRequestSection(),
-                      ),
-                      (route) => false,
-                    );
+                    bottomNavigatorBackButton?.call();
+                    // Navigator.pushAndRemoveUntil(
+                    //   context,
+                    //   MaterialPageRoute(
+                    //     builder: (context) => const LoanRequestSection(),
+                    //   ),
+                    //   (route) => false,
+                    // );
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: btnC,

@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 class customText extends StatelessWidget {
   final String label;
 
-  const customText({super.key, required this.label});
+  const customText(String s, {super.key, required this.label});
 
   @override
   Widget build(BuildContext context) {

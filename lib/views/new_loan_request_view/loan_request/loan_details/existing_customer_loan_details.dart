@@ -99,7 +99,8 @@ class LoanDetailsPage extends StatelessWidget {
                           children: [
                             _buildDetailRow(
                               'Interest Rate',
-                              (loan.interestRate?.rate!) != null
+                              (loan.interestRate?.rate != null &&
+                                      loan.interestRate!.rate != 0.0)
                                   ? '${loan.interestRate?.rate!.toStringAsFixed(2)}%'
                                   : "Pending",
                             ),
