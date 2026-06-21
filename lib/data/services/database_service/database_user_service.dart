@@ -1,5 +1,5 @@
 import 'package:nkrs_app/data/services/database_initializer_service.dart';
-import 'package:nkrs_app/models/new_customer_model.dart';
+import 'package:nkrs_app/models/new_user_model.dart';
 import 'package:nkrs_app/models/user_loan_model.dart';
 import 'package:nkrs_app/models/user_model.dart';
 import 'package:sqflite_sqlcipher/sqflite.dart';
@@ -78,11 +78,22 @@ class DatabaseUserService {
     }
   }
 
-  Future<String?> addCustomerAndLoan(NewCustomerModel customer) async {
+  Future<String?> addCustomerAndLoan(NewUserModel customer) async {
     try {
       final db = await _databaseService.database;
 
-      await db?.transaction((txn) async {
+      final customerResult = await db!.query(
+        'customers',
+        where: 'nic = ?',
+        whereArgs: [customer.customerId],
+        limit: 1,
+      );
+
+      if (customerResult.isNotEmpty) {
+        return "Customer exists with NIC :  ${customer.customerId}";
+      }
+
+      await db.transaction((txn) async {
         await txn.insert('customers', {
           'nic': customer.customerId,
           'email': customer.email,

@@ -18,10 +18,7 @@ class LoanSuccessScreen extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: appBarC,
         elevation: 0,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios, size: 0),
-          onPressed: () {},
-        ),
+        automaticallyImplyLeading: false,
         title: const Text('Success'),
         centerTitle: true,
         titleTextStyle: TextStyle(

@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:nkrs_app/models/new_customer_model.dart';
+import 'package:nkrs_app/models/new_user_model.dart';
 import 'package:nkrs_app/models/user_model.dart';
 
 class UserService {
@@ -21,7 +21,7 @@ class UserService {
     }
   }
 
-  Future<String?> addCustomerAndLoan(NewCustomerModel customer) async {
+  Future<String?> addCustomerAndLoan(NewUserModel customer) async {
     final Uri url = Uri.parse('$baseUrl/add/customer');
     try {
       final response = await http
@@ -34,7 +34,9 @@ class UserService {
       if (response.statusCode == 200 || response.statusCode == 201) {
         return '';
       } else if (response.statusCode == 409) {
-        return jsonDecode(response.body);
+        // return jsonDecode(response.body);
+        final Map<String, dynamic> data = jsonDecode(response.body);
+        return data["message"].toString();
       } else {
         final Map<String, dynamic> data = jsonDecode(response.body);
         return data["message"].toString();

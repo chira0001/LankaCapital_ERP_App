@@ -2,9 +2,9 @@
 
 import 'package:flutter/material.dart';
 import 'package:nkrs_app/data/view_model/user_view_model.dart';
-import 'package:nkrs_app/models/Interest_rate_model.dart';
+import 'package:nkrs_app/models/interest_rate_model.dart';
 import 'package:nkrs_app/models/installment_model.dart';
-import 'package:nkrs_app/models/new_customer_model.dart';
+import 'package:nkrs_app/models/new_user_model.dart';
 import 'package:nkrs_app/utility/constanst.dart';
 import 'package:nkrs_app/views/new_loan_request_view/loan_request_section_view.dart';
 import 'package:nkrs_app/views/new_loan_request_view/new_loan_request/loan_request_section/loan_details_step.dart';
@@ -64,7 +64,7 @@ class _NewClientLoanRequest extends State<NewClientLoanRequest> {
   Future<void> _submitForm() async {
     LoadingDialog.show(context, message: 'Please Wait...');
     final bool success = await UserViewModel().newCustomer(
-      NewCustomerModel(
+      NewUserModel(
         customerId: int.parse(_nic.text),
         name: _name.text,
         address: _address.text,

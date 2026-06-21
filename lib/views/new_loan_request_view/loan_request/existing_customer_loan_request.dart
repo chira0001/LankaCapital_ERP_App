@@ -1,9 +1,9 @@
 // ignore_for_file: deprecated_member_use
 import 'package:flutter/material.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
-import 'package:nkrs_app/data/view_model/add_loan_view.dart';
 import 'package:nkrs_app/data/view_model/check_connection.dart';
-import 'package:nkrs_app/models/Interest_rate_model.dart';
+import 'package:nkrs_app/data/view_model/loan_view_model.dart';
+import 'package:nkrs_app/models/interest_rate_model.dart';
 import 'package:nkrs_app/models/add_loan_model.dart';
 import 'package:nkrs_app/models/installment_model.dart';
 import 'package:nkrs_app/utility/constanst.dart';
@@ -155,7 +155,7 @@ class _ExistingCustomerLoanRequestState
                                 context,
                                 message: 'Please Wait...',
                               );
-                              final bool success = await AddLoanView()
+                              final bool success = await LoanViewModel()
                                   .existingLoan(
                                     AddLoanModel(
                                       amount: double.parse(

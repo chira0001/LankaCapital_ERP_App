@@ -1,4 +1,4 @@
-class NewCustomerModel {
+class NewUserModel {
   final int customerId;
   final String email;
   final String name;
@@ -9,7 +9,7 @@ class NewCustomerModel {
   final int installmentId;
   // final String type;
 
-  NewCustomerModel({
+  NewUserModel({
     required this.customerId,
     required this.email,
     required this.name,

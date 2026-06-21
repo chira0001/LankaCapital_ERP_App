@@ -160,8 +160,11 @@ class _DebugViewState extends State<DebugView> {
                     child: const Text("Reset Customer"),
                   ),
                   ElevatedButton(
-                    onPressed: () {},
-                    child: const Text("print Loans"),
+                    onPressed: () {
+                      databaseService.deleteAllData("loans");
+                      databaseService.deleteAllData("customers");
+                    },
+                    child: const Text("Delete customer and loans"),
                   ),
                   // ElevatedButton(
                   //   onPressed: () {},

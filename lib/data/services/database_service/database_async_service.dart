@@ -63,4 +63,25 @@ class DatabaseAsyncService {
       return;
     }
   }
+
+  Future<int?> removeDuplicateUuidLoans() async {
+    final db = await _databaseService.database;
+    try {
+      final deletedCount = await db?.rawDelete('''
+        DELETE FROM loans
+        WHERE file_number NOT LIKE 'D%'
+          AND EXISTS (
+            SELECT 1
+            FROM loans AS serverLoan
+            WHERE serverLoan.customer_id = loans.customer_id
+              AND serverLoan.employee_id = loans.employee_id
+              AND serverLoan.created_at = loans.created_at
+              AND serverLoan.file_number LIKE 'D%'
+          )
+      ''');
+      return deletedCount;
+    } catch (e) {
+      return null;
+    }
+  }
 }

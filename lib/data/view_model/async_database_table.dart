@@ -123,7 +123,6 @@ class AsyncDatabaseTable {
         return false;
       }
       if (tableData.isEmpty) {
-        // ScaffoldMessageBottom.show(context, "Loans Sync Completed");
         return true;
       }
       tableData = tableData.map((e) {

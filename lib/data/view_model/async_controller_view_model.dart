@@ -53,11 +53,12 @@ class AsyncControllerViewModel {
           checker[5] = await _service.loansTable(context);
         }
       }
-      // _updateAsync(checker);
       await _database.updateAsync(checker);
       final successCount = checker.values.where((v) => v == true).length;
       if (successCount == 5) {
         await _database.updateSyncTime(1);
+        int? num = await _database.removeDuplicateUuidLoans();
+        print(num);
         AppTopSnackBar.success(context, "Async completed successfully.");
       }
       //   AppTopSnackBar.error(
@@ -72,39 +73,6 @@ class AsyncControllerViewModel {
       );
     }
   }
-
-  // Future<void> _updateAsync(Map<int, bool?> checker) async {
-  //   final tableNames = {
-  //     1: "customers",
-  //     2: "employees",
-  //     3: "installments",
-  //     4: "interest_rates",
-  //     5: "loans",
-  //   };
-  //   try {
-  //     for (final entry in checker.entries) {
-  //       if (entry.value == true) {
-  //         final tableName = tableNames[entry.key];
-  //         if (tableName != null) {
-  //           await _database.updateSyncStatus(tableName);
-  //         }
-  //       }
-  //     }
-  //   } catch (e) {
-  //     return;
-  //   }
-  // }
-
-  // final successCount = checker.values.where((v) => v == true).length;
-  // if (successCount == 5) {
-  //   await _database.updateSyncStatus("customers");
-  //   await _database.updateSyncStatus("employees");
-  //   await _database.updateSyncStatus("installments");
-  //   await _database.updateSyncStatus("interest_rates");
-  //   await _database.updateSyncStatus("loans");
-
-  //   debugPrint('Final check statuses after retries: $checker');
-  // }
 
   Future<void> retryFailedMethod(
     int index,

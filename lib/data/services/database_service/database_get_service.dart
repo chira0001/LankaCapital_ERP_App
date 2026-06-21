@@ -1,5 +1,5 @@
 import 'package:nkrs_app/data/services/database_initializer_service.dart';
-import 'package:nkrs_app/models/Interest_rate_model.dart';
+import 'package:nkrs_app/models/interest_rate_model.dart';
 import 'package:nkrs_app/models/add_loan_model.dart';
 import 'package:nkrs_app/models/installment_model.dart';
 import 'package:nkrs_app/models/user_model.dart';

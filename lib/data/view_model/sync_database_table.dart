@@ -108,4 +108,5 @@ class SyncDatabaseTable {
   // Future<SyncResult> collectionsTable() async {
   //   return SyncResult(success: true,);
   // }
+
 }
