@@ -7,6 +7,17 @@ import 'package:nkrs_app/models/user_model.dart';
 import 'package:flutter/foundation.dart';
 import 'package:nkrs_app/data/services/api_config.dart';
 
+/// Thrown when a user successfully authenticates but does not have the
+/// required role (e.g. not a Field Officer) to use this app.
+class RoleNotAllowedException implements Exception {
+  final String message;
+  const RoleNotAllowedException(
+      [this.message = 'Access denied: Field Officers only.']);
+
+  @override
+  String toString() => message;
+}
+
 class AuthService {
   final FlutterSecureStorage _storage = const FlutterSecureStorage(
     aOptions: AndroidOptions(),
@@ -95,6 +106,10 @@ class AuthService {
     return null;
   }
 
+  /// Returns `true` only when login succeeds AND the user has the "FO" role.
+  /// Returns `false` otherwise (wrong credentials, network error, or wrong role).
+  /// Throws a [RoleNotAllowedException] when the credentials are valid but
+  /// the role is not "FO", so the caller can show a specific error message.
   Future<bool> login(String username, String password) async {
     try {
       final response = await _dio.post(
@@ -107,19 +122,48 @@ class AuthService {
         final refreshToken = response.data['refreshToken'];
 
         if (token != null) {
+          // ── Role gate: only Field Officers (role == "FO") may enter ──
+          try {
+            final Map<String, dynamic> decoded = JwtDecoder.decode(token);
+            // The role claim can arrive as a String or a List<dynamic>
+            final dynamic roleClaim = decoded['role'] ?? decoded['roles'];
+            bool isFO = false;
+            if (roleClaim is String) {
+              isFO = roleClaim == 'FO';
+            } else if (roleClaim is List) {
+              isFO = roleClaim.contains('FO');
+            }
+
+            if (!isFO) {
+              // Valid credentials but wrong role — reject access
+              debugPrint('Login blocked: role is "$roleClaim", expected "FO"');
+              throw RoleNotAllowedException();
+            }
+          } on RoleNotAllowedException {
+            rethrow; // propagate so the UI can show the right message
+          } catch (e) {
+            if (e is RoleNotAllowedException) rethrow;
+            debugPrint('Could not decode token for role check: $e');
+            // If decoding fails we cannot verify the role — deny access
+            throw RoleNotAllowedException();
+          }
+          // ─────────────────────────────────────────────────────────────
+
           try {
             await _storage.write(key: _tokenKey, value: token);
             if (refreshToken != null) {
               await _storage.write(key: _refreshTokenKey, value: refreshToken);
             }
           } catch (e) {
-            debugPrint("Error writing token: $e");
+            debugPrint('Error writing token: $e');
           }
           return true;
         }
       }
+    } on RoleNotAllowedException {
+      rethrow; // let login_page.dart handle this specifically
     } on DioException catch (e) {
-      debugPrint("Login failed: ${e.response?.statusCode} - ${e.message}");
+      debugPrint('Login failed: ${e.response?.statusCode} - ${e.message}');
     }
     return false;
   }
