@@ -129,7 +129,16 @@ class _LoginPageState extends State<LoginPage> {
       await _storage.delete(key: 'saved_email');
     }
 
-    final success = await _authService.login(email, password);
+    bool success = false;
+    String? errorMessage;
+
+    try {
+      success = await _authService.login(email, password);
+    } on RoleNotAllowedException {
+      errorMessage = 'Access denied. Only Field Officers can use this app.';
+    } catch (_) {
+      errorMessage = 'Login failed. Please check your credentials.';
+    }
 
     if (!mounted) return;
     setState(() {
@@ -147,7 +156,10 @@ class _LoginPageState extends State<LoginPage> {
         ),
       );
     } else {
-      CustomSnackBar.showError(context, 'Login failed. Please check your credentials.');
+      CustomSnackBar.showError(
+        context,
+        errorMessage ?? 'Login failed. Please check your credentials.',
+      );
     }
   }
 

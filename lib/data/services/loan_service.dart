@@ -10,12 +10,13 @@ import 'package:http/http.dart' as http;
 import 'package:nkrs_app/models/user_model.dart';
 
 class LoanService {
+  static const String _baseUrl = 'http://10.59.109.130:8080/api/v1/field';
   late final String _message;
   String? get message => _message;
 
   Future<(User, List<Loan>)> fetchUserAndLoans(int nic) async {
     final Uri url = Uri.parse(
-      'http://192.168.43.90:8080/api/v1/recep/customers/loans/$nic',
+      '${ApiConfig.baseUrl}/recep/customers/loans/$nic',
     );
 
     try {
@@ -43,8 +44,8 @@ class LoanService {
     }
   }
 
-  Future<String?> addExistingLoan(AddLoanModel loan) async {
-    final Uri url = Uri.parse('${UserService.baseUrl}/customers/loans');
+  Future<String?> addLoan(AddLoanModel loan) async {
+    final Uri url = Uri.parse('${ApiConfig.baseUrl}/field/customers/loans');
 
     try {
       final response = await http
@@ -66,12 +67,9 @@ class LoanService {
     }
   }
 
-  // getInterestRates
-  Future<List<InstallmentModel>?> getInstallments() async {
-    // final Uri url = Uri.parse('${UserService.baseUrl}/installments');
-    final Uri url = Uri.parse(
-      'http://192.168.43.90:8080/api/v1/recep/installments',
-    );
+  Future<List<InstallmentsModel>?> getInstallments() async {
+    final Uri url = Uri.parse('${ApiConfig.baseUrl}/recep/installments');
+
     try {
       final response = await http.get(url).timeout(const Duration(seconds: 10));
       if (response.statusCode == 200 || response.statusCode == 201) {
