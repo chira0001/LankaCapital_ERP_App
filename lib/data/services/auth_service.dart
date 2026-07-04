@@ -255,7 +255,7 @@ class AuthService {
       final jwtToken = await getToken();
 
       final response = await _dio.put(
-        '/field/employees/profile',
+        '/field/employees/profile', // or your customer endpoint
         data: data,
         options: Options(
           headers: {
@@ -264,7 +264,9 @@ class AuthService {
           },
         ),
       );
+
       if (response.statusCode == 200 || response.statusCode == 204) {
+        // Update cache
         final cachedStr = await _storage.read(key: 'cached_profile');
         if (cachedStr != null) {
           Map<String, dynamic> cached = jsonDecode(cachedStr);

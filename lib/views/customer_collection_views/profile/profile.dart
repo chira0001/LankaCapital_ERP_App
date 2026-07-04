@@ -12,7 +12,10 @@ class ProfilePage extends StatefulWidget {
 class _ProfilePageState extends State<ProfilePage> {
   final AuthService _authService = AuthService();
 
-  final TextEditingController _nameController = TextEditingController();
+  // Controllers
+  final TextEditingController _firstNameController = TextEditingController();
+  final TextEditingController _lastNameController = TextEditingController();
+  final TextEditingController _nicController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _addressController = TextEditingController();
@@ -31,6 +34,7 @@ class _ProfilePageState extends State<ProfilePage> {
   Future<void> _loadProfile() async {
     final profile = await _authService.getCustomerProfile();
     final userId = await _authService.getUserIdFromToken();
+
     if (mounted) {
       setState(() {
         _profileData = profile;
@@ -38,9 +42,9 @@ class _ProfilePageState extends State<ProfilePage> {
         _isLoading = false;
 
         if (profile != null) {
-          _nameController.text =
-              "${profile['firstName'] ?? ''} ${profile['lastName'] ?? ''}"
-                  .trim();
+          _firstNameController.text = profile['firstName'] ?? '';
+          _lastNameController.text = profile['lastName'] ?? '';
+          _nicController.text = profile['nic']?.toString() ?? '';
           _phoneController.text = profile['phoneNumber'] ?? '';
           _emailController.text = profile['email'] ?? '';
           _addressController.text = profile['address'] ?? '';
@@ -49,16 +53,60 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
+  // Validation helpers
+  bool _isValidEmail(String email) {
+    final regex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+    return regex.hasMatch(email);
+  }
+
+  bool _isValidPhone(String phone) {
+    final digitsOnly = phone.replaceAll(RegExp(r'\D'), '');
+    return digitsOnly.length == 10;
+  }
+
   Future<void> _saveProfile() async {
     if (_userId == null || _profileData == null) return;
 
-    setState(() {
-      _isSaving = true;
-    });
+    final firstName = _firstNameController.text.trim();
+    final lastName = _lastNameController.text.trim();
+    final nic = _nicController.text.trim();
+    final phone = _phoneController.text.trim();
+    final email = _emailController.text.trim();
+    final address = _addressController.text.trim();
+
+    // Validation
+    if (firstName.isEmpty || lastName.isEmpty) {
+      _showSnackBar('First name and Last name are required');
+      return;
+    }
+
+    if (nic.isEmpty) {
+      _showSnackBar('NIC is required');
+      return;
+    }
+
+    if (!_isValidPhone(phone)) {
+      _showSnackBar('Phone number must be 10 digits');
+      return;
+    }
+
+    if (!_isValidEmail(email)) {
+      _showSnackBar('Please enter a valid email address');
+      return;
+    }
+
+    setState(() => _isSaving = true);
 
     final updatedData = {
       ..._profileData!,
-      'address': _addressController.text.trim(),
+      'firstName': firstName,
+      'lastName': lastName,
+      'nic': nic.isNotEmpty
+          ? int.tryParse(nic)
+          : null, // Backend expects Long/Integer
+      'phoneNumber': phone,
+      'email': email,
+      'address': address,
     };
 
     final success = await _authService.updateCustomerProfile(
@@ -67,19 +115,17 @@ class _ProfilePageState extends State<ProfilePage> {
     );
 
     if (mounted) {
-      setState(() {
-        _isSaving = false;
-      });
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            success
-                ? 'Profile updated successfully!'
-                : 'Failed to update profile.',
-          ),
-        ),
+      setState(() => _isSaving = false);
+      _showSnackBar(
+        success ? 'Profile updated successfully!' : 'Failed to update profile.',
       );
     }
+  }
+
+  void _showSnackBar(String message) {
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
   }
 
   Future<void> _logout() async {
@@ -91,6 +137,17 @@ class _ProfilePageState extends State<ProfilePage> {
         (route) => false,
       );
     }
+  }
+
+  @override
+  void dispose() {
+    _firstNameController.dispose();
+    _lastNameController.dispose();
+    _nicController.dispose();
+    _phoneController.dispose();
+    _emailController.dispose();
+    _addressController.dispose();
+    super.dispose();
   }
 
   @override
@@ -129,7 +186,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          /// Profile Image (Centered)
+                          // Profile Image
                           Center(
                             child: Stack(
                               children: [
@@ -157,8 +214,19 @@ class _ProfilePageState extends State<ProfilePage> {
                           ),
                           const SizedBox(height: 24),
 
-                          _label("FULL NAME"),
-                          _textField(_nameController),
+                          _label("FIRST NAME"),
+                          _textField(_firstNameController),
+                          const SizedBox(height: 16),
+
+                          _label("LAST NAME"),
+                          _textField(_lastNameController),
+                          const SizedBox(height: 16),
+
+                          _label("NIC"),
+                          _textField(
+                            _nicController,
+                            prefixIcon: Icons.credit_card,
+                          ),
                           const SizedBox(height: 16),
 
                           _label("PHONE NUMBER"),
@@ -276,6 +344,11 @@ class _ProfilePageState extends State<ProfilePage> {
     return TextField(
       controller: controller,
       readOnly: readOnly,
+      keyboardType: prefixIcon == Icons.phone_outlined
+          ? TextInputType.phone
+          : prefixIcon == Icons.email_outlined
+          ? TextInputType.emailAddress
+          : TextInputType.text,
       style: TextStyle(color: readOnly ? Colors.grey.shade700 : Colors.black),
       decoration: InputDecoration(
         prefixIcon: prefixIcon != null ? Icon(prefixIcon, size: 20) : null,
