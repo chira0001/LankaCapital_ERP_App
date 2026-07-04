@@ -11,8 +11,9 @@ import 'package:nkrs_app/data/services/api_config.dart';
 /// required role (e.g. not a Field Officer) to use this app.
 class RoleNotAllowedException implements Exception {
   final String message;
-  const RoleNotAllowedException(
-      [this.message = 'Access denied: Field Officers only.']);
+  const RoleNotAllowedException([
+    this.message = 'Access denied: Field Officers only.',
+  ]);
 
   @override
   String toString() => message;
@@ -261,33 +262,37 @@ class AuthService {
 
   Future<Map<String, dynamic>?> getCustomerProfile() async {
     try {
-      final userId = await getUserIdFromToken();
-      if (userId == null) return null;
+      final jwtToken = await getToken();
+      if (jwtToken == null) return null;
+      print('jwtToken---------------------------------------------: $jwtToken');
+      final response = await _dio.get(
+        '/field/employees/profile', // or your customer endpoint
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer $jwtToken',
+            'Content-Type': 'application/json',
+          },
+        ),
+      );
 
-      try {
-        final response = await _dio.get('/field/employees');
-        if (response.statusCode == 200) {
-          final List<dynamic> employees = response.data;
-          for (var emp in employees) {
-            if (emp['email'] == userId) {
-              await _storage.write(
-                key: 'cached_profile',
-                value: jsonEncode(emp),
-              );
-              return emp;
-            }
-          }
-        }
-      } catch (e) {
-        debugPrint("Network error fetching profile, falling back to cache: $e");
-        final cached = await _storage.read(key: 'cached_profile');
-        if (cached != null) {
-          return jsonDecode(cached);
-        }
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> profile = Map<String, dynamic>.from(
+          response.data,
+        );
+
+        await _storage.write(key: 'cached_profile', value: jsonEncode(profile));
+
+        return profile;
       }
     } catch (e) {
-      debugPrint("Error fetching profile: $e");
+      debugPrint("Network error fetching profile: $e");
+
+      final cached = await _storage.read(key: 'cached_profile');
+      if (cached != null) {
+        return Map<String, dynamic>.from(jsonDecode(cached));
+      }
     }
+
     return null;
   }
 
@@ -335,7 +340,7 @@ class AuthService {
 
   Future<(User, List<Loan>)> fetchCustomerAndLoans(int nic) async {
     try {
-      final response = await _dio.get('/recep/customers/$nic');
+      final response = await _dio.get('/field/customers/$nic');
 
       if (response.statusCode == 200) {
         final data = response.data as Map<String, dynamic>;
