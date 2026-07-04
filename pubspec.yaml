@@ -28,11 +28,11 @@ dependencies:
   local_auth: ^3.0.1
   phosphor_flutter: ^2.1.0
 
-  # print_bluetooth_thermal: ^1.1.1     # classic Bluetooth thermal printer (Android)
-  # esc_pos_utils_plus: ^2.0.4          # ESC/POS byte generation for the receipt
-  # shared_preferences: ^2.2.3          # remembers the paired printer
-  # http: ^1.2.1                        # calls your Spring Boot API
-  # permission_handler: ^11.3.1         # runtime Bluetooth permissions
+  shared_preferences: ^2.2.3
+
+  # print_bluetooth_thermal: ^1.1.1
+  # esc_pos_utils_plus: ^2.0.4
+  # permission_handler: ^11.3.1
 
 dev_dependencies:
   flutter_test:
