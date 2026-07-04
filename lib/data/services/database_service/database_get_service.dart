@@ -1,4 +1,5 @@
 import 'package:nkrs_app/data/services/database_initializer_service.dart';
+import 'package:nkrs_app/models/collections_model.dart';
 import 'package:nkrs_app/models/interest_rate_model.dart';
 import 'package:nkrs_app/models/add_loan_model.dart';
 import 'package:nkrs_app/models/installment_model.dart';
@@ -156,6 +157,20 @@ class DatabaseGetService {
         whereArgs: [0],
       );
       return result.map(AddLoanModel.fromJson).toList();
+    } catch (e) {
+      print(e);
+      return null;
+    }
+  }
+
+  Future<List<CollectionsModel>?> getCollections() async {
+    try {
+      final db = await _databaseService.database;
+      final result = await db!.query(
+        'collections',
+        orderBy: 'collection_date DESC',
+      );
+      return result.map((e) => CollectionsModel.fromDatabase(e)).toList();
     } catch (e) {
       print(e);
       return null;

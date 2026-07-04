@@ -1,10 +1,11 @@
-// ignore_for_file: deprecated_member_use, use_build_context_synchronously
+// ignore_for_file: control_flow_in_finally, deprecated_member_use, use_build_context_synchronously
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:nkrs_app/data/view_model/check_connection.dart';
 import 'package:nkrs_app/data/view_model/loan_view_model.dart';
 import 'package:nkrs_app/models/installment_model.dart';
 import 'package:nkrs_app/models/user_loan_model.dart';
+import 'package:nkrs_app/models/user_model.dart';
 import 'package:nkrs_app/utility/constanst.dart';
 import 'package:nkrs_app/views/new_loan_request_view/loan_request/loan_details/existing_customer_loan_details.dart';
 import 'package:nkrs_app/views/new_loan_request_view/loan_request/existing_customer_loan_request.dart';
@@ -24,11 +25,10 @@ class ExistingCustomerLoan extends StatefulWidget {
 
 class _ExistingCustomerLoanState extends State<ExistingCustomerLoan> {
   bool showDetails = false;
-  late bool isLoading = false;
 
   TextEditingController nicNumber = TextEditingController();
   final _formKey = GlobalKey<FormState>();
-  dynamic _user;
+  User? _user;
 
   @override
   void initState() {
@@ -121,7 +121,10 @@ class _ExistingCustomerLoanState extends State<ExistingCustomerLoan> {
                             ElevatedButton(
                               onPressed: () async {
                                 if (_formKey.currentState!.validate()) {
-                                  setState(() => isLoading = true);
+                                  LoadingDialog.show(
+                                    context,
+                                    message: 'Please Wait...',
+                                  );
                                   try {
                                     _user = await LoanViewModel()
                                         .findUserAndLoanById(
@@ -152,9 +155,8 @@ class _ExistingCustomerLoanState extends State<ExistingCustomerLoan> {
                                       "Something went wrong. Please try again.",
                                     );
                                   } finally {
-                                    setState(() {
-                                      isLoading = false;
-                                    });
+                                    if (!context.mounted) return;
+                                    LoadingDialog.hide(context);
                                   }
                                 }
                               },
@@ -175,29 +177,15 @@ class _ExistingCustomerLoanState extends State<ExistingCustomerLoan> {
                                   //   ),
                                 ),
                               ),
-                              child: isLoading
-                                  ? Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 10,
-                                      ),
-                                      child: SizedBox(
-                                        height: 20,
-                                        width: 20,
-                                        child: CircularProgressIndicator(
-                                          strokeWidth: 2.5,
-                                          color: Colors.white,
-                                        ),
-                                      ),
-                                    )
-                                  : Text(
-                                      "FIND",
-                                      style: TextStyle(
-                                        letterSpacing: 2,
-                                        color: Colors.white,
-                                        fontSize: btnFontSize,
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                    ),
+                              child: Text(
+                                "FIND",
+                                style: TextStyle(
+                                  letterSpacing: 2,
+                                  color: Colors.white,
+                                  fontSize: btnFontSize,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
                             ),
                           ],
                         ),
@@ -246,40 +234,47 @@ class _ExistingCustomerLoanState extends State<ExistingCustomerLoan> {
                 CustomRow(label: "Phone Number", value: _user!.phoneNumber),
                 GestureDetector(
                   onTap: () async {
-                    // if (_user.loan?.length < 3) {
-                    List<InstallmentModel>? installments;
-                    // List<InterestRateModel>? interestRate;
-                    LoadingDialog.show(context, message: 'Please Wait...');
-                    try {
-                      installments = await LoanViewModel().getInstallmentInfo(
-                        context,
-                      );
-                    } catch (e) {
-                      // handle/log error if you want
-                    } finally {
-                      if (context.mounted) {
-                        LoadingDialog.hide(context);
+                    if ((_user?.loans?.length ?? 0) <= 2) {
+                      List<InstallmentModel>? installments;
+                      // List<InterestRateModel>? interestRate;
+                      LoadingDialog.show(context, message: 'Please Wait...');
+                      try {
+                        installments = await LoanViewModel().getInstallmentInfo(
+                          context,
+                        );
+                      } catch (e) {
+                        // handle/log error if you want
+                      } finally {
+                        if (context.mounted) {
+                          LoadingDialog.hide(context);
+                        }
                       }
-                    }
-                    if (!context.mounted) return;
-                    if (installments != null && installments.isNotEmpty) {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => ExistingCustomerLoanRequest(
-                            installments: installments!,
-                            interestRates: null,
-                            nicNumber: int.tryParse(nicNumber.text.trim()) ?? 0,
+                      if (!context.mounted) return;
+                      if (installments != null && installments.isNotEmpty) {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => ExistingCustomerLoanRequest(
+                              installments: installments!,
+                              interestRates: null,
+                              nicNumber:
+                                  int.tryParse(nicNumber.text.trim()) ?? 0,
+                            ),
                           ),
-                        ),
-                      );
+                        );
+                      } else {
+                        AppTopSnackBar.error(
+                          context,
+                          "Failed to load installments. Cannot proceed.",
+                        );
+                      }
                     } else {
-                      AppTopSnackBar.error(
+                      AppTopSnackBar.info(
                         context,
-                        "Failed to load installments. Cannot proceed.",
+                        "This customer has already reached the maximum number of allowed loans",
+                        duration: const Duration(seconds: 10),
                       );
                     }
-                    // }
                   },
                   child: Container(
                     width: double.infinity,

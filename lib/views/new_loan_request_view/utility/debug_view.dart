@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:nkrs_app/data/services/async_service/async_customer/async_database_customer.dart';
 import 'package:nkrs_app/data/services/database_service.dart';
 import 'package:nkrs_app/data/services/database_service/database_get_service.dart';
 import 'package:nkrs_app/data/services/database_service/database_sync_service.dart';
@@ -133,6 +134,7 @@ class _DebugViewState extends State<DebugView> {
                       databaseService.getAllTableData("installments");
                       databaseService.getAllTableData("interest_rates");
                       databaseService.getAllTableData("loans");
+                      AsyncDatabaseCustomer().printUpdateCustomers();
                     },
                     child: const Text("print Table Data"),
                   ),
@@ -184,7 +186,7 @@ class _DebugViewState extends State<DebugView> {
                   ),
                   OutlinedButton(
                     onPressed: () {
-                      asyncDatabaseTable.customersTable(context);
+                      // asyncDatabaseTable.customersTable(context);
                       asyncDatabaseTable.employeesTable(context);
                       asyncDatabaseTable.installmentsTable(context);
                     },

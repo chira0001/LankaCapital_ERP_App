@@ -5,6 +5,7 @@ import 'package:nkrs_app/data/services/database_service/database_sync_service.da
 import 'package:nkrs_app/data/view_model/check_connection.dart';
 import 'package:nkrs_app/data/view_model/sync_database_table.dart';
 import 'package:nkrs_app/views/new_loan_request_view/utility/scaffold_message.dart';
+import 'package:nkrs_app/views/new_loan_request_view/utility/scaffold_message_bottom.dart';
 
 class SyncControllerViewModel {
   final DatabaseSyncService _service = DatabaseSyncService();
@@ -28,27 +29,32 @@ class SyncControllerViewModel {
             break;
           }
         }
-        // if(!result.success && result.failedId!.isEmpty){
-        //   //null
-        // }
-        // if (result.failedId!.isNotEmpty && result.successId!.isEmpty) {
-        //   // await syncDatabaseTable.customersTable(context);
-        // }
         if (result.failedId!.isNotEmpty && result.successId!.isNotEmpty) {
           await _service.updateCustomersSync(result.successId!);
+          if (i == 1) {
+            ScaffoldMessageBottom.show(
+              context,
+              "Error_Message_c2E00001_customer",
+            );
+          }
         }
       }
       for (int i = 0; i < 2; i++) {
         final result = await syncDatabaseTable.loanTable(context);
         if (result.success) {
           if (result.successId!.isNotEmpty) {
-            await _service.deleteSyncedLoans(result.successId!);
+            await _service.updateSyncedLoans(result.obj);
             await DatabaseAsyncService().updateSyncTime(0);
             break;
           }
         }
-        if (result.failedId!.isNotEmpty && result.successId!.isNotEmpty) {
-          await _service.deleteSyncedLoans(result.successId!);
+        if (result.failedId!.isNotEmpty || result.successId!.isNotEmpty) {
+          if (result.obj!.isNotEmpty) {
+            await _service.updateSyncedLoans(result.obj);
+          }
+          if (i == 1) {
+            ScaffoldMessageBottom.show(context, "Error_Message_c2E00001_loan");
+          }
         }
       }
     } catch (e) {

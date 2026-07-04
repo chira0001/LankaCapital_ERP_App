@@ -223,7 +223,7 @@ class _TopSnackBarWidgetState extends State<_TopSnackBarWidget>
                       Expanded(
                         child: Text(
                           widget.message,
-                          maxLines: 2,
+                          maxLines: 3,
                           overflow: TextOverflow.ellipsis,
                           style: const TextStyle(
                             color: Colors.white,

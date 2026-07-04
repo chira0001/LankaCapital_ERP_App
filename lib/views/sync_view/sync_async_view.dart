@@ -4,6 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:nkrs_app/data/view_model/async_controller_view_model.dart';
+import 'package:nkrs_app/data/view_model/async_customer_vm/async_customer_view_model.dart';
+import 'package:nkrs_app/data/view_model/async_employee_vm/async_employee_view_model.dart';
+import 'package:nkrs_app/data/view_model/async_loan_vm/async_loan_view_model.dart';
 import 'package:nkrs_app/data/view_model/check_connection.dart';
 import 'package:nkrs_app/data/view_model/sync_controller_view_model.dart';
 import 'package:nkrs_app/utility/constanst.dart';
@@ -228,9 +231,16 @@ class _SyncAsyncViewState extends State<SyncAsyncView> {
                             context,
                             message: 'Please Wait...',
                           );
-                          await AsyncControllerViewModel().asyncController(
-                            context,
-                          );
+                          // await AsyncControllerViewModel().asyncController(
+                          //   context,
+                          // );
+                          // await AsyncCustomerViewModel().ManageCustomersTabel(
+                          //   context,
+                          // );
+                          // await AsyncEmployeeViewModel().ManageEmployeesTabel(
+                          //   context,
+                          // );
+                          await AsyncLoanViewModel().ManageLoansTabel(context);
                           if (!context.mounted) return;
                           LoadingDialog.hide(context);
                         },

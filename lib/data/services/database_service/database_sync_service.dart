@@ -1,4 +1,5 @@
 import 'package:nkrs_app/data/services/database_initializer_service.dart';
+import 'package:nkrs_app/models/sync_loan_resp_model.dart';
 
 class DatabaseSyncService {
   final DatabaseInitializerService _databaseService =
@@ -20,14 +21,20 @@ class DatabaseSyncService {
     }
   }
 
-  Future<void> deleteSyncedLoans(List<int> successKeys) async {
+  Future<void> updateSyncedLoans(List<SyncLoanRespModel>? loans) async {
+    final db = await _databaseService.database;
     try {
-      if (successKeys.isEmpty) return;
-      final db = await _databaseService.database;
-      final placeholders = List.filled(successKeys.length, '?').join(',');
-      await db!.rawDelete('''
-      DELETE FROM loans WHERE sync = 0 AND id IN ($placeholders)
-      ''', successKeys);
+      if (loans!.isEmpty) return;
+      await db!.transaction((txn) async {
+        for (final loan in loans) {
+          await txn.update(
+            'loans',
+            {'sync': 1, 'file_number': loan.loanUUID},
+            where: 'id = ?',
+            whereArgs: [loan.id],
+          );
+        }
+      });
     } catch (e) {
       return;
     }

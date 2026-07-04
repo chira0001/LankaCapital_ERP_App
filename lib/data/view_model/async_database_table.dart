@@ -2,58 +2,59 @@
 
 import 'package:flutter/material.dart';
 import 'package:nkrs_app/data/services/async_service/async_service.dart';
+import 'package:nkrs_app/data/services/database_service/database_async_service.dart';
 import 'package:nkrs_app/data/services/database_service/database_get_service.dart';
 import 'package:nkrs_app/data/services/database_service/database_put_service.dart';
-import 'package:nkrs_app/views/new_loan_request_view/utility/scaffold_message.dart';
 import 'package:nkrs_app/views/new_loan_request_view/utility/scaffold_message_bottom.dart';
 
 class AsyncDatabaseTable {
   final DatabaseGetService _databaseGetService = DatabaseGetService();
   final DatabasePutService _databasePutService = DatabasePutService();
   final AsyncService asyncService = AsyncService();
+  final DatabaseAsyncService _asyncService = DatabaseAsyncService();
   //1
-  Future<bool?> customersTable(BuildContext context) async {
-    List<int>? customerId = await _databaseGetService
-        .getCustomersId(); //customer ID
-    if (customerId == null) {
-      ScaffoldMessageBottom.show(context, "Local database error : Customers");
-      return false;
-    }
+  // Future<bool?> customersTable(BuildContext context) async {
+  //   List<int>? customerId = await _databaseGetService
+  //       .getCustomersId(); //customer ID
+  //   if (customerId == null) {
+  //     ScaffoldMessageBottom.show(context, "Local database error : Customers");
+  //     return false;
+  //   }
 
-    int pageNo = 0;
-    int? savedId;
-    Map<String, dynamic> json = {"nic": customerId};
+  //   int pageNo = 0;
+  //   int? savedId;
+  //   Map<String, dynamic> json = {"nic": customerId};
 
-    while (true) {
-      List<Map<String, dynamic>>? tableData = await asyncService.asyncCustomers(
-        pageNo,
-        json,
-      );
-      if (tableData == null) {
-        AppTopSnackBar.info(
-          context,
-          "Server or Connection or Error : Customers",
-        );
-        return false;
-      }
-      if (tableData.isEmpty) {
-        // AppTopSnackBar.success(context, "Customers Sync Completed");
-        return true;
-      }
-      tableData = tableData.map((e) {
-        e["sync"] = 2;
-        return e;
-      }).toList();
-      for (var item in tableData) {
-        savedId = (await _databasePutService.insertDataToCustomers(item));
-        if (savedId == null) {
-          ScaffoldMessageBottom.show(context, "Can't insert data Customers");
-          return false;
-        }
-      }
-      ++pageNo;
-    }
-  }
+  //   while (true) {
+  //     List<Map<String, dynamic>>? tableData = await asyncService.asyncCustomers(
+  //       pageNo,
+  //       json,
+  //     );
+  //     if (tableData == null) {
+  //       AppTopSnackBar.info(
+  //         context,
+  //         "Server or Connection or Error : Customers",
+  //       );
+  //       return false;
+  //     }
+  //     if (tableData.isEmpty) {
+  //       // AppTopSnackBar.success(context, "Customers Sync Completed");
+  //       return true;
+  //     }
+  //     tableData = tableData.map((e) {
+  //       e["sync"] = 2;
+  //       return e;
+  //     }).toList();
+  // for (var item in tableData) {
+  //   savedId = (await _databasePutService.insertDataToCustomers(item));
+  //   if (savedId == null) {
+  //     ScaffoldMessageBottom.show(context, "Can't insert data Customers");
+  //     return false;
+  //   }
+  // }
+  //     ++pageNo;
+  //   }
+  // }
 
   //2
   Future<bool?> employeesTable(BuildContext context) async {

@@ -39,7 +39,9 @@ class DatabaseInitializerService {
         last_name TEXT,
         nic INTEGER NOT NULL UNIQUE,
         phone_number TEXT,
-        sync INTEGER DEFAULT 0
+        sync INTEGER DEFAULT 0,
+        update_status INTEGER DEFAULT 0,
+        active_status INTEGER DEFAULT 0
       )
   ''');
     // create customers table
@@ -50,7 +52,9 @@ class DatabaseInitializerService {
       email TEXT,
       name TEXT NOT NULL,
       phone_number TEXT NOT NULL,
-      sync INTEGER DEFAULT 0
+      sync INTEGER DEFAULT 0,
+      update_status INTEGER DEFAULT 0,
+      active_status INTEGER DEFAULT 0
     )
   ''');
     // create installments table
@@ -58,7 +62,8 @@ class DatabaseInitializerService {
       CREATE TABLE IF NOT EXISTS installments (
         id INTEGER PRIMARY KEY,
         value INTEGER NOT NULL UNIQUE,
-        sync INTEGER DEFAULT 0
+        sync INTEGER DEFAULT 0,
+        update_status INTEGER DEFAULT 0
       )
     ''');
     // create interest_rates table
@@ -66,7 +71,8 @@ class DatabaseInitializerService {
       CREATE TABLE IF NOT EXISTS interest_rates (
         id INTEGER PRIMARY KEY,
         rate REAL NOT NULL UNIQUE,
-        sync INTEGER DEFAULT 0
+        sync INTEGER DEFAULT 0,
+        update_status INTEGER DEFAULT 0
       )
     ''');
     // create loans table
@@ -84,6 +90,8 @@ class DatabaseInitializerService {
       rejection_note TEXT,
       status TEXT CHECK(status IN ('APPROVED', 'PENDING', 'REJECTED')) DEFAULT 'PENDING',
       sync INTEGER DEFAULT 0,
+      update_status INTEGER DEFAULT 0,
+      active_status INTEGER DEFAULT 0,
       FOREIGN KEY (customer_id) REFERENCES customers(nic),
       FOREIGN KEY (employee_id) REFERENCES employees(id),
       FOREIGN KEY (installment_id) REFERENCES installments(id)
@@ -100,6 +108,45 @@ class DatabaseInitializerService {
         due_amount DECIMAL(12,2),
         collected_by VARCHAR(255),
         FOREIGN KEY (file_number) REFERENCES loans(file_number) ON DELETE CASCADE
+      )
+    ''');
+
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS temp_customers (
+        id INTEGER PRIMARY KEY,
+        update_status INTEGER DEFAULT 0
+      )
+    ''');
+
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS update_customers (
+        id INTEGER PRIMARY KEY
+      )
+    ''');
+
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS temp_emloyees (
+        id INTEGER PRIMARY KEY,
+        update_status INTEGER DEFAULT 0
+      )
+    ''');
+
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS update_emloyees (
+        id INTEGER PRIMARY KEY
+      )
+    ''');
+
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS temp_loans (
+        id TEXT PRIMARY KEY,
+        update_status INTEGER DEFAULT 0
+      )
+    ''');
+
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS update_loans (
+        id TEXT PRIMARY KEY
       )
     ''');
 
