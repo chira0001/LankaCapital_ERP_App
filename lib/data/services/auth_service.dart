@@ -105,6 +105,7 @@ class AuthService {
       if (response.statusCode == 200) {
         final token = response.data['token'];
         final refreshToken = response.data['refreshToken'];
+
         if (token != null) {
           try {
             await _storage.write(key: _tokenKey, value: token);
@@ -148,7 +149,9 @@ class AuthService {
         return true;
       }
     } on DioException catch (e) {
-      debugPrint("Registration failed: ${e.response?.statusCode} - ${e.response?.data}");
+      debugPrint(
+        "Registration failed: ${e.response?.statusCode} - ${e.response?.data}",
+      );
       rethrow;
     } catch (e) {
       debugPrint("Registration error: $e");
@@ -156,7 +159,6 @@ class AuthService {
     }
     return false;
   }
-
 
   Future<String?> getToken() async {
     try {
@@ -219,12 +221,15 @@ class AuthService {
       if (userId == null) return null;
 
       try {
-        final response = await _dio.get('/recep/employees');
+        final response = await _dio.get('/field/employees');
         if (response.statusCode == 200) {
           final List<dynamic> employees = response.data;
           for (var emp in employees) {
             if (emp['email'] == userId) {
-              await _storage.write(key: 'cached_profile', value: jsonEncode(emp));
+              await _storage.write(
+                key: 'cached_profile',
+                value: jsonEncode(emp),
+              );
               return emp;
             }
           }
@@ -247,13 +252,27 @@ class AuthService {
     Map<String, dynamic> data,
   ) async {
     try {
-      final response = await _dio.put('/recep/employees/$userId', data: data);
+      final jwtToken = await getToken();
+
+      final response = await _dio.put(
+        '/field/employees/profile',
+        data: data,
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer $jwtToken',
+            'Content-Type': 'application/json',
+          },
+        ),
+      );
       if (response.statusCode == 200 || response.statusCode == 204) {
         final cachedStr = await _storage.read(key: 'cached_profile');
         if (cachedStr != null) {
           Map<String, dynamic> cached = jsonDecode(cachedStr);
           cached.addAll(data);
-          await _storage.write(key: 'cached_profile', value: jsonEncode(cached));
+          await _storage.write(
+            key: 'cached_profile',
+            value: jsonEncode(cached),
+          );
         }
         return true;
       }

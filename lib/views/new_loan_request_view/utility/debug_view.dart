@@ -107,7 +107,7 @@ class _DebugViewState extends State<DebugView> {
               horizontal: safeAreaHorizontalPD,
               vertical: safeAreaVerticalPD,
             ),
-            child: Container(
+            child: SizedBox(
               width: double.infinity,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,

@@ -10,7 +10,7 @@ import 'package:nkrs_app/data/services/api_config.dart';
 // import 'package:nkrs_app/views/new_loan_request_view/utility/check_connection.dart';
 
 class LoanService {
-  static const String _baseUrl = 'http://192.168.43.90:8080/api/v1/field';
+  static const String _baseUrl = 'http://10.59.109.130:8080/api/v1/field';
   late final String _message;
   String? get message => _message;
 
@@ -78,9 +78,7 @@ class LoanService {
   }
 
   Future<String?> addLoan(AddLoanModel loan) async {
-    final Uri url = Uri.parse(
-      '${ApiConfig.baseUrl}/field/customers/loans',
-    );
+    final Uri url = Uri.parse('${ApiConfig.baseUrl}/field/customers/loans');
 
     try {
       final response = await http
@@ -103,9 +101,7 @@ class LoanService {
   }
 
   Future<List<InstallmentsModel>?> getInstallments() async {
-    final Uri url = Uri.parse(
-      'http://192.168.43.90:8080/api/v1/recep/installments',
-    );
+    final Uri url = Uri.parse('${ApiConfig.baseUrl}/recep/installments');
     try {
       final response = await http.get(url).timeout(const Duration(seconds: 10));
       if (response.statusCode == 200 || response.statusCode == 201) {

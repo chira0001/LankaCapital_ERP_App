@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class AsyncService {
-  final String _baseUrl = 'http://192.168.43.90:8080/api/v1/field';
+  final String _baseUrl = 'http://10.59.109.130:8080/api/v1/field';
   final int _time = 10;
 
   Future<List<Map<String, dynamic>>?> asyncCustomers(

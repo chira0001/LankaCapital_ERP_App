@@ -45,7 +45,10 @@ class _RegisterPageState extends State<RegisterPage> {
     }
 
     if (!agree) {
-      CustomSnackBar.showError(context, 'Please agree to the Terms & Conditions');
+      CustomSnackBar.showError(
+        context,
+        'Please agree to the Terms & Conditions',
+      );
       return;
     }
 
@@ -75,10 +78,16 @@ class _RegisterPageState extends State<RegisterPage> {
       });
 
       if (success) {
-        CustomSnackBar.showSuccess(context, 'Registration successful! Please login.');
+        CustomSnackBar.showSuccess(
+          context,
+          'Registration successful! Please login.',
+        );
         Navigator.pop(context);
       } else {
-        CustomSnackBar.showError(context, 'Registration failed. Please try again.');
+        CustomSnackBar.showError(
+          context,
+          'Registration failed. Please try again.',
+        );
       }
     } catch (e) {
       if (!mounted) return;
@@ -163,8 +172,6 @@ class _RegisterPageState extends State<RegisterPage> {
                             ),
                           ),
                           const SizedBox(height: 30),
-
-
 
                           // First Name
                           const Align(
