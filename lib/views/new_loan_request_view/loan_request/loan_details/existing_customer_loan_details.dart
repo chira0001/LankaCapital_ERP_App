@@ -129,18 +129,20 @@ class LoanDetailsPage extends StatelessWidget {
                         ),
                       ),
                 const SizedBox(height: 20),
-                const Padding(
-                  padding: EdgeInsets.only(left: 4.0, bottom: 8.0),
-                  child: Text(
-                    'LOAN STATUS',
-                    style: TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.bold,
-                      color: Color.fromARGB(255, 149, 149, 149),
-                      letterSpacing: 1.1,
-                    ),
-                  ),
-                ),
+                loan.status.toLowerCase() == "pending"
+                    ? const Padding(
+                        padding: EdgeInsets.only(left: 4.0, bottom: 8.0),
+                        child: Text(
+                          'LOAN STATUS',
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.bold,
+                            color: Color.fromARGB(255, 149, 149, 149),
+                            letterSpacing: 1.1,
+                          ),
+                        ),
+                      )
+                    : const SizedBox.shrink(),
                 loan.status.toLowerCase() == "pending"
                     ? Container(
                         decoration: BoxDecoration(
@@ -292,7 +294,7 @@ class LoanDetailsPage extends StatelessWidget {
                   loan.status,
                   style: TextStyle(
                     color: switch (loan.status) {
-                      'APPROVED' => Colors.green[700],
+                      'APPROVED' => const Color.fromARGB(255, 25, 209, 34),
                       'PENDING' => Colors.amber[600],
                       'REJECTED' => Colors.red[700],
                       _ => Colors.grey[600],

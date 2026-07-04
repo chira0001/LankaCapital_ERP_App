@@ -100,8 +100,9 @@ class DatabaseInitializerService {
     // create collections table
     await db.execute('''
       CREATE TABLE IF NOT EXISTS collections (
-        receipt_id VARCHAR(255) PRIMARY KEY,
+        receipt_id INTEGER PRIMARY KEY AUTOINCREMENT,
         file_number VARCHAR(255),
+        installment_number INTEGER,
         collection_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         premium_amount DECIMAL(12,2),
         paid_amount DECIMAL(12,2),
@@ -110,6 +111,20 @@ class DatabaseInitializerService {
         FOREIGN KEY (file_number) REFERENCES loans(file_number) ON DELETE CASCADE
       )
     ''');
+
+    await db.execute('''
+CREATE TABLE collections (
+    id TEXT PRIMARY KEY,
+    installment_number INTEGER,
+    paid_amount REAL,
+    paid_at TEXT DEFAULT CURRENT_TIMESTAMP,
+    employee_id INTEGER,
+    file_number TEXT,
+    due_amount REAL,
+    entered_by INTEGER,
+
+)
+''');
 
     await db.execute('''
       CREATE TABLE IF NOT EXISTS temp_customers (

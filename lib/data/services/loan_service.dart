@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
+import 'package:nkrs_app/data/services/api_config.dart';
 import 'package:nkrs_app/data/services/user_service.dart';
 import 'package:nkrs_app/models/interest_rate_model.dart';
 import 'package:nkrs_app/models/add_loan_model.dart';
@@ -10,7 +11,7 @@ import 'package:http/http.dart' as http;
 import 'package:nkrs_app/models/user_model.dart';
 
 class LoanService {
-  static const String _baseUrl = 'http://10.59.109.130:8080/api/v1/field';
+  static const String _baseUrl = 'http://192.168.43.90/api/v1/field';
   late final String _message;
   String? get message => _message;
 
@@ -44,8 +45,31 @@ class LoanService {
     }
   }
 
-  Future<String?> addLoan(AddLoanModel loan) async {
-    final Uri url = Uri.parse('${ApiConfig.baseUrl}/field/customers/loans');
+  // Future<String?> addLoan(AddLoanModel loan) async {
+  //   final Uri url = Uri.parse('${ApiConfig.baseUrl}/field/customers/loans');
+
+  //   try {
+  //     final response = await http
+  //         .post(
+  //           url,
+  //           headers: {"Content-Type": "application/json"},
+  //           body: jsonEncode(loan.toJsonServer()),
+  //         )
+  //         .timeout(Duration(seconds: 10));
+  //     if (response.statusCode == 200 || response.statusCode == 201) {
+  //       return '';
+  //     } else {
+  //       final Map<String, dynamic> data = jsonDecode(response.body);
+  //       return data["message"].toString();
+  //     }
+  //   } catch (e) {
+  //     debugPrint("Failed $e");
+  //     return null;
+  //   }
+  // }
+
+  Future<String?> addExistingLoan(AddLoanModel loan) async {
+    final Uri url = Uri.parse('${UserService.baseUrl}/customers/loans');
 
     try {
       final response = await http
@@ -67,7 +91,7 @@ class LoanService {
     }
   }
 
-  Future<List<InstallmentsModel>?> getInstallments() async {
+  Future<List<InstallmentModel>?> getInstallments() async {
     final Uri url = Uri.parse('${ApiConfig.baseUrl}/recep/installments');
 
     try {
