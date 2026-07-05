@@ -11,26 +11,40 @@ import 'package:http/http.dart' as http;
 import 'package:nkrs_app/models/user_model.dart';
 
 class LoanService {
-  static const String _baseUrl = 'http://192.168.43.90/api/v1/field';
+  static const String _baseUrl = 'http://10.59.109.130/api/v1/field';
   late final String _message;
   String? get message => _message;
 
   Future<(User, List<Loan>)> fetchUserAndLoans(int nic) async {
     final Uri url = Uri.parse(
-      '${ApiConfig.baseUrl}/recep/customers/loans/$nic',
+      '${ApiConfig.baseUrl}/field/customers/loans/$nic',
     );
-
     try {
       final response = await http.get(url).timeout(const Duration(seconds: 10));
+
       if (response.statusCode == 200) {
         _message = '';
-        final Map<String, dynamic> data = json.decode(response.body);
-        final user = User.fromJson(data);
-        final loans = (data['loans'] as List)
-            .map((json) => Loan.fromJson(json))
-            .toList();
+        try {
+          final Map<String, dynamic> data = json.decode(response.body);
 
-        return (user, loans);
+          print("JSON: $data");
+
+          final user = User.fromJson(data);
+          print("User parsed");
+
+          final loans = (data['loans'] as List).map((e) {
+            print("Loan JSON: $e");
+            return Loan.fromJson(e);
+          }).toList();
+
+          print("Loans parsed");
+
+          return (user, loans);
+        } catch (e, s) {
+          print("ERROR: $e");
+          print(s);
+          rethrow;
+        }
       } else if (response.statusCode == 404) {
         // final Map<String, dynamic> error = json.decode(response.body);
         _message = "Invalid user ID : $nic";

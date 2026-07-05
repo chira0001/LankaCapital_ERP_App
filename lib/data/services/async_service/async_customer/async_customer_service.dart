@@ -5,7 +5,7 @@ import 'package:nkrs_app/models/async_manage_model/manage_customer_model.dart';
 import 'package:nkrs_app/models/update_model/customer_update.dart';
 
 class AsyncCustomerService {
-  final String _baseUrl = 'http://192.168.43.90:8080/api/v1/field';
+  final String _baseUrl = 'http://10.59.109.130:8080/api/v1/field';
   final int _time = 10;
 
   Future<List<ManageCustomerModel>?> manageCustomers(int page) async {

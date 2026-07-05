@@ -23,11 +23,16 @@ class Loan {
 
   factory Loan.fromJson(Map<String, dynamic> json) {
     return Loan(
-      fileNumber: json['fileNumber'] ?? "N/A",
-      interestRate: (json['interestRate'] as num?)?.toDouble() ?? 0.0,
-      amount: double.tryParse(json['amount']?.toString() ?? "0.0") ?? 0.0,
-      createdAt: json['createdAt'] ?? "N/A",
-      noOfInstallments: json['noOfInstallments'] as int? ?? 0,
+      fileNumber: json['fileNumber']?.toString() ?? "N/A",
+
+      amount: (json['amount'] as num?)?.toDouble() ?? 0.0,
+
+      createdAt: json['createdAt']?.toString(),
+
+      interestRate: (json['interestRate']?['rate'] as num?)?.toDouble() ?? 0.0,
+
+      noOfInstallments: (json['installments']?['value'] as num?)?.toInt() ?? 0,
+
       documentCharge: (json['documentCharge'] as num?)?.toDouble() ?? 0.0,
     );
   }
