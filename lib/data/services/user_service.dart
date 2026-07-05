@@ -4,7 +4,7 @@ import 'package:nkrs_app/models/new_user_model.dart';
 import 'package:nkrs_app/models/user_model.dart';
 
 class UserService {
-  static const String baseUrl = 'http://192.168.43.90:8080/api/v1/field';
+  static const String baseUrl = 'http://10.59.109.130:8080/api/v1/field';
 
   Future<User?> findUserInfoById(int nic) async {
     final Uri url = Uri.parse('$baseUrl/customers/loans/$nic');

@@ -7,15 +7,6 @@ class DatabaseService {
   final DatabaseInitializerService _databaseService =
       DatabaseInitializerService();
 
-  // Future<bool?> isTableExists(String tableName) async {
-  //   final db = await _databaseService.database; //risk
-  //   final result = await db?.rawQuery(
-  //     "SELECT name FROM sqlite_master WHERE type='table' AND name=?",
-  //     [tableName],
-  //   );
-  //   return result?.isNotEmpty;
-  // }
-
   Future<void> printAllTables() async {
     final db = await _databaseService.database;
     final tables = await db?.rawQuery(
@@ -39,7 +30,6 @@ class DatabaseService {
     } catch (e) {
       debugPrint("Error dropping tables: $e");
     } finally {
-      // Re-enable foreign keys
       await db?.execute('PRAGMA foreign_keys = ON');
     }
   }
@@ -133,10 +123,8 @@ class DatabaseService {
     try {
       final db = await _databaseService.database;
       final rowsDeleted = await db!.delete(tableName);
-      // debugPrint('Successfully cleared table. Deleted $rowsDeleted customers.');
       return rowsDeleted;
     } catch (e) {
-      // debugPrint('Error clearing customers table: $e');
       return 0;
     }
   }
@@ -174,6 +162,20 @@ class DatabaseService {
   }) async {
     try {
       final db = await _databaseService.database;
+
+      await db?.execute('''
+        CREATE TABLE IF NOT EXISTS daily_collections (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          receipt_id TEXT,
+          file_number TEXT,
+          premium_amount REAL,
+          paid_amount REAL,
+          due_amount REAL,
+          collected_by TEXT,
+          collection_date TEXT
+        )
+      ''');
+
       final Map<String, dynamic> collectionData = {
         'receipt_id': receiptId,
         'file_number': fileNumber,
@@ -185,11 +187,13 @@ class DatabaseService {
       };
 
       await db?.insert(
-        'collections',
+        'daily_collections',
         collectionData,
         conflictAlgorithm: ConflictAlgorithm.replace,
       );
-      debugPrint('Collection $receiptId inserted successfully.');
+      debugPrint(
+        'Collection $receiptId inserted successfully to daily_collections.',
+      );
     } catch (e) {
       debugPrint('Error inserting collection: $e');
       rethrow;
@@ -199,9 +203,23 @@ class DatabaseService {
   Future<List<Map<String, dynamic>>> getTodayCollections() async {
     try {
       final db = await _databaseService.database;
+
+      await db?.execute('''
+        CREATE TABLE IF NOT EXISTS daily_collections (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          receipt_id TEXT,
+          file_number TEXT,
+          premium_amount REAL,
+          paid_amount REAL,
+          due_amount REAL,
+          collected_by TEXT,
+          collection_date TEXT
+        )
+      ''');
+
       final today = DateTime.now().toIso8601String().split('T')[0];
       final List<Map<String, dynamic>> maps = await db!.query(
-        'collections',
+        'daily_collections',
         where: 'collection_date LIKE ?',
         whereArgs: ['$today%'],
         orderBy: 'collection_date DESC',
@@ -230,19 +248,9 @@ class DatabaseService {
       final List<Map<String, dynamic>> employees = await db!.query(table);
       print("----------------------");
       for (var employee in employees) {
-        // print("----------------------");
-        // print("ID : ${employee['id']}");
-        // print("First Name : ${employee['first_name']}");
-        // print("Last Name : ${employee['last_name']}");
-        // print("Email : ${employee['email']}");
-        // print("NIC : ${employee['nic']}");
-        // print("Phone : ${employee['phone_number']}");
-        // print("Address : ${employee['address']}");
-        // print("Sync : ${employee['sync']}");
         print(employee);
       }
       print("----------------------");
-      // return employees;
     } catch (e) {
       debugPrint("Get Employees Error: $e");
     }

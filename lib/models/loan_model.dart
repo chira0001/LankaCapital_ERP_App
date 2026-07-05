@@ -7,7 +7,7 @@ class Loan {
   // final int? employeeId;
   final int noOfInstallments;
   // final String? rejectionNote;
-  // final String status;
+  final String status;
   final double documentCharge;
 
   Loan({
@@ -19,6 +19,7 @@ class Loan {
     required this.noOfInstallments,
     required this.fileNumber,
     required this.documentCharge,
+    required this.status,
   });
 
   factory Loan.fromJson(Map<String, dynamic> json) {
@@ -34,6 +35,8 @@ class Loan {
       noOfInstallments: (json['installments']?['value'] as num?)?.toInt() ?? 0,
 
       documentCharge: (json['documentCharge'] as num?)?.toDouble() ?? 0.0,
+
+      status: json['status']?.toString() ?? "PENDING",
     );
   }
 
@@ -46,7 +49,7 @@ class Loan {
       // 'employeeId': employeeId,
       'noOfInstallments': noOfInstallments,
       // 'rejection_note': rejectionNote,
-      // 'status': status,
+      'status': status,
     };
   }
 

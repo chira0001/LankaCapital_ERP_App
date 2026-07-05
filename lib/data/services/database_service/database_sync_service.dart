@@ -94,7 +94,7 @@ class DatabaseSyncService {
       final placeholders = List.filled(ids.length, '?').join(',');
       return await db!.delete(
         'collections',
-        where: 'id IN ($placeholders)',
+        where: 'receipt_id IN ($placeholders)',
         whereArgs: ids,
       );
     } catch (e) {

@@ -147,7 +147,7 @@ class SyncDatabaseTable {
       }
       final allCollectionIds = collections
           .where((data) => data.id != null)
-          .map((data) => data.id)
+          .map((data) => int.parse(data.id!))
           .toList();
 
       final List<int> successIds = [];

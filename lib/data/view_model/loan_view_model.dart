@@ -28,7 +28,7 @@ class LoanViewModel extends ChangeNotifier {
     try {
       final (user, loans) = await service.fetchUserAndLoans(nic);
       _user = user;
-      _loans = loans;
+      _loans = loans.where((loan) => loan.status == "APPROVED").toList();
     } catch (e) {
       _user = null;
       _loans = [];
@@ -51,7 +51,15 @@ class LoanViewModel extends ChangeNotifier {
       }
       if (user != null) {
         if (user.loans != null) {
-          return user;
+          return User(
+            nic: user.nic,
+            email: user.email,
+            name: user.name,
+            phoneNumber: user.phoneNumber,
+            address: user.address,
+            sync: user.sync,
+            loans: user.loans!.where((loan) => loan.status == "APPROVED").toList(),
+          );
         } else {}
       } else {
         // AppTopSnackBar.error(context, "");

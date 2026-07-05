@@ -19,7 +19,7 @@ class CollectionsModel {
 
   factory CollectionsModel.fromDatabase(Map<String, dynamic> map) {
     return CollectionsModel(
-      id: map['id'] as String?,
+      id: map['receipt_id']?.toString(),
       fileNumber: map['file_number'] as String,
       installmentNumber: map['installment_number'] as int,
       paidAmount: (map['paid_amount'] as num).toDouble(),

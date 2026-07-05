@@ -8,7 +8,6 @@ import 'package:flutter/services.dart';
 import 'package:nkrs_app/views/customer_collection_views/utility/app_lock_wrapper.dart';
 import 'package:nkrs_app/views/customer_collection_views/utility/custom_snackbar.dart';
 
-
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
 
@@ -92,7 +91,7 @@ class _LoginPageState extends State<LoginPage> {
         _emailController.text = savedEmail;
         rememberMe = true;
       });
-      
+
       final isLoggedIn = await _authService.isLoggedIn();
       if (isLoggedIn && _canCheckBiometrics) {
         _authenticateWithBiometrics();
@@ -250,16 +249,6 @@ class _LoginPageState extends State<LoginPage> {
                         style: TextStyle(color: Colors.black),
                       ),
                     ),
-
-                    TextButton(
-                      onPressed: () {},
-                      child: const Text(
-                        "Forgot password?",
-                        style: TextStyle(
-                          color: Color.fromARGB(255, 77, 124, 190),
-                        ),
-                      ),
-                    ),
                   ],
                 ),
 
@@ -356,7 +345,10 @@ class _LoginPageState extends State<LoginPage> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    socialButton(Icons.fingerprint, _authenticateWithBiometrics),
+                    socialButton(
+                      Icons.fingerprint,
+                      _authenticateWithBiometrics,
+                    ),
                     const SizedBox(width: 15),
                     socialButton(Icons.face, _authenticateWithBiometrics),
                   ],

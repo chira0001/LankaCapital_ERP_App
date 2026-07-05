@@ -120,13 +120,22 @@ class _ReceiptPreviewPageState extends State<ReceiptPreviewPage> {
         collectedBy: widget.collectedBy,
       );
 
-      debugPrint(
-        '[ReceiptPreviewPage] Collection ${widget.receiptId} saved after print.',
-      );
+      int? c = await DatabaseUserService().getTempUserId();
+      if (c != null) {
+        await CollectionViewModel().addCollection(
+          CollectionsModel(
+            dueAmount: widget.dueAmount,
+            fileNumber: widget.fileNumber,
+            installmentNumber: 1, // Currently hardcoded
+            paidAmount: widget.paidAmount,
+            employeeId: c,
+          ),
+          context,
+        );
+      }
+      debugPrint('[ReceiptPreviewPage] Collection ${widget.receiptId} saved & synced after print.');
     } catch (e) {
-      // This should be rare (DB error). Log it but still navigate —
-      // the receipt was already printed so the transaction happened.
-      debugPrint('[ReceiptPreviewPage] DB save failed after print: $e');
+      debugPrint('[ReceiptPreviewPage] Save failed after print: $e');
     } finally {
       if (mounted) setState(() => _isSaving = false);
     }
@@ -329,32 +338,7 @@ class _ReceiptPreviewPageState extends State<ReceiptPreviewPage> {
                   const SizedBox(width: 12),
                   Expanded(
                     child: ElevatedButton.icon(
-                      onPressed: busy
-                          ? null
-                          : () async {
-                              int? c = await DatabaseUserService()
-                                  .getTempUserId();
-
-                              await CollectionViewModel().addCollection(
-                                CollectionsModel(
-                                  dueAmount: widget.dueAmount,
-                                  fileNumber: widget.fileNumber,
-                                  installmentNumber: c!,
-                                  paidAmount: widget.paidAmount,
-                                  employeeId: 1,
-                                ),
-                                context,
-                              );
-
-                              await _reprintOnly();
-
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => PaymentCompleteScreen(),
-                                ),
-                              );
-                            },
+                      onPressed: busy ? null : _reprintOnly,
                       icon: busy
                           ? const SizedBox(
                               width: 16,
