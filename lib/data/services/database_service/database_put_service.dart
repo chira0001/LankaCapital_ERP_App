@@ -1,4 +1,5 @@
 import 'package:nkrs_app/data/services/database_initializer_service.dart';
+import 'package:nkrs_app/models/collections_model.dart';
 import 'package:sqflite_sqlcipher/sqflite.dart';
 
 class DatabasePutService {
@@ -94,7 +95,22 @@ class DatabasePutService {
   //   }
   // }
 
-  Future<int?> insertCustomer() async {
-    return 1;
+  // Future<int?> insertCustomer() async {
+  //   return 1;
+  // }
+
+  Future<String?> insertCollectionLocal(CollectionsModel collection) async {
+    try {
+      final db = await _databaseService.database;
+      await db?.insert(
+        'collections',
+        collection.toDatabase(),
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
+      return collection.id;
+    } catch (e) {
+      print(e);
+      return null;
+    }
   }
 }

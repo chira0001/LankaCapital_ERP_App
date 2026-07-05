@@ -1,55 +1,65 @@
 class CollectionsModel {
-  final String receiptId;
+  final String? id;
   final String fileNumber;
-  final DateTime? collectionDate;
-  final double premiumAmount;
+  final int installmentNumber;
   final double paidAmount;
   final double dueAmount;
-  final String? collectedBy;
+  final DateTime? paidAt;
+  final int? employeeId;
 
   CollectionsModel({
-    required this.receiptId,
+    this.id,
     required this.fileNumber,
-    this.collectionDate,
-    required this.premiumAmount,
+    required this.installmentNumber,
     required this.paidAmount,
     required this.dueAmount,
-    this.collectedBy,
+    this.paidAt,
+    this.employeeId,
   });
 
   factory CollectionsModel.fromDatabase(Map<String, dynamic> map) {
     return CollectionsModel(
-      receiptId: map['receipt_id'] as String,
+      id: map['id'] as String?,
       fileNumber: map['file_number'] as String,
-      collectionDate: map['collection_date'],
-      premiumAmount: (map['premium_amount'] as num?)?.toDouble() ?? 0.0,
-      paidAmount: (map['paid_amount'] as num?)?.toDouble() ?? 0.0,
-      dueAmount: (map['due_amount'] as num?)?.toDouble() ?? 0.0,
-      collectedBy: map['collected_by'] as String?,
+      installmentNumber: map['installment_number'] as int,
+      paidAmount: (map['paid_amount'] as num).toDouble(),
+      dueAmount: (map['due_amount'] as num).toDouble(),
+      paidAt: map['paid_at'] != null
+          ? DateTime.parse(map['paid_at'] as String)
+          : null,
+      employeeId: map['collected_by'] as int?,
     );
   }
 
   Map<String, dynamic> toDatabase() {
     return {
-      'receipt_id': receiptId,
       'file_number': fileNumber,
-      // 'collection_date': collectionDate?.toIso8601String(),
-      'premium_amount': premiumAmount,
+      'installment_number': installmentNumber,
       'paid_amount': paidAmount,
       'due_amount': dueAmount,
-      'collected_by': collectedBy,
+      'collected_by': employeeId,
     };
   }
 
   Map<String, dynamic> toServer() {
     return {
-      'receiptId': receiptId,
       'fileNumber': fileNumber,
-      'collectionDate': collectionDate,
-      'premiumAmount': premiumAmount,
+      'installmentNumber': installmentNumber,
       'paidAmount': paidAmount,
       'dueAmount': dueAmount,
-      'collectedBy': collectedBy,
+      'employeeId': employeeId,
+    };
+  }
+
+  Map<String, dynamic> toSync() {
+    return {
+      'id':id,
+      'fileNumber': fileNumber,
+      'installmentNumber': installmentNumber,
+      'paidAmount': paidAmount,
+      'paidAt': paidAt,
+      'dueAmount': dueAmount,
+      'employeeId': employeeId,
     };
   }
 }

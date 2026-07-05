@@ -111,7 +111,7 @@ class _DebugViewState extends State<DebugView> {
               horizontal: safeAreaHorizontalPD,
               vertical: safeAreaVerticalPD,
             ),
-            child: Container(
+            child: SizedBox(
               width: double.infinity,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
@@ -135,6 +135,7 @@ class _DebugViewState extends State<DebugView> {
                       databaseService.getAllTableData("interest_rates");
                       databaseService.getAllTableData("loans");
                       AsyncDatabaseCustomer().printUpdateCustomers();
+                      DatabaseSyncService().printAllCollections();
                     },
                     child: const Text("print Table Data"),
                   ),

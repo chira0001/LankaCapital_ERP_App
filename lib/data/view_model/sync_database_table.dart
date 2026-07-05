@@ -129,37 +129,61 @@ class SyncDatabaseTable {
     }
   }
 
-  // Future<CustomerSyncResult> collectionsTable(BuildContext context) async {
-  //   const int batchSize = 2;
+  Future<CustomerSyncResult> collectionsTable(BuildContext context) async {
+    const int batchSize = 2;
 
-  //   final collections = await _databaseGetService.getCollections();
-  //   if (collections == null) {
-  //     ScaffoldMessageBottom.show(context, "Failed to load Collections");
-  //     return CustomerSyncResult(success: false);
-  //   }
-  //   if (collections.isEmpty) {
-  //     AppTopSnackBar.success(context, "No Collections are available for Sync.");
-  //     return CustomerSyncResult(success: true);
-  //   }
-  //   final allLoanIds = collections
-  //       .where((loan) => loan.receiptId != null)
-  //       .map((loan) => loan.receiptId)
-  //       .toList();
+    try {
+      final collections = await _databaseGetService.getCollections();
+      if (collections == null) {
+        ScaffoldMessageBottom.show(context, "Failed to load Collections");
+        return CustomerSyncResult(success: false);
+      }
+      if (collections.isEmpty) {
+        AppTopSnackBar.success(
+          context,
+          "No Collections are available for Sync.",
+        );
+        return CustomerSyncResult(success: true);
+      }
+      final allCollectionIds = collections
+          .where((data) => data.id != null)
+          .map((data) => data.id)
+          .toList();
 
-  //   final List<String> successIds = [];
-  //   final List<int> failedIds = [];
+      final List<int> successIds = [];
 
-  //   for (int i = 0; i < collections.length; i += batchSize) {
-  //     final batch = collections.skip(i).take(batchSize).toList();
-  //     List<String>? result = await SyncService().syncCollections(batch);
-  //     if (result == null || result.isEmpty) {
-  //       AppTopSnackBar.error(context, "Can't sync data to server");
-  //       return CustomerSyncResult(success: false);
-  //     }
-  //     successIds.addAll(result);
-  //   }
-  //   // final missedIds = collections
-  //   //     .where((id) => !successIds.contains(id) && !failedIds.contains(id))
-  //   //     .toList();
-  // }
+      for (int i = 0; i < collections.length; i += batchSize) {
+        final batch = collections.skip(i).take(batchSize).toList();
+        List<int>? result = await SyncService().syncCollections(batch);
+        if (result == null || result.isEmpty) {
+          AppTopSnackBar.error(context, "Can't sync data to server");
+          return CustomerSyncResult(success: false);
+        }
+        successIds.addAll(result);
+      }
+      final failedIds = allCollectionIds
+          .where((id) => !successIds.contains(id))
+          .toList();
+
+      final missedIds = allCollectionIds
+          .where((id) => !successIds.contains(id) && !failedIds.contains(id))
+          .toList();
+
+      if (failedIds.isEmpty && successIds.length == allCollectionIds.length) {
+        AppTopSnackBar.success(context, "Customer data synced successfully.");
+        return CustomerSyncResult(success: true, successId: successIds);
+      }
+      if (successIds.isNotEmpty || failedIds.isNotEmpty) {
+        return CustomerSyncResult(
+          success: false,
+          successId: successIds,
+          // failedId: missedIds,
+        );
+      }
+      return CustomerSyncResult(success: false);
+    } catch (e) {
+      ScaffoldMessageBottom.show(context, "Error_Message_c2E00001_Collection");
+      return CustomerSyncResult(success: false);
+    }
+  }
 }

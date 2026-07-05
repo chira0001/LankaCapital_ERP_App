@@ -57,6 +57,25 @@ class SyncControllerViewModel {
           }
         }
       }
+      for (int i = 0; i < 2; i++) {
+        final result = await syncDatabaseTable.collectionsTable(context);
+        if (result.success) {
+          if (result.successId!.isNotEmpty) {
+            await _service.deleteCollectionsSync(result.successId!);
+            await DatabaseAsyncService().updateSyncTime(0);
+            break;
+          }
+        }
+        if (result.failedId!.isNotEmpty && result.successId!.isNotEmpty) {
+          await _service.deleteCollectionsSync(result.successId!);
+          if (i == 1) {
+            ScaffoldMessageBottom.show(
+              context,
+              "Error_Message_c2E00001_collection",
+            );
+          }
+        }
+      }
     } catch (e) {
       return;
     }

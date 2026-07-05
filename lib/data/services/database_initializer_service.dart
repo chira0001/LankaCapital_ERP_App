@@ -100,13 +100,13 @@ class DatabaseInitializerService {
     // create collections table
     await db.execute('''
       CREATE TABLE IF NOT EXISTS collections (
-        receipt_id VARCHAR(255) PRIMARY KEY,
+        receipt_id INTEGER PRIMARY KEY AUTOINCREMENT,
         file_number VARCHAR(255),
+        installment_number INTEGER,
         collection_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        premium_amount DECIMAL(12,2),
         paid_amount DECIMAL(12,2),
         due_amount DECIMAL(12,2),
-        collected_by VARCHAR(255),
+        collected_by INTEGER,
         FOREIGN KEY (file_number) REFERENCES loans(file_number) ON DELETE CASCADE
       )
     ''');
@@ -133,6 +133,12 @@ class DatabaseInitializerService {
 
     await db.execute('''
       CREATE TABLE IF NOT EXISTS update_emloyees (
+        id INTEGER PRIMARY KEY
+      )
+    ''');
+
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS temp_user (
         id INTEGER PRIMARY KEY
       )
     ''');
