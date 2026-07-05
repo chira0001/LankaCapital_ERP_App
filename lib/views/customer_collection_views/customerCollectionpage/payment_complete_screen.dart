@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:nkrs_app/views/customer_collection_views/customerCollectionpage/collection_entry.dart';
+
 
 class PaymentCompleteScreen extends StatelessWidget {
   const PaymentCompleteScreen({super.key});
 
-  // Color palette matching the design
   final Color primaryGreen = const Color(0xFF1CE865);
   final Color backgroundColor = const Color(0xFFF4F9F6);
   final Color titleColor = const Color(0xFF101426);
@@ -21,8 +20,6 @@ class PaymentCompleteScreen extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const Spacer(flex: 3),
-
-              // Glowing Checkmark Icon
               Container(
                 width: 100,
                 height: 100,
@@ -38,16 +35,9 @@ class PaymentCompleteScreen extends StatelessWidget {
                     ),
                   ],
                 ),
-                child: const Icon(
-                  Icons.check_rounded,
-                  color: Colors.black,
-                  size: 56,
-                ),
+                child: const Icon(Icons.check_rounded, color: Colors.black, size: 56),
               ),
-
               const SizedBox(height: 48),
-
-              // Title text
               Text(
                 'Payment Successful!',
                 style: TextStyle(
@@ -57,48 +47,28 @@ class PaymentCompleteScreen extends StatelessWidget {
                   letterSpacing: -0.5,
                 ),
               ),
-
               const SizedBox(height: 12),
-
-              // Subtitle text
               Text(
                 'Transaction processed successfully.',
-                style: TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w400,
-                  color: subtitleColor,
-                ),
+                style: TextStyle(fontSize: 15, fontWeight: FontWeight.w400, color: subtitleColor),
               ),
-
               const SizedBox(height: 24),
-
-              // Printer Ready Status indicator
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Container(
                     width: 8,
                     height: 8,
-                    decoration: BoxDecoration(
-                      color: primaryGreen,
-                      shape: BoxShape.circle,
-                    ),
+                    decoration: BoxDecoration(color: primaryGreen, shape: BoxShape.circle),
                   ),
                   const SizedBox(width: 8),
                   Text(
-                    'Printer Ready',
-                    style: TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
-                      color: primaryGreen,
-                    ),
+                    'Receipt Printed',
+                    style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: primaryGreen),
                   ),
                 ],
               ),
-
               const Spacer(flex: 4),
-
-              // Done Button
               Container(
                 width: double.infinity,
                 height: 60,
@@ -119,30 +89,18 @@ class PaymentCompleteScreen extends StatelessWidget {
                   child: InkWell(
                     borderRadius: BorderRadius.circular(30),
                     onTap: () {
-                      // Add navigation logic here, e.g., returning to home
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => CollectionEntryPage(),
-                        ),
-                      );
+                      // Pop back to the CollectionEntryPage with 'true'
+                      // so it knows to refresh the list and clear the form.
+                      Navigator.pop(context, true);
                     },
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: const [
-                        Icon(
-                          Icons.check_rounded,
-                          color: Colors.black,
-                          size: 24,
-                        ),
+                        Icon(Icons.check_rounded, color: Colors.black, size: 24),
                         SizedBox(width: 12),
                         Text(
                           'Done',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black,
-                          ),
+                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black),
                         ),
                       ],
                     ),

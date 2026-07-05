@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:nkrs_app/utility/constanst.dart';
+import 'package:nkrs_app/utility/navigation_helper.dart';
 import 'package:nkrs_app/views/customer_collection_views/customerCollectionpage/collection_entry.dart';
+import 'package:nkrs_app/views/customer_collection_views/printer/add_printer_page.dart';
 import 'package:nkrs_app/views/customer_collection_views/profile/profile.dart';
 import 'package:nkrs_app/views/customer_collection_views/utility/main_card.dart';
 import 'package:nkrs_app/views/new_loan_request_view/loan_request_section_view.dart';
 import 'package:nkrs_app/data/services/auth_service.dart';
+import 'package:nkrs_app/data/services/printer_service.dart';
 
 class CustomerCollectionHome extends StatefulWidget {
   const CustomerCollectionHome({super.key});
@@ -16,12 +19,15 @@ class CustomerCollectionHome extends StatefulWidget {
 
 class _CustomerCollectionHomeState extends State<CustomerCollectionHome> {
   final AuthService _authService = AuthService();
+  final PrinterService _printerService = PrinterService();
   String _userName = "Loading...";
+  bool _printerConnected = false;
 
   @override
   void initState() {
     super.initState();
     _fetchUserName();
+    _checkPrinter();
   }
 
   void _fetchUserName() async {
@@ -33,8 +39,12 @@ class _CustomerCollectionHomeState extends State<CustomerCollectionHome> {
     }
   }
 
-  // int _selectedIndex = 0;
-  // double logoSize = 32;
+  Future<void> _checkPrinter() async {
+    final saved = await _printerService.getSavedPrinter();
+    if (!mounted) return;
+    setState(() => _printerConnected = saved != null);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -51,12 +61,10 @@ class _CustomerCollectionHomeState extends State<CustomerCollectionHome> {
               ),
               child: const Icon(Icons.account_balance, color: Colors.white),
             ),
-
             SizedBox(width: 10),
             Text("Lanka Capital"),
           ],
         ),
-
         centerTitle: true,
         backgroundColor: appBarC,
         elevation: 2.0,
@@ -70,10 +78,7 @@ class _CustomerCollectionHomeState extends State<CustomerCollectionHome> {
         actions: [
           IconButton(
             onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => ProfilePage()),
-              );
+              NavigationHelper.push(context, const ProfilePage());
             },
             icon: Icon(
               Iconsax.user_edit_copy,
@@ -95,7 +100,6 @@ class _CustomerCollectionHomeState extends State<CustomerCollectionHome> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Greeting
                 Text(
                   "Hello, $_userName",
                   style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
@@ -108,16 +112,8 @@ class _CustomerCollectionHomeState extends State<CustomerCollectionHome> {
 
                 const SizedBox(height: 20),
 
-                // Cards
                 InkWell(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => CollectionEntryPage(),
-                      ),
-                    );
-                  },
+                  onTap: () => NavigationHelper.push(context, const CollectionEntryPage()),
                   borderRadius: BorderRadius.circular(cardBorderRadius),
                   child: MainCard(
                     header: "Customer Collection",
@@ -131,14 +127,7 @@ class _CustomerCollectionHomeState extends State<CustomerCollectionHome> {
                 ),
                 SizedBox(height: kMediumSpacing),
                 InkWell(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => LoanRequestSection(),
-                      ),
-                    );
-                  },
+                  onTap: () => NavigationHelper.push(context, LoanRequestSection()),
                   borderRadius: BorderRadius.circular(cardBorderRadius),
                   child: MainCard(
                     header: "New Loan Request",
@@ -153,13 +142,23 @@ class _CustomerCollectionHomeState extends State<CustomerCollectionHome> {
 
                 SizedBox(height: kMediumSpacing),
 
-                MainCard(
-                  header: "Add printer",
-                  description: "Add New Thermal printer or Existing one.",
-                  cusIconRight: Icons.print,
-                  iconColor: Colors.indigoAccent,
-                  // ignore: deprecated_member_use
-                  iconBackgrouundColor: Colors.indigoAccent.withOpacity(0.1),
+                InkWell(
+                  onTap: () async {
+                    await NavigationHelper.push(context, const AddPrinterPage());
+                    await _checkPrinter();
+                  },
+                  borderRadius: BorderRadius.circular(cardBorderRadius),
+                  child: MainCard(
+                    header: _printerConnected ? "Printer Connected" : "Add Printer",
+                    description: _printerConnected
+                        ? "Manage your connected Bluetooth thermal printer."
+                        : "Search and connect a new Bluetooth thermal printer.",
+                    cusIconRight: Icons.print,
+                    iconColor: _printerConnected ? Colors.green : Colors.indigoAccent,
+                    // ignore: deprecated_member_use
+                    iconBackgrouundColor: (_printerConnected ? Colors.green : Colors.indigoAccent)
+                        .withOpacity(0.1),
+                  ),
                 ),
               ],
             ),
