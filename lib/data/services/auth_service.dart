@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
+import 'package:nkrs_app/data/services/database_service/database_user_service.dart';
 import 'package:nkrs_app/models/loan_model.dart';
 import 'package:nkrs_app/models/user_model.dart';
 import 'package:flutter/foundation.dart';
@@ -279,6 +280,8 @@ class AuthService {
         final Map<String, dynamic> profile = Map<String, dynamic>.from(
           response.data,
         );
+        await DatabaseUserService().clearTempUsers();
+        await DatabaseUserService().insertTempUser(profile['id'] as int);
 
         await _storage.write(key: 'cached_profile', value: jsonEncode(profile));
 

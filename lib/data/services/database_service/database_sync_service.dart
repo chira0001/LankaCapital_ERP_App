@@ -86,4 +86,55 @@ class DatabaseSyncService {
       return;
     }
   }
+
+  Future<int?> deleteCollectionsSync(List<int> ids) async {
+    final db = await _databaseService.database;
+    try {
+      if (ids.isEmpty) return 0;
+      final placeholders = List.filled(ids.length, '?').join(',');
+      return await db!.delete(
+        'collections',
+        where: 'id IN ($placeholders)',
+        whereArgs: ids,
+      );
+    } catch (e) {
+      print(e);
+      return null;
+    }
+  }
+
+  Future<void> printAllCollections() async {
+    final db = await _databaseService.database;
+
+    if (db == null) {
+      print("Database is null");
+      return;
+    }
+
+    try {
+      final List<Map<String, dynamic>> collections = await db.query(
+        'collections',
+      );
+
+      if (collections.isEmpty) {
+        print("No collections found.");
+        return;
+      }
+
+      for (final collection in collections) {
+        print('''
+Receipt ID          : ${collection['receipt_id']}
+File Number         : ${collection['file_number']}
+Installment Number  : ${collection['installment_number']}
+Collection Date     : ${collection['collection_date']}
+Paid Amount         : ${collection['paid_amount']}
+Due Amount          : ${collection['due_amount']}
+Collected By        : ${collection['collected_by']}
+---------------------------------------------
+''');
+      }
+    } catch (e) {
+      print("Error fetching collections: $e");
+    }
+  }
 }

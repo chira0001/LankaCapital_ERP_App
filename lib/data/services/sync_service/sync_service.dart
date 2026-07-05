@@ -48,16 +48,16 @@ class SyncService {
     }
   }
 
-  Future<List<String>?> syncCollections(List<CollectionsModel> loans) async {
-    final Uri url = Uri.parse('${UserService.baseUrl}/sync/loan');
+  Future<List<int>?> syncCollections(List<CollectionsModel> loans) async {
+    final Uri url = Uri.parse('${UserService.baseUrl}/sync/collection');
     try {
       final response = await http.post(
         url,
         headers: {"Content-Type": "application/json"},
-        body: jsonEncode(loans.map((e) => e.toServer()).toList()),
+        body: jsonEncode(loans.map((e) => e.toSync()).toList()),
       );
       if (response.statusCode == 200 || response.statusCode == 201) {
-        return List<String>.from(jsonDecode(response.body));
+        return List<int>.from(jsonDecode(response.body));
       }
       return [];
     } catch (e) {

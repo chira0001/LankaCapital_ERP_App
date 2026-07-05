@@ -119,4 +119,37 @@ class DatabaseUserService {
       return null;
     }
   }
+
+  Future<int?> insertTempUser(int id) async {
+    try {
+      final db = await _databaseService.database;
+      return await db?.insert('temp_user', {
+        'id': id,
+      }, conflictAlgorithm: ConflictAlgorithm.replace);
+    } catch (e) {
+      return null;
+    }
+  }
+
+  Future<int?> clearTempUsers() async {
+    try {
+      final db = await _databaseService.database;
+      return await db?.delete('temp_user');
+    } catch (e) {
+      return null;
+    }
+  }
+
+  Future<int?> getTempUserId() async {
+    try {
+      final db = await _databaseService.database;
+      final result = await db!.query('temp_user', columns: ['id'], limit: 1);
+      if (result.isEmpty) {
+        return null;
+      }
+      return result.first['id'] as int;
+    } catch (e) {
+      return null;
+    }
+  }
 }

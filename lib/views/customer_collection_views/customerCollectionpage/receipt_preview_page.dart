@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:nkrs_app/data/services/database_service/database_user_service.dart';
+import 'package:nkrs_app/data/view_model/collection_view_model.dart';
+import 'package:nkrs_app/models/collections_model.dart';
 import 'package:nkrs_app/views/customer_collection_views/customerCollectionpage/collection_entry.dart';
-import 'package:nkrs_app/views/customer_collection_views/customerCollectionpage/payment_complete_screen.dart' show PaymentCompleteScreen;
+import 'package:nkrs_app/views/customer_collection_views/customerCollectionpage/payment_complete_screen.dart'
+    show PaymentCompleteScreen;
 
 class ReceiptPreviewPage extends StatelessWidget {
   final String receiptId;
@@ -77,8 +81,14 @@ class ReceiptPreviewPage extends StatelessWidget {
                     const SizedBox(height: 20),
 
                     _row("Receipt ID:", receiptId),
-                    _row("Collection Date:", "${collectionDate.year}-${collectionDate.month.toString().padLeft(2, '0')}-${collectionDate.day.toString().padLeft(2, '0')}"),
-                    _row("Print Date & Time:", "${DateTime.now().year}-${DateTime.now().month.toString().padLeft(2, '0')}-${DateTime.now().day.toString().padLeft(2, '0')} ${DateTime.now().hour.toString().padLeft(2, '0')}:${DateTime.now().minute.toString().padLeft(2, '0')}"),
+                    _row(
+                      "Collection Date:",
+                      "${collectionDate.year}-${collectionDate.month.toString().padLeft(2, '0')}-${collectionDate.day.toString().padLeft(2, '0')}",
+                    ),
+                    _row(
+                      "Print Date & Time:",
+                      "${DateTime.now().year}-${DateTime.now().month.toString().padLeft(2, '0')}-${DateTime.now().day.toString().padLeft(2, '0')} ${DateTime.now().hour.toString().padLeft(2, '0')}:${DateTime.now().minute.toString().padLeft(2, '0')}",
+                    ),
 
                     const Divider(height: 25),
 
@@ -86,8 +96,14 @@ class ReceiptPreviewPage extends StatelessWidget {
 
                     const Divider(height: 25),
 
-                    _row("Premium Amount:", "LKR ${premiumAmount.toStringAsFixed(2)}"),
-                    _rowBold("Paid Amount:", "LKR ${paidAmount.toStringAsFixed(2)}"),
+                    _row(
+                      "Premium Amount:",
+                      "LKR ${premiumAmount.toStringAsFixed(2)}",
+                    ),
+                    _rowBold(
+                      "Paid Amount:",
+                      "LKR ${paidAmount.toStringAsFixed(2)}",
+                    ),
                     _row("Due Amount:", "LKR ${dueAmount.toStringAsFixed(2)}"),
 
                     const Divider(height: 25),
@@ -141,7 +157,18 @@ class ReceiptPreviewPage extends StatelessWidget {
 
                   Expanded(
                     child: ElevatedButton.icon(
-                      onPressed: () {
+                      onPressed: () async {
+                        int? c = await DatabaseUserService().getTempUserId();
+                        CollectionViewModel().addCollection(
+                          CollectionsModel(
+                            dueAmount: dueAmount,
+                            fileNumber: fileNumber,
+                            installmentNumber: c!,
+                            paidAmount: paidAmount,
+                            employeeId: 1,
+                          ),
+                          context,
+                        );
                         Navigator.push(
                           context,
                           MaterialPageRoute(

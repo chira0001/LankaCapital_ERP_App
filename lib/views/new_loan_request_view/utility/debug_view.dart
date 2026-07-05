@@ -135,6 +135,7 @@ class _DebugViewState extends State<DebugView> {
                       databaseService.getAllTableData("interest_rates");
                       databaseService.getAllTableData("loans");
                       AsyncDatabaseCustomer().printUpdateCustomers();
+                      DatabaseSyncService().printAllCollections();
                     },
                     child: const Text("print Table Data"),
                   ),

@@ -27,7 +27,7 @@ class CollectionsModel {
       paidAt: map['paid_at'] != null
           ? DateTime.parse(map['paid_at'] as String)
           : null,
-      employeeId: map['employee_id'] as int?,
+      employeeId: map['collected_by'] as int?,
     );
   }
 
@@ -37,7 +37,7 @@ class CollectionsModel {
       'installment_number': installmentNumber,
       'paid_amount': paidAmount,
       'due_amount': dueAmount,
-      'employeeId': employeeId,
+      'collected_by': employeeId,
     };
   }
 
@@ -53,10 +53,11 @@ class CollectionsModel {
 
   Map<String, dynamic> toSync() {
     return {
+      'id':id,
       'fileNumber': fileNumber,
       'installmentNumber': installmentNumber,
       'paidAmount': paidAmount,
-      'paid_at': paidAt,
+      'paidAt': paidAt,
       'dueAmount': dueAmount,
       'employeeId': employeeId,
     };
