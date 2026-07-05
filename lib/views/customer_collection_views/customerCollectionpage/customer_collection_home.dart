@@ -1,4 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:iconsax_flutter/iconsax_flutter.dart';
+import 'package:nkrs_app/utility/constanst.dart';
+import 'package:nkrs_app/utility/navigation_helper.dart';
+import 'package:nkrs_app/views/customer_collection_views/customerCollectionpage/collection_entry.dart';
+import 'package:nkrs_app/views/customer_collection_views/printer/add_printer_page.dart';
+import 'package:nkrs_app/views/customer_collection_views/profile/profile.dart';
+import 'package:nkrs_app/views/customer_collection_views/utility/main_card.dart';
+import 'package:nkrs_app/views/new_loan_request_view/loan_request_section_view.dart';
+import 'package:nkrs_app/data/services/auth_service.dart';
+import 'package:nkrs_app/data/services/printer_service.dart';
 
 class CustomerCollectionHome extends StatefulWidget {
   const CustomerCollectionHome({super.key});
@@ -8,159 +18,152 @@ class CustomerCollectionHome extends StatefulWidget {
 }
 
 class _CustomerCollectionHomeState extends State<CustomerCollectionHome> {
+  final AuthService _authService = AuthService();
+  final PrinterService _printerService = PrinterService();
+  String _userName = "Loading...";
+  bool _printerConnected = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchUserName();
+    _checkPrinter();
+  }
+
+  void _fetchUserName() async {
+    final name = await _authService.getUserName();
+    if (mounted) {
+      setState(() {
+        _userName = name ?? "User";
+      });
+    }
+  }
+
+  Future<void> _checkPrinter() async {
+    final saved = await _printerService.getSavedPrinter();
+    if (!mounted) return;
+    setState(() => _printerConnected = saved != null);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F7FB),
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 10),
-
-              // Top Bar
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: Colors.blue.shade900,
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: const Icon(
-                          Icons.account_balance,
-                          color: Colors.white,
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      const Text(
-                        "Lanka Capital",
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const CircleAvatar(
-                    radius: 23,
-                    backgroundImage: AssetImage("assets/avatar.png"),
-                  ),
-                ],
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Container(
+              padding: EdgeInsets.all(kContainerPadding),
+              decoration: BoxDecoration(
+                color: Colors.blue.shade900,
+                borderRadius: BorderRadius.circular(kBorderRadiusSmall),
               ),
-
-              const SizedBox(height: 20),
-
-              // Greeting
-              const Text(
-                "Hello, Alex",
-                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 4),
-              const Text(
-                "Manage your daily collections and loan requests.",
-                style: TextStyle(color: Colors.grey, fontSize: 14),
-              ),
-
-              const SizedBox(height: 20),
-
-              // Cards
-              _buildCard(
-                icon: Icons.person_search,
-                iconColor: Colors.blue,
-                title: "Customer Collection",
-                subtitle:
-                    "Add installment or view existing collection history for any borrower.",
-              ),
-
-              _buildCard(
-                icon: Icons.post_add,
-                iconColor: Colors.orange,
-                title: "New Loan Request",
-                subtitle:
-                    "Submit a fresh loan application for a new or existing customer.",
-              ),
-
-              _buildCard(
-                icon: Icons.print,
-                iconColor: Colors.indigoAccent,
-                title: "Add printer",
-                subtitle: "Add New Thermal printer or Existing one.",
-              ),
-            ],
-          ),
+              child: const Icon(Icons.account_balance, color: Colors.white),
+            ),
+            SizedBox(width: 10),
+            Text("Lanka Capital"),
+          ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildCard({
-    required IconData icon,
-    required Color iconColor,
-    required String title,
-    required String subtitle,
-  }) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      padding: const EdgeInsets.all(16),
-      height: 150,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey,
-            blurRadius: 10,
-            offset: const Offset(0, 4),
+        centerTitle: true,
+        backgroundColor: appBarC,
+        elevation: 2.0,
+        shadowColor: appBarShadow,
+        titleTextStyle: TextStyle(
+          color: btnC,
+          fontSize: appBarFontS,
+          fontWeight: FontWeight.bold,
+          letterSpacing: 1.3,
+        ),
+        actions: [
+          IconButton(
+            onPressed: () {
+              NavigationHelper.push(context, const ProfilePage());
+            },
+            icon: Icon(
+              Iconsax.user_edit_copy,
+              color: Color.fromARGB(255, 0, 0, 0),
+              size: appBarIconS,
+            ),
           ),
+          const SizedBox(width: 12),
         ],
       ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: iconColor.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Icon(icon, color: iconColor),
-              ),
-              const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
-            ],
-          ),
-
-          SizedBox(
-            width: double.infinity,
+      backgroundColor: const Color(0xFFF5F7FB),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: EdgeInsets.symmetric(
+              horizontal: safeAreaHorizontalPD,
+              vertical: safeAreaVerticalPD,
+            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  title,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 15,
+                  "Hello, $_userName",
+                  style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                ),
+                SizedBox(height: kTinySpacing),
+                const Text(
+                  "Manage your daily collections and loan requests.",
+                  style: TextStyle(color: Colors.grey, fontSize: 14),
+                ),
+
+                const SizedBox(height: 20),
+
+                InkWell(
+                  onTap: () => NavigationHelper.push(context, const CollectionEntryPage()),
+                  borderRadius: BorderRadius.circular(cardBorderRadius),
+                  child: MainCard(
+                    header: "Customer Collection",
+                    description:
+                        "Add installment or view existing collection history for any borrower.",
+                    cusIconRight: Icons.person_search,
+                    iconColor: Colors.blue,
+                    // ignore: deprecated_member_use
+                    iconBackgrouundColor: Colors.blue.withOpacity(0.1),
                   ),
                 ),
-                const SizedBox(height: 4),
-                Text(
-                  subtitle,
-                  style: const TextStyle(color: Colors.grey, fontSize: 13),
-                  textAlign: TextAlign.left,
+                SizedBox(height: kMediumSpacing),
+                InkWell(
+                  onTap: () => NavigationHelper.push(context, LoanRequestSection()),
+                  borderRadius: BorderRadius.circular(cardBorderRadius),
+                  child: MainCard(
+                    header: "New Loan Request",
+                    description:
+                        "Submit a fresh loan application for a new or existing customer.",
+                    cusIconRight: Icons.post_add,
+                    iconColor: Colors.orange,
+                    // ignore: deprecated_member_use
+                    iconBackgrouundColor: Colors.orange.withOpacity(0.1),
+                  ),
+                ),
+
+                SizedBox(height: kMediumSpacing),
+
+                InkWell(
+                  onTap: () async {
+                    await NavigationHelper.push(context, const AddPrinterPage());
+                    await _checkPrinter();
+                  },
+                  borderRadius: BorderRadius.circular(cardBorderRadius),
+                  child: MainCard(
+                    header: _printerConnected ? "Printer Connected" : "Add Printer",
+                    description: _printerConnected
+                        ? "Manage your connected Bluetooth thermal printer."
+                        : "Search and connect a new Bluetooth thermal printer.",
+                    cusIconRight: Icons.print,
+                    iconColor: _printerConnected ? Colors.green : Colors.indigoAccent,
+                    // ignore: deprecated_member_use
+                    iconBackgrouundColor: (_printerConnected ? Colors.green : Colors.indigoAccent)
+                        .withOpacity(0.1),
+                  ),
                 ),
               ],
             ),
           ),
-        ],
+        ),
       ),
     );
   }

@@ -1,262 +1,449 @@
+// ignore_for_file: control_flow_in_finally, deprecated_member_use, use_build_context_synchronously
 import 'package:flutter/material.dart';
-import 'package:nkrs_app/main.dart';
+import 'package:intl/intl.dart';
+import 'package:nkrs_app/data/view_model/check_connection.dart';
+import 'package:nkrs_app/data/view_model/loan_view_model.dart';
+import 'package:nkrs_app/models/installment_model.dart';
+import 'package:nkrs_app/models/user_loan_model.dart';
+import 'package:nkrs_app/models/user_model.dart';
 import 'package:nkrs_app/utility/constanst.dart';
-import 'package:nkrs_app/views/new_loan_request_view/utility/custom_dialog_box.dart';
-// import 'package:http/http.dart' as http;
+import 'package:nkrs_app/views/new_loan_request_view/loan_request/loan_details/existing_customer_loan_details.dart';
+import 'package:nkrs_app/views/new_loan_request_view/loan_request/existing_customer_loan_request.dart';
+import 'package:nkrs_app/views/new_loan_request_view/utility/custom_row.dart';
+import 'package:nkrs_app/views/new_loan_request_view/utility/custom_text_field.dart';
+import 'package:nkrs_app/views/new_loan_request_view/utility/loading_dialog.dart';
+import 'package:nkrs_app/views/new_loan_request_view/utility/main_card.dart';
+import 'package:nkrs_app/views/new_loan_request_view/utility/scaffold_message.dart';
+import 'package:nkrs_app/views/new_loan_request_view/utility/custom_app_bar.dart';
 
 class ExistingCustomerLoan extends StatefulWidget {
   const ExistingCustomerLoan({super.key});
-
-  // Future<void> _showMySheet(BuildContext context) async {
-  //   String url =
-  //       "https://www.lankacapital.lk/api/submit"; // Ensure the path is correct
-
-  //   try {
-  //     var response = await http.post(
-  //       Uri.parse(url),
-  //       body: {"name": "John Doe", "email": "john.doe@example.com"},
-  //     );
-
-  //     if (response.statusCode == 200) {
-  //       // Success: Add logic to handle the server response
-  //       print("Data Sent Successfully: ${response.body}");
-  //     } else {
-  //       // Handle server errors
-  //       print("Server Error: ${response.statusCode}");
-  //     }
-  //   } catch (e) {
-  //     // Handle network errors
-  //     print("Connection Error: $e");
-  //   }
-  // }
 
   @override
   State<ExistingCustomerLoan> createState() => _ExistingCustomerLoanState();
 }
 
 class _ExistingCustomerLoanState extends State<ExistingCustomerLoan> {
+  bool showDetails = false;
+
+  TextEditingController nicNumber = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
+  User? _user;
+
+  @override
+  void initState() {
+    super.initState();
+    CheckConnection.initialize();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: appBarC,
-        elevation: 2.0,
-        shadowColor: appBarShadow,
-        leading: IconButton(
-          onPressed: () {
-            // _showMySheet(context);
-            Navigator.pop(context);
-          },
-          icon: Icon(
-            Icons.arrow_back_ios,
-            color: const Color.fromARGB(255, 0, 0, 0),
-            size: 20,
-            fontWeight: FontWeight.w900,
-          ),
-        ),
-        title: Text("Existing Customer Loan"),
-        titleTextStyle: TextStyle(
-          color: btnC,
-          fontSize: appBarFontS,
-          fontWeight: FontWeight.bold,
-        ),
-        actions: [
-          Padding(
-            padding: EdgeInsets.only(right: 10),
-            child: IconButton(
-              onPressed: () {},
-              icon: Icon(
-                Icons.help_outline,
-                color: const Color.fromARGB(118, 17, 17, 17),
-                size: 26,
-              ),
-            ),
-          ),
-        ],
+      appBar: CustomAppBar(
+        title: "Existing Customer Loan",
+        onBackPressed: () => Navigator.pop(context),
       ),
-      backgroundColor: const Color.fromARGB(255, 245, 245, 245),
-      body: Padding(
-        padding: EdgeInsetsGeometry.symmetric(
-          horizontal: safeAreaHorizontalPD,
-          vertical: safeAreaVerticalPD,
-        ),
+      backgroundColor: safeAreaC,
+      body: SafeArea(
         child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                "Existing Customer Loan",
-                style: TextStyle(
-                  fontWeight: FontWeight(HeaderFW),
-                  fontSize: cardHeaderFS,
-                  color: headerTextC,
-                  // letterSpacing: 1,
+          child: Padding(
+            padding: EdgeInsetsGeometry.symmetric(
+              horizontal: safeAreaHorizontalPD,
+              vertical: safeAreaVerticalPD,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "Existing Customer Loan",
+                  style: TextStyle(
+                    fontWeight: FontWeight(HeaderFW),
+                    fontSize: headerFontSize,
+                    color: headerTextC,
+                    // letterSpacing: 1,
+                  ),
                 ),
-              ),
-              SizedBox(height: 5),
-              Text(
-                "Loan Management for Existing Customers",
-                textAlign: TextAlign.start,
-                style: TextStyle(
-                  fontSize: cardDescriptionFS,
-                  fontWeight: FontWeight(descriptionFw),
-                  color: descriptionC,
-                  // letterSpacing:
+                SizedBox(height: 5),
+                Text(
+                  "Loan Management for Existing Customers",
+                  textAlign: TextAlign.start,
+                  style: TextStyle(
+                    fontSize: cardDescriptionFS,
+                    fontWeight: FontWeight(descriptionFw),
+                    color: descriptionC,
+                    // letterSpacing:
+                  ),
                 ),
-              ),
-              SizedBox(height: 30),
-              Container(
-                width: double.infinity,
-                height: 200,
-                padding: EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: const Color.fromARGB(255, 255, 255, 255),
-                  borderRadius: BorderRadius.circular(cardBorderRadius),
-                  boxShadow: [
-                    BoxShadow(
-                      // ignore: deprecated_member_use
-                      color: const Color.fromARGB(
-                        28,
-                        29,
-                        29,
-                        29,
-                        // ignore: deprecated_member_use
-                      ).withOpacity(0.1),
-                      spreadRadius: 2,
-                      blurRadius: 5,
-                      offset: const Offset(0, 3),
-                    ),
-                  ],
-                  // backgroundBlendMode: BlendMode.lighten,
-                  // border: BoxBorder.all(
-                  //   color: const Color.fromARGB(88, 175, 175, 175),
-                  //   width: 1,
-                  // ),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Customer Verification".toUpperCase(),
-                      style: TextStyle(
-                        fontSize: cardDescriptionFS,
-                        color: cardDescriptionFC,
-                        fontWeight: FontWeight(cardDescriptionFW),
-                        letterSpacing: 1,
+                SizedBox(height: 30),
+                Container(
+                  width: double.infinity,
+                  padding: EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: appBarC,
+                    borderRadius: BorderRadius.circular(cardBorderRadius),
+                    boxShadow: [MainCard.customShadow()],
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Search for Customer".toUpperCase(),
+                        style: TextStyle(
+                          fontSize: 12.5,
+                          fontWeight: FontWeight(500),
+                          color: const Color.fromARGB(138, 26, 26, 26),
+                        ),
                       ),
-                    ),
-                    SizedBox(height: 10),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        SizedBox(
-                          // width: isMobile(context) ? 200 : 300,
-                          width: 240,
-                          // height: 50,
-                          child: TextFormField(
-                            keyboardType: TextInputType.number,
-                            autocorrect: false,
-                            cursorColor: const Color.fromARGB(255, 0, 55, 255),
-                            decoration: InputDecoration(
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.all(
-                                  Radius.circular(btnBorderRadius),
-                                ),
+                      SizedBox(height: 10),
+                      Form(
+                        key: _formKey,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            SizedBox(
+                              width: 240,
+                              child: CustomTextField(
+                                controllerNames: nicNumber,
+                                labelText_: "Enter Customer ID",
+                                type: TextInputType.number,
+                                validatorCallback: (value) {
+                                  if (value == null) {
+                                    return "Please fill this field";
+                                  } else if (value.isEmpty) {
+                                    return "Enter a valid NIC number";
+                                  } else {
+                                    return null;
+                                  }
+                                },
                               ),
-                              enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.all(
-                                  Radius.circular(btnBorderRadius),
-                                ),
-                                borderSide: BorderSide(
-                                  color: Color.fromARGB(58, 23, 23, 23),
-                                  width: 1.5,
-                                ),
-                              ),
-                              fillColor: safeAreaC,
-                              filled: true,
-                              labelText: "Enter Customer ID",
-                              labelStyle: TextStyle(
-                                color: btnC,
-                                fontSize: 18,
-                                fontWeight: const FontWeight(500),
-                              ),
-                              // prefixIcon: Icon(Iconsax.user_search_copy),
-                              // prefixIconColor: Color.fromARGB(255, 0, 55, 255),
                             ),
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Please enter a customer ID';
-                              }
-                              return null;
-                            },
-                          ),
-                        ),
-                        ElevatedButton(
-                          onPressed: () {
-                            // showAboutDialog(
-                            //   context: context,
-                            //   children: [
-                            //     Text("Customer ID: 123456"),
-                            //     Text("Name: John Doe"),
-                            //     Text("Loan Status: Active"),
-                            //   ],
-                            // );
-                            showDialog(
-                              context: context,
-                              builder: (context) => CustomDialogBox(
-                                leftBtn: () {
-                                  Navigator.pushAndRemoveUntil(
+                            ElevatedButton(
+                              onPressed: () async {
+                                if (_formKey.currentState!.validate()) {
+                                  LoadingDialog.show(
                                     context,
-                                    MaterialPageRoute(
-                                      builder: (context) =>
-                                          const MyApp(), //navigate to home page
-                                    ),
-                                    (Route<dynamic> route) => false,
+                                    message: 'Please Wait...',
                                   );
-                                },
-                                rightBtn: () {
-                                  Navigator.pop(context);
-                                },
-                                // ignore: deprecated_member_use
-                                imageBColor: btnC.withOpacity(0.4),
-                                header: "Loan Approved !",
-                                description:
-                                    "You can now proceed with the next steps in the loan process.",
-                                imageURL: 'assets/images/success-icon.png',
+                                  try {
+                                    _user = await LoanViewModel()
+                                        .findUserAndLoanById(
+                                          context,
+                                          int.parse(nicNumber.text.trim()),
+                                        );
+                                    if (_user != null) {
+                                      setState(() {
+                                        showDetails = true;
+                                      });
+                                    } else {
+                                      setState(() {
+                                        showDetails = false;
+                                        _user = null;
+                                      });
+                                      AppTopSnackBar.error(
+                                        context,
+                                        "User not found. Please check the ID.",
+                                      );
+                                    }
+                                  } catch (e) {
+                                    setState(() {
+                                      showDetails = false;
+                                      _user = null;
+                                    });
+                                    AppTopSnackBar.error(
+                                      context,
+                                      "Something went wrong. Please try again.",
+                                    );
+                                  } finally {
+                                    if (!context.mounted) return;
+                                    LoadingDialog.hide(context);
+                                  }
+                                }
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: btnC,
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 20,
+                                  vertical: 14,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(
+                                    btnBorderRadius,
+                                  ),
+                                  //   side: BorderSide(
+                                  //     width: 2,
+                                  //     // ignore: deprecated_member_use
+                                  //     color: btnC.withOpacity(0.3),
+                                  //   ),
+                                ),
                               ),
-                            );
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: btnC,
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 20,
-                              vertical: 15,
-                            ),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(
-                                btnBorderRadius,
+                              child: Text(
+                                "FIND",
+                                style: TextStyle(
+                                  letterSpacing: 2,
+                                  color: Colors.white,
+                                  fontSize: btnFontSize,
+                                  fontWeight: FontWeight.w500,
+                                ),
                               ),
                             ),
-                          ),
-                          child: Text(
-                            "FIND",
-                            style: TextStyle(
-                              letterSpacing: 2,
-                              color: const Color.fromARGB(255, 255, 255, 255),
-                              fontSize: btnFontSize,
-                              fontWeight: FontWeight(500),
-                            ),
-                          ),
+                          ],
                         ),
-                      ],
-                    ),
-                  ],
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ],
+                SizedBox(height: 30),
+                customBox(),
+                SizedBox(height: 30),
+              ],
+            ),
           ),
         ),
       ),
     );
+  }
+
+  Widget customBox() {
+    if (showDetails) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            "Active & Past Loans",
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: Color(0xFF1A3D81),
+            ),
+          ),
+          const SizedBox(height: 15),
+          Container(
+            padding: EdgeInsetsDirectional.all(20),
+            decoration: BoxDecoration(
+              color: appBarC,
+              borderRadius: BorderRadius.circular(cardBorderRadius),
+              boxShadow: [MainCard.customShadow()],
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Text(_user!.name),
+                CustomRow(label: "Full Name", value: _user!.name),
+                CustomRow(label: "Address", value: _user!.address),
+                CustomRow(label: "Phone Number", value: _user!.phoneNumber),
+                GestureDetector(
+                  onTap: () async {
+                    if ((_user?.loans?.length ?? 0) <= 2) {
+                      List<InstallmentModel>? installments;
+                      // List<InterestRateModel>? interestRate;
+                      LoadingDialog.show(context, message: 'Please Wait...');
+                      try {
+                        installments = await LoanViewModel().getInstallmentInfo(
+                          context,
+                        );
+                      } catch (e) {
+                        // handle/log error if you want
+                      } finally {
+                        if (context.mounted) {
+                          LoadingDialog.hide(context);
+                        }
+                      }
+                      if (!context.mounted) return;
+                      if (installments != null && installments.isNotEmpty) {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => ExistingCustomerLoanRequest(
+                              installments: installments!,
+                              interestRates: null,
+                              nicNumber:
+                                  int.tryParse(nicNumber.text.trim()) ?? 0,
+                            ),
+                          ),
+                        );
+                      } else {
+                        AppTopSnackBar.error(
+                          context,
+                          "Failed to load installments. Cannot proceed.",
+                        );
+                      }
+                    } else {
+                      AppTopSnackBar.info(
+                        context,
+                        "This customer has already reached the maximum number of allowed loans",
+                        duration: const Duration(seconds: 10),
+                      );
+                    }
+                  },
+                  child: Container(
+                    width: double.infinity,
+                    margin: const EdgeInsets.only(top: 20),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 13,
+                    ),
+                    decoration: BoxDecoration(
+                      color: btnC,
+                      borderRadius: BorderRadius.circular(btnBorderRadius),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          "Request New Loan",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: btnFontSize,
+                            fontWeight: FontWeight(700),
+                          ),
+                        ),
+                        SizedBox(width: 10),
+                        Icon(
+                          Icons.arrow_forward_ios,
+                          color: Colors.white,
+                          size: 16,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          SizedBox(height: 20),
+          FutureBuilder<List<UserLoanModel>>(
+            future: Future.value(_user?.loans), //getter
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return Center(
+                  child: SizedBox(
+                    height: 300,
+                    width: double.infinity,
+                    child: CircularProgressIndicator(),
+                  ),
+                );
+              } else if (snapshot.hasError) {
+                return const Center(child: Text("Errors "));
+              } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                return Center(
+                  child: Text(
+                    "This user does not have any loan records.",
+                    style: TextStyle(
+                      fontSize: 17,
+                      fontWeight: FontWeight.w600,
+                      color: const Color.fromARGB(255, 72, 56, 56),
+                      letterSpacing: 0.5,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                );
+              } else {
+                return ListView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: snapshot.data!.length,
+                  itemBuilder: (context, index) {
+                    UserLoanModel loan = snapshot.data![index];
+                    return Container(
+                      margin: const EdgeInsets.only(bottom: 12),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: Colors.blue.withOpacity(0.1)),
+                      ),
+                      child: ListTile(
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 8,
+                        ),
+                        leading: CircleAvatar(
+                          backgroundColor: const Color(
+                            0xFF1A3D81,
+                          ).withOpacity(0.1),
+                          child: const Icon(
+                            Icons.account_balance_wallet,
+                            color: Color(0xFF1A3D81),
+                          ),
+                        ),
+                        title: Text(
+                          "Loan ID : ${loan.fileNumber.toString()}",
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF1A3D81),
+                          ),
+                        ),
+                        subtitle: Text(
+                          "Issued: ${DateFormat('yyyy-MM-dd').format(DateTime.parse(loan.createdAt.replaceFirst(' ', 'T')))}",
+                          // "Issued: ${loan.createdAt.split('T')[0]}",
+                        ),
+                        trailing: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            Text(
+                              "LKR ${loan.amount.toString()}",
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black87,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 2,
+                              ),
+                              decoration: BoxDecoration(
+                                color: switch (loan.status.toString()) {
+                                  'APPROVED' => Colors.green[50],
+                                  'PENDING' => const Color.fromARGB(
+                                    255,
+                                    255,
+                                    238,
+                                    225,
+                                  ),
+                                  'REJECTED' => Colors.red[50],
+                                  _ => Colors.grey[100],
+                                },
+                                borderRadius: BorderRadius.circular(5),
+                              ),
+                              child: Text(
+                                loan.status.toString(),
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.bold,
+                                  color: switch (loan.status) {
+                                    'APPROVED' => Colors.green[700],
+                                    'PENDING' => Colors.amber[600],
+                                    'REJECTED' => Colors.red[700],
+                                    _ => Colors.grey[600],
+                                  },
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => LoanDetailsPage(loan: loan),
+                            ),
+                          );
+                        },
+                      ),
+                    );
+                  },
+                );
+              }
+            },
+          ),
+        ],
+      );
+    } else {
+      return Container();
+    }
   }
 }

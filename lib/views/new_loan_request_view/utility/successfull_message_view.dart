@@ -2,13 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:nkrs_app/utility/constanst.dart';
 
 class LoanSuccessScreen extends StatelessWidget {
-  final VoidCallback? appBarNavigator;
-  final VoidCallback? bottomNavigatorBackButton;
-  final VoidCallback? bottomNavigatorViewButton;
+  final void Function()? bottomNavigatorBackButton;
+  final void Function()? bottomNavigatorViewButton;
 
   const LoanSuccessScreen({
     super.key,
-    this.appBarNavigator,
     this.bottomNavigatorBackButton,
     this.bottomNavigatorViewButton,
   });
@@ -20,22 +18,7 @@ class LoanSuccessScreen extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: appBarC,
         elevation: 0,
-        leading: IconButton(
-          icon: Icon(
-            Icons.arrow_back_ios,
-            color: const Color.fromARGB(255, 0, 0, 0),
-            size: 20,
-            fontWeight: FontWeight.w900,
-          ),
-          onPressed: () {
-            // Navigator.pushAndRemoveUntil(
-            //   context,
-            //   MaterialPageRoute(builder: (context) => const MyApp()),
-            //   (Route<dynamic> route) => false,
-            // );
-            appBarNavigator?.call();
-          },
-        ),
+        automaticallyImplyLeading: false,
         title: const Text('Success'),
         centerTitle: true,
         titleTextStyle: TextStyle(
@@ -93,9 +76,16 @@ class LoanSuccessScreen extends StatelessWidget {
                 child: ElevatedButton(
                   onPressed: () {
                     bottomNavigatorBackButton?.call();
+                    // Navigator.pushAndRemoveUntil(
+                    //   context,
+                    //   MaterialPageRoute(
+                    //     builder: (context) => const LoanRequestSection(),
+                    //   ),
+                    //   (route) => false,
+                    // );
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF1E88E5),
+                    backgroundColor: btnC,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),

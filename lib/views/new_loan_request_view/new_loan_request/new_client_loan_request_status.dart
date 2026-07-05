@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:nkrs_app/main.dart';
 import 'package:nkrs_app/utility/constanst.dart';
+import 'package:nkrs_app/views/new_loan_request_view/loan_request_section_view.dart';
+import 'package:nkrs_app/views/new_loan_request_view/utility/custom_app_bar.dart';
+import 'package:nkrs_app/views/new_loan_request_view/utility/main_card.dart'
+    show MainCard;
 import 'package:timeline_tile/timeline_tile.dart';
 
 class NewClientLoanRequestStatus extends StatefulWidget {
@@ -16,34 +19,15 @@ class _NewClientLoanRequestStatusState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        elevation: 2.0,
-        shadowColor: appBarShadow,
-        backgroundColor: appBarC,
-        leading: Padding(
-          padding: EdgeInsets.only(left: 10),
-          child: IconButton(
-            onPressed: () {
-              Navigator.pushAndRemoveUntil(
-                context,
-                MaterialPageRoute(builder: (context) => const MyApp()),
-                (Route<dynamic> route) => false,
-              );
-            },
-            icon: Icon(
-              Icons.close,
-              color: const Color.fromARGB(255, 0, 0, 0),
-              size: 26,
-              fontWeight: FontWeight.w900,
-            ),
-          ),
-        ),
-        title: Text("Loan Request Status"),
-        titleTextStyle: TextStyle(
-          color: btnC,
-          fontSize: appBarFontS,
-          fontWeight: FontWeight.bold,
-        ),
+      appBar: CustomAppBar(
+        title: "Loan Request Status",
+        onBackPressed: () {
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (context) => const LoanRequestSection()),
+            (route) => false,
+          );
+        },
       ),
       backgroundColor: safeAreaC,
       body: SingleChildScrollView(
@@ -59,13 +43,7 @@ class _NewClientLoanRequestStatusState
                   decoration: BoxDecoration(
                     color: safeAreaC,
                     borderRadius: BorderRadius.circular(cardBorderRadius),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black26,
-                        blurRadius: 10,
-                        offset: Offset(0, 5),
-                      ),
-                    ],
+                    boxShadow: [MainCard.customShadow()],
                   ),
                   child: Padding(
                     padding: const EdgeInsets.all(20),
