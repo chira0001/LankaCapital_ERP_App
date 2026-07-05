@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:nkrs_app/data/view_model/loan_view_model.dart';
@@ -11,6 +13,9 @@ import 'package:nkrs_app/views/customer_collection_views/profile/profile.dart';
 import 'package:nkrs_app/views/customer_collection_views/utility/dialog_box.dart';
 import 'package:nkrs_app/data/view_model/check_connection.dart';
 import 'package:nkrs_app/data/services/database_service.dart';
+import 'package:nkrs_app/data/services/printer_service.dart';
+import 'package:nkrs_app/utility/navigation_helper.dart';
+import 'package:nkrs_app/views/customer_collection_views/printer/add_printer_page.dart';
 
 class CollectionEntryPage extends StatefulWidget {
   const CollectionEntryPage({super.key});
@@ -26,9 +31,12 @@ class _CollectionEntryPageState extends State<CollectionEntryPage> {
   final TextEditingController loanAmountController = TextEditingController();
   final TextEditingController paidAmountController = TextEditingController();
   final AuthService _authService = AuthService();
+  final PrinterService _printerService = PrinterService();
   LoanViewModel loanData = LoanViewModel();
 
   bool _isLoading = false;
+  bool _isSubmitting = false;
+  bool _printerConnected = false;
   String? _errorMessage;
   User? _customer;
   List<Loan> _loans = [];
@@ -48,6 +56,13 @@ class _CollectionEntryPageState extends State<CollectionEntryPage> {
     paidAmountController.addListener(_calculateDueAmount);
     _loadTodayCollections();
     _fetchUserName();
+    _checkPrinterStatus();
+  }
+
+  Future<void> _checkPrinterStatus() async {
+    final saved = await _printerService.getSavedPrinter();
+    if (!mounted) return;
+    setState(() => _printerConnected = saved != null);
   }
 
   Future<void> _fetchUserName() async {
@@ -180,6 +195,77 @@ class _CollectionEntryPageState extends State<CollectionEntryPage> {
     ).showLoanDialog(context);
   }
 
+  Future<void> _submitCollection() async {
+    if (_isSubmitting) return;
+
+    if (_selectedLoan == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please select a loan first.')),
+      );
+      return;
+    }
+
+    final paidAmountText = paidAmountController.text;
+    if (paidAmountText.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please enter the paid amount.')),
+      );
+      return;
+    }
+
+    setState(() => _isSubmitting = true);
+
+    final double paidAmount = double.tryParse(paidAmountText) ?? 0.0;
+    final String receiptId = DateTime.now().millisecondsSinceEpoch.toString();
+    final String fileNumber = _selectedLoan!.fileNumber;
+    final String collectedBy = _currentUserName;
+    final DateTime collectionDate = DateTime.now();
+
+    try {
+      if (!mounted) return;
+      setState(() => _isSubmitting = false);
+
+      // Hand off to the receipt screen, where the user triggers the
+      // Bluetooth print. Printing updates local DB afterward.
+      final bool? success = await Navigator.push<bool>(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ReceiptPreviewPage(
+            receiptId: receiptId,
+            fileNumber: fileNumber,
+            premiumAmount: _calculatedPremium,
+            paidAmount: paidAmount,
+            dueAmount: _dueAmount,
+            collectedBy: collectedBy,
+            collectionDate: collectionDate,
+          ),
+        ),
+      );
+
+      if (success == true && mounted) {
+        // Reset the form after successful print and save
+        setState(() {
+          _selectedLoan = null;
+          _customer = null;
+          _loans = [];
+          _dueAmount = 0.0;
+          _calculatedPremium = 0.0;
+          nicController.clear();
+          lorncontroller.clear();
+          loanAmountController.clear();
+          paidAmountController.clear();
+        });
+        await _loadTodayCollections();
+      }
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => _isSubmitting = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: $e')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -206,10 +292,7 @@ class _CollectionEntryPageState extends State<CollectionEntryPage> {
         shadowColor: appBarShadow,
         leading: IconButton(
           onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => CustomerCollectionHome()),
-            );
+            NavigationHelper.safePop(context);
           },
           icon: Icon(
             Icons.arrow_back_ios,
@@ -226,11 +309,19 @@ class _CollectionEntryPageState extends State<CollectionEntryPage> {
         ),
         actions: [
           IconButton(
+            tooltip: _printerConnected ? 'Printer ready' : 'No printer connected',
+            onPressed: () async {
+              await NavigationHelper.push(context, const AddPrinterPage());
+              await _checkPrinterStatus();
+            },
+            icon: Icon(
+              Icons.bluetooth,
+              color: _printerConnected ? Colors.blue : Colors.grey,
+            ),
+          ),
+          IconButton(
             onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => ProfilePage()),
-              );
+              NavigationHelper.push(context, const ProfilePage());
             },
             icon: Icon(
               Iconsax.user_edit_copy,
@@ -548,75 +639,20 @@ class _CollectionEntryPageState extends State<CollectionEntryPage> {
                             ),
                           ),
                         ),
-
-                        onPressed: () async {
-                          if (_selectedLoan == null) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('Please select a loan first.'),
-                              ),
-                            );
-                            return;
-                          }
-
-                          final paidAmountText = paidAmountController.text;
-                          if (paidAmountText.isEmpty) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('Please enter the paid amount.'),
-                              ),
-                            );
-                            return;
-                          }
-
-                          double paidAmount =
-                              double.tryParse(paidAmountText) ?? 0.0;
-                          String receiptId = DateTime.now()
-                              .millisecondsSinceEpoch
-                              .toString();
-                          String fileNumber = _selectedLoan!.fileNumber;
-                          String collectedBy = _currentUserName;
-
-                          try {
-                            await DatabaseService().insertCollection(
-                              receiptId: receiptId,
-                              fileNumber: fileNumber,
-                              premiumAmount: _calculatedPremium,
-                              paidAmount: paidAmount,
-                              dueAmount: _dueAmount,
-                              collectedBy: collectedBy,
-                            );
-
-                            await _loadTodayCollections();
-
-                            if (!context.mounted) return;
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => ReceiptPreviewPage(
-                                    receiptId: receiptId,
-                                    fileNumber: fileNumber,
-                                    premiumAmount: _calculatedPremium,
-                                    paidAmount: paidAmount,
-                                    dueAmount: _dueAmount,
-                                    collectedBy: collectedBy,
-                                    collectionDate: DateTime.now(),
-                                  ),
+                        onPressed: _isSubmitting ? null : _submitCollection,
+                        child: _isSubmitting
+                            ? const SizedBox(
+                                width: 20,
+                                height: 20,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: Colors.white,
                                 ),
-                              );
-                          } catch (e) {
-                            if (!context.mounted) return;
-                            ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text('Failed to save data: $e'),
-                                ),
-                              );
-                          }
-                        },
-                        child: const Text(
-                          "SUBMIT & PRINT",
-                          style: TextStyle(color: Colors.white),
-                        ),
+                              )
+                            : const Text(
+                                "SUBMIT & PRINT",
+                                style: TextStyle(color: Colors.white),
+                              ),
                       ),
                     ),
                   ],
@@ -726,19 +762,17 @@ class _CollectionEntryPageState extends State<CollectionEntryPage> {
       onTap: () {
         final timeStr = col['collection_date'].toString();
         DateTime collectionTime = DateTime.tryParse(timeStr) ?? DateTime.now();
-        Navigator.push(
+        NavigationHelper.push(
           context,
-          MaterialPageRoute(
-            builder: (context) => ReceiptPreviewPage(
-              receiptId: col['receipt_id'] ?? "",
-              fileNumber: col['file_number'] ?? "",
-              premiumAmount: (col['premium_amount'] as num?)?.toDouble() ?? 0.0,
-              paidAmount: (col['paid_amount'] as num?)?.toDouble() ?? 0.0,
-              dueAmount: (col['due_amount'] as num?)?.toDouble() ?? 0.0,
-              collectedBy: col['collected_by'] ?? "Unknown",
-              collectionDate: collectionTime,
-              isViewOnly: true,
-            ),
+          ReceiptPreviewPage(
+            receiptId: col['receipt_id'] ?? "",
+            fileNumber: col['file_number'] ?? "",
+            premiumAmount: (col['premium_amount'] as num?)?.toDouble() ?? 0.0,
+            paidAmount: (col['paid_amount'] as num?)?.toDouble() ?? 0.0,
+            dueAmount: (col['due_amount'] as num?)?.toDouble() ?? 0.0,
+            collectedBy: col['collected_by'] ?? "Unknown",
+            collectionDate: collectionTime,
+            isViewOnly: true,
           ),
         );
       },
