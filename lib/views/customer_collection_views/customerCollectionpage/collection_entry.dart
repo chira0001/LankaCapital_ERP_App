@@ -163,13 +163,42 @@ class _CollectionEntryPageState extends State<CollectionEntryPage> {
       } else if (loans.isEmpty) {
         setState(() => _errorMessage = 'No loans found for this customer.');
       } else {
+        final fileNumbers = loans.map((l) => l.fileNumber).toList();
+        final double pastDue = await DatabaseService().getTotalPastDueAmount(fileNumbers);
+
         if (mounted) {
-          DialogBox(
-            loans: _loans,
-            nicController: nicController,
-            lorncontroller: lorncontroller,
-            onLoanSelected: _handleLoanSelected,
-          ).showLoanDialog(context);
+          if (pastDue > 0) {
+            await showDialog(
+              context: context,
+              builder: (ctx) => AlertDialog(
+                title: Row(
+                  children: const [
+                    Icon(Icons.warning_amber_rounded, color: Colors.red),
+                    SizedBox(width: 8),
+                    Text("Due Balance Alert"),
+                  ],
+                ),
+                content: Text(
+                  "This customer has a total past due balance of LKR ${pastDue.toStringAsFixed(2)}",
+                  style: const TextStyle(fontSize: 16),
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(ctx),
+                    child: const Text("OK", style: TextStyle(color: Colors.blue)),
+                  ),
+                ],
+              ),
+            );
+          }
+          if (mounted) {
+            DialogBox(
+              loans: _loans,
+              nicController: nicController,
+              lorncontroller: lorncontroller,
+              onLoanSelected: _handleLoanSelected,
+            ).showLoanDialog(context);
+          }
         }
       }
     } catch (e) {

@@ -246,4 +246,38 @@ class DatabaseService {
       debugPrint("Get Employees Error: $e");
     }
   }
+
+  Future<double> getTotalPastDueAmount(List<String> fileNumbers) async {
+    if (fileNumbers.isEmpty) return 0.0;
+    try {
+      final db = await _databaseService.database;
+
+      // Ensure table exists before querying
+      await db?.execute('''
+        CREATE TABLE IF NOT EXISTS daily_collections (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          receipt_id TEXT,
+          file_number TEXT,
+          premium_amount REAL,
+          paid_amount REAL,
+          due_amount REAL,
+          collected_by TEXT,
+          collection_date TEXT
+        )
+      ''');
+
+      final placeholders = List.filled(fileNumbers.length, '?').join(',');
+      final result = await db?.rawQuery(
+        'SELECT SUM(due_amount) as total_due FROM daily_collections WHERE file_number IN ($placeholders)',
+        fileNumbers,
+      );
+      if (result != null && result.isNotEmpty && result.first['total_due'] != null) {
+        return (result.first['total_due'] as num).toDouble();
+      }
+      return 0.0;
+    } catch (e) {
+      debugPrint('Error getting total past due amount: $e');
+      return 0.0;
+    }
+  }
 }

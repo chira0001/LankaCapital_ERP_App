@@ -254,26 +254,26 @@ class _LoanRequestSectionState extends State<LoanRequestSection> {
                   ),
                 ),
                 //debug function for test database
-                InkWell(
-                  borderRadius: BorderRadius.circular(30),
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => DebugView(),
-                        // builder: (context)=> LoanSuccessScreen(),
-                      ),
-                    );
-                  },
-                  child: MainCard(
-                    header: "Debug Section",
-                    description:
-                        "Register and create a loan application   for a first-time borrower.",
-                    cusIconRight: Iconsax.user_add_copy,
-                    iconColor: const Color.fromARGB(255, 153, 0, 255),
-                    iconBackgrouundColor: Color.fromARGB(40, 153, 0, 255),
-                  ),
-                ),
+                // InkWell(
+                //   borderRadius: BorderRadius.circular(30),
+                //   onTap: () {
+                //     Navigator.push(
+                //       context,
+                //       MaterialPageRoute(
+                //         builder: (context) => DebugView(),
+                //         // builder: (context)=> LoanSuccessScreen(),
+                //       ),
+                //     );
+                //   },
+                //   child: MainCard(
+                //     header: "Debug Section",
+                //     description:
+                //         "Register and create a loan application   for a first-time borrower.",
+                //     cusIconRight: Iconsax.user_add_copy,
+                //     iconColor: const Color.fromARGB(255, 153, 0, 255),
+                //     iconBackgrouundColor: Color.fromARGB(40, 153, 0, 255),
+                //   ),
+                // ),
               ],
             ),
           ),
